@@ -29,7 +29,7 @@ ext {
     coreTestingVersion = '2.1.0'
     lifecycleVersion = '2.2.0'
     materialVersion = '1.2.1'
-    roomVersion = '2.2.5'
+    roomVersion = '2.2.6'
     // testing
     junitVersion = '4.13.1'
     espressoVersion = '3.1.0'
