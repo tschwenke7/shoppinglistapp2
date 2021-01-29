@@ -16,7 +16,7 @@ public interface RecipeDao {
     @Query("SELECT * FROM recipes ORDER BY name ASC")
     public LiveData<List<Recipe>> getAllAlphabetical();
 
-    @Query("SELECT * FROM recipes WHERE rowid = :id")
+    @Query("SELECT * FROM recipes WHERE id = :id")
     public Recipe getById(int id);
 
     @Query("SELECT * FROM recipes WHERE name = :name LIMIT 1")

@@ -7,18 +7,16 @@ import androidx.room.ForeignKey;
 import androidx.room.Fts4;
 import androidx.room.PrimaryKey;
 
-@Fts4
 @Entity(tableName = "ingredients",
         foreignKeys = @ForeignKey(
                 entity = Recipe.class,
-                parentColumns = "rowid",
+                parentColumns = "id",
                 childColumns = "recipe_id",
                 onDelete = ForeignKey.CASCADE
         )
 )
 public class Ingredient {
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "rowid")
     private int id;
 
     @NonNull

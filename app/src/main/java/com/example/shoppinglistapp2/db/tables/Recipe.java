@@ -10,7 +10,6 @@ import androidx.room.PrimaryKey;
 
 import java.util.List;
 
-@Fts4
 @Entity(
     tableName = "recipes",
     indices = {@Index(value = {"name"}, unique = true)}//the recipe name must be unique
@@ -18,13 +17,21 @@ import java.util.List;
 public class Recipe {
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "rowid")
     private int id;
 
     @NonNull
     private String name;
 
     private String category;
+
+    /**Preparation time in minutes*/
+    @ColumnInfo(name="prep_time")
+    private int prepTime;
+
+    /**Cooking time in minutes*/
+    @ColumnInfo(name = "cook_time")
+    private int cookTime;
+
     private String url;
     private String notes;
 
@@ -97,5 +104,21 @@ public class Recipe {
 
     public void setIngredients(List<Ingredient> ingredients) {
         this.ingredients = ingredients;
+    }
+
+    public int getPrepTime() {
+        return prepTime;
+    }
+
+    public void setPrepTime(int prepTime) {
+        this.prepTime = prepTime;
+    }
+
+    public int getCookTime() {
+        return cookTime;
+    }
+
+    public void setCookTime(int cookTime) {
+        this.cookTime = cookTime;
     }
 }
