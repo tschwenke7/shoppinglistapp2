@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.RecipeListAdapter;
-import com.example.shoppinglistapp2.db.SlaViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class RecipesFragment extends Fragment {
@@ -35,13 +34,13 @@ public class RecipesFragment extends Fragment {
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
         //initiate viewModel to manage data
-//        viewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(root.getapp)
-//                .create(SlaViewModel.class);
-//
-//        //set observer to update recipe list if it changes
-//        viewModel.getAllRecipes().observe(this, recipes -> {
-//            adapter.submitList(recipes);
-//        });
+        recipesViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getActivity().getApplication())
+                .create(RecipesViewModel.class);
+
+        //set observer to update recipe list if it changes
+        recipesViewModel.getAllRecipes().observe(getViewLifecycleOwner(), recipes -> {
+            adapter.submitList(recipes);
+        });
 
         //setup the new recipe button
         FloatingActionButton newRecipeButton = root.findViewById(R.id.new_recipe_button);

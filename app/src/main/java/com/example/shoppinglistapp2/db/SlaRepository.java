@@ -1,6 +1,7 @@
 package com.example.shoppinglistapp2.db;
 
 import android.app.Application;
+import android.content.Context;
 
 import androidx.lifecycle.LiveData;
 
@@ -16,8 +17,8 @@ public class SlaRepository {
 
     private LiveData<List<Recipe>> allRecipes;
 
-    public SlaRepository(Application application){
-        SlaDatabase db = SlaDatabase.getDatabase(application);
+    public SlaRepository(Context context){
+        SlaDatabase db = SlaDatabase.getDatabase(context);
         ingredientDao = db.ingredientDao();
         recipeDao = db.recipeDao();
         allRecipes = recipeDao.getAllAlphabetical();

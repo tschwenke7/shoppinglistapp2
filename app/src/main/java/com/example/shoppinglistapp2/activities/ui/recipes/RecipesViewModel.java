@@ -1,19 +1,34 @@
 package com.example.shoppinglistapp2.activities.ui.recipes;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class RecipesViewModel extends ViewModel {
+import com.example.shoppinglistapp2.db.SlaRepository;
+import com.example.shoppinglistapp2.db.tables.Recipe;
 
-    private MutableLiveData<String> mText;
+import java.util.List;
 
-    public RecipesViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is home fragment");
+public class RecipesViewModel extends AndroidViewModel {
+
+    private final SlaRepository slaRepository;
+    private final LiveData<List<Recipe>> allRecipes;
+
+    public RecipesViewModel(@NonNull Application application) {
+        super(application);
+        slaRepository = new SlaRepository(application);
+        allRecipes = slaRepository.getAllRecipes();
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public LiveData<List<Recipe>> getAllRecipes(){
+        return allRecipes;
+    }
+
+    public void addNewRecipe(Recipe recipe){
+        slaRepository.insert(recipe);
     }
 }

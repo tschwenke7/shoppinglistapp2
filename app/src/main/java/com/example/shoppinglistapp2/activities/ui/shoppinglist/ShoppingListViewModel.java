@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2.activities.ui.shoppingList;
+package com.example.shoppinglistapp2.activities.ui.shoppinglist;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
