@@ -14,7 +14,7 @@ import java.util.List;
 public interface RecipeDao {
 
     @Query("SELECT * FROM recipes ORDER BY name ASC")
-    public LiveData<List<Recipe>> getAll();
+    public LiveData<List<Recipe>> getAllAlphabetical();
 
     @Query("SELECT * FROM recipes WHERE rowid = :id")
     public Recipe getById(int id);
