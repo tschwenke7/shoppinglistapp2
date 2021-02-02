@@ -5,6 +5,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Fts4;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "ingredients",
@@ -29,6 +30,11 @@ public class Ingredient {
     public Ingredient(@NonNull String name, @NonNull int recipeId){
         this.name = name;
         this.recipeId = recipeId;
+    }
+
+    @Ignore
+    public Ingredient(@NonNull String name){
+        this.name = name;
     }
 
     public int getId() {

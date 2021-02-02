@@ -11,7 +11,7 @@
         android:label="@string/title_recipes"
         tools:layout="@layout/fragment_recipe_list" >
         <action
-            android:id="@+id/action_navigation_recipes_to_newRecipeFragment"
+            android:id="@+id/action_add_new_recipe"
             app:destination="@id/newRecipeFragment" />
     </fragment>
 
@@ -22,10 +22,10 @@
         tools:layout="@layout/fragment_shopping_list" />
     <fragment
         android:id="@+id/newRecipeFragment"
-        android:name="com.example.shoppinglistapp2.activities.ui.recipes.NewRecipeFragment"
+        android:name="com.example.shoppinglistapp2.activities.ui.newrecipe.NewRecipeFragment"
         android:label="NewRecipeFragment" >
         <action
-            android:id="@+id/action_newRecipeFragment_to_navigation_recipes"
+            android:id="@+id/action_save_or_cancel_and_return_to_recipe_list"
             app:destination="@id/navigation_recipes" />
     </fragment>
 

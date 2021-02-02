@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,7 +25,8 @@ public class RecipesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         recipesViewModel =
-                ViewModelProviders.of(this).get(RecipesViewModel.class);
+                new ViewModelProvider(getActivity()).get(RecipesViewModel.class);
+
         View root = inflater.inflate(R.layout.fragment_recipe_list, container, false);
 
         //setup recipe list recyclerview
@@ -32,10 +34,6 @@ public class RecipesFragment extends Fragment {
         final RecipeListAdapter adapter = new RecipeListAdapter(new RecipeListAdapter.RecipeDiff());
         recipeRecyclerView.setAdapter(adapter);
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
-
-        //initiate viewModel to manage data
-        recipesViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getActivity().getApplication())
-                .create(RecipesViewModel.class);
 
         //set observer to update recipe list if it changes
         recipesViewModel.getAllRecipes().observe(getViewLifecycleOwner(), recipes -> {
@@ -45,7 +43,7 @@ public class RecipesFragment extends Fragment {
         //setup the new recipe button
         FloatingActionButton newRecipeButton = root.findViewById(R.id.new_recipe_button);
         newRecipeButton.setOnClickListener(view -> {
-//            Intent intent = new Intent(MainActivity.this)
+            Navigation.findNavController(view).navigate(R.id.action_add_new_recipe);
         });
 
         return root;
