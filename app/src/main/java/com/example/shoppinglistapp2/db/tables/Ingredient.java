@@ -27,9 +27,28 @@ public class Ingredient {
     @ColumnInfo(name = "recipe_id")
     private int recipeId;
 
+    private String qty;
+
+    private String unit;
+
     public Ingredient(@NonNull String name, @NonNull int recipeId){
         this.name = name;
         this.recipeId = recipeId;
+    }
+
+    @Ignore
+    public Ingredient(@NonNull String name, String qty, String unit) {
+        this.name = name;
+        this.qty = qty;
+        this.unit = unit;
+    }
+
+    @Ignore
+    public Ingredient(@NonNull String name, String qty, String unit, int recipeId) {
+        this.name = name;
+        this.recipeId = recipeId;
+        this.qty = qty;
+        this.unit = unit;
     }
 
     @Ignore
@@ -60,5 +79,35 @@ public class Ingredient {
 
     public void setRecipeId(int recipeId) {
         this.recipeId = recipeId;
+    }
+
+    public String getQty() {
+        return qty;
+    }
+
+    public void setQty(String qty) {
+        this.qty = qty;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    @Ignore
+    public String toString(){
+        String str = "";
+        //prepend qty and unit if present to the ingredient's name
+        if (null != qty){
+            str += qty + " ";
+        }
+        if(null != unit){
+            str += unit + " ";
+        }
+
+        return str + name;
     }
 }

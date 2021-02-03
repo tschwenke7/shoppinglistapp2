@@ -83,6 +83,7 @@ public class NewRecipeFragment extends Fragment {
             //save recipe, navigate back to main recipe list page, and display success message
             else{
                 Toast.makeText(this.getContext(), "Recipe \"" + recipe.getName() + "\" saved",Toast.LENGTH_LONG).show();
+                recipesViewModel.clearNewRecipe();//clears the ingredients section
                 Navigation.findNavController(view).navigate(R.id.action_save_or_cancel_and_return_to_recipe_list);
             }
         });
@@ -91,12 +92,18 @@ public class NewRecipeFragment extends Fragment {
         Button cancelRecipeButton = root.findViewById(R.id.cancel_recipe_button);
         cancelRecipeButton.setOnClickListener(view -> {
             Toast.makeText(this.getContext(), "Recipe draft discarded",Toast.LENGTH_LONG).show();
+            recipesViewModel.clearNewRecipe();//clears the ingredients section
             Navigation.findNavController(view).navigate(R.id.action_save_or_cancel_and_return_to_recipe_list);
         });
 
         return root;
     }
 
+    /**
+     * Adds the ingredient/s (separated by newlines) in the edit_text_ingredient
+     * textview to this recipe.
+     * @param view
+     */
     private void addIngredients(View view){
         EditText input = view.getRootView().findViewById(R.id.edit_text_ingredient);
         String inputText = input.getText().toString();
@@ -105,13 +112,14 @@ public class NewRecipeFragment extends Fragment {
         if (!(inputText.isEmpty())){
             //split input in case of multiple lines
             String[] items = inputText.split("(\\r\\n|\\r|\\n)");
-            Log.d("TOM_TEST", "items (split): " + items.toString());
 
+            //send all items to viewModel to be processed/stored
             recipesViewModel.addIngredientToNewRecipe(items);
 
             //clear new item input
             input.setText("");
         }
+        //if nothing was entered, then simply display an error message instead
         else{
             Toast.makeText(this.getContext(), "No ingredient entered", Toast.LENGTH_LONG);
         }
