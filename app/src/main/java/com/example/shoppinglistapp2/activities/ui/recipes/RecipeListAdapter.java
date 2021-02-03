@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2;
+package com.example.shoppinglistapp2.activities.ui.recipes;
 
 import android.view.ViewGroup;
 

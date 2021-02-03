@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2;
+package com.example.shoppinglistapp2.activities.ui.newrecipe;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,8 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
-import com.example.shoppinglistapp2.db.tables.Recipe;
 
 public class IngredientViewHolder extends RecyclerView.ViewHolder {
     private final TextView ingredientNameView;
