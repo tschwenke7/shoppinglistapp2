@@ -20,7 +20,7 @@ public class IngredientViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind (Ingredient ingredient){
-        ingredientNameView.setText(ingredient.getName());
+        ingredientNameView.setText(ingredient.toString());
     }
 
     public static IngredientViewHolder create(ViewGroup parent) {

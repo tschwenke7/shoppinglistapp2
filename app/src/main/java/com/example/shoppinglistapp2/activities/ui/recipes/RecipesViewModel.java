@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel;
 import com.example.shoppinglistapp2.db.SlaRepository;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
+import com.example.shoppinglistapp2.helpers.IngredientUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,7 @@ public class RecipesViewModel extends AndroidViewModel {
         //add each new item to the copy
         for (String ingredientText : ingredients){
             //todo - split into qty and name
-            Ingredient ingredient = new Ingredient(ingredientText);
+            Ingredient ingredient = IngredientUtil.toIngredient(ingredientText);
             temp.add(ingredient);
             Log.d("TOM_TEST", "adding item: " + ingredientText);
         }

@@ -16,7 +16,7 @@ import com.example.shoppinglistapp2.db.tables.Recipe;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Recipe.class, Ingredient.class}, version = 1, exportSchema = false)
+@Database(entities = {Recipe.class, Ingredient.class}, version = 2, exportSchema = false)
 public abstract class SlaDatabase extends RoomDatabase {
     public abstract RecipeDao recipeDao();
     public abstract IngredientDao ingredientDao();
@@ -33,6 +33,7 @@ public abstract class SlaDatabase extends RoomDatabase {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             SlaDatabase.class, "word_database")
                             .addCallback(sRoomDatabaseCallback)
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }
@@ -62,4 +63,6 @@ public abstract class SlaDatabase extends RoomDatabase {
             });
         }
     };
+
+
 }

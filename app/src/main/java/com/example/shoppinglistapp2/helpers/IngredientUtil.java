@@ -71,7 +71,7 @@ public class IngredientUtil {
                     }
 
                     qty += words[i].substring(0,splitIndex+1) + " ";
-                    unit = words[i].substring(splitIndex);
+                    unit = words[i].substring(splitIndex+1);
                 }
 
                 //if it doesn't contain letters, assume it was solely a component of qty
@@ -102,7 +102,10 @@ public class IngredientUtil {
         if ("l".equals(unit)){
             unit = "L";
         }
+        else if ("ml".equals(unit)){
+            unit = "mL";
+        }
 
-        return new Ingredient(qty.trim(),unit,name.trim());
+        return new Ingredient(name.trim(),qty.trim(),unit);
     }
 }
