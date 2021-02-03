@@ -23,7 +23,7 @@ public interface RecipeDao {
     public Recipe getByName(String name);
 
     @Insert
-    public void insertAll(Recipe... recipes);
+    public long insert(Recipe recipe);
 
     @Delete
     public void delete(Recipe recipe);

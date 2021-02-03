@@ -26,6 +26,6 @@ public class SlaViewModel extends AndroidViewModel {
     }
 
     public void addNewRecipe(Recipe recipe){
-        slaRepository.insert(recipe);
+        slaRepository.insertRecipe(recipe);
     }
 }

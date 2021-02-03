@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.shoppinglistapp2.db.SlaRepository;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
@@ -61,10 +60,20 @@ public class RecipesViewModel extends AndroidViewModel {
         newRecipeIngredients.setValue(new ArrayList<>());
     }
 
-    public void addNewRecipe(Recipe recipe){
+    public boolean addNewRecipe(Recipe recipe){
         //insert recipe
-        slaRepository.insert(recipe);
+        long rowId = slaRepository.insertRecipe(recipe);
 
-        //todo - insert each ingredient as well
+        if(rowId == -1){
+            Log.d("TOM_TEST","Error adding recipe. Please try again later.");
+            return false;
+        }
+
+        for(Ingredient ing : newRecipeIngredients.getValue()){
+            ing.setRecipeId((int) rowId);
+            slaRepository.insertIngredient(ing);
+        }
+
+        return true;
     }
 }

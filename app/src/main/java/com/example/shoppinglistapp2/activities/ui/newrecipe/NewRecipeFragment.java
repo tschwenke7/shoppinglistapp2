@@ -67,24 +67,10 @@ public class NewRecipeFragment extends Fragment {
 
         //handle the save recipe button
         Button saveRecipeButton = root.findViewById(R.id.save_recipe_button);
-        saveRecipeButton.setOnClickListener(view -> {
-            //read the contents of the form  and compile into recipe Object for storage
-            Recipe recipe = new Recipe();
-
-            //read name of recipe
-            TextView recipeNameField = root.findViewById(R.id.edit_text_recipe_name);
-            recipe.setName(recipeNameField.getText().toString());
-
-            //validate that fields were entered correctly
-            if (null == recipe.getName()){
-                Toast.makeText(this.getContext(), "Please enter a name for this recipe",Toast.LENGTH_LONG).show();
-            }
-
-            //save recipe, navigate back to main recipe list page, and display success message
-            else{
-                Toast.makeText(this.getContext(), "Recipe \"" + recipe.getName() + "\" saved",Toast.LENGTH_LONG).show();
-                recipesViewModel.clearNewRecipe();//clears the ingredients section
-                Navigation.findNavController(view).navigate(R.id.action_save_or_cancel_and_return_to_recipe_list);
+        saveRecipeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveRecipe(view);
             }
         });
 
@@ -122,6 +108,62 @@ public class NewRecipeFragment extends Fragment {
         //if nothing was entered, then simply display an error message instead
         else{
             Toast.makeText(this.getContext(), "No ingredient entered", Toast.LENGTH_LONG);
+        }
+    }
+
+    private void saveRecipe(View view){
+        View root = view.getRootView();
+        //read the contents of the form  and compile into recipe Object for storage
+        Recipe recipe = new Recipe();
+
+        //read name of recipe
+        TextView recipeNameField = root.findViewById(R.id.edit_text_recipe_name);
+        recipe.setName(recipeNameField.getText().toString());
+
+
+        //read website link
+        TextView urlField = root.findViewById(R.id.edit_text_url);
+        recipe.setUrl(urlField.getText().toString());
+
+        //ingredients are already stored in viewModel, and so don't need to be read
+
+        //read prep time if provided
+        TextView prepTimeField = root.findViewById(R.id.edit_text_prep_time);
+        if(!prepTimeField.getText().toString().isEmpty()){
+            recipe.setPrepTime(Integer.parseInt(prepTimeField.getText().toString()));
+        }
+
+
+        //read cook time if provided
+        TextView cookTimeField = root.findViewById(R.id.edit_text_cook_time);
+        if(!cookTimeField.getText().toString().isEmpty()) {
+            recipe.setCookTime(Integer.parseInt(cookTimeField.getText().toString()));
+        }
+
+        //read notes
+        TextView notesField = root.findViewById(R.id.edit_text_recipe_notes);
+        recipe.setUrl(notesField.getText().toString());
+
+        /* VALIDATION */
+        //check that a recipe name was entered
+        if (null == recipe.getName() || recipe.getName().isEmpty()){
+            Toast.makeText(this.getContext(), "Please enter a name for this recipe",Toast.LENGTH_LONG).show();
+        }
+
+        //todo - check that recipe name is unique
+
+        //save recipe
+        else{
+            //save recipe and show error message if it fails
+            if(!recipesViewModel.addNewRecipe(recipe)){
+                Toast.makeText(getContext(),"Error adding recipe. Please try again later.", Toast.LENGTH_SHORT).show();
+            }
+
+            Log.d("TOM_TEST", "Recipe_id: " + recipe.getId());
+            //navigate back to main recipe list page, and display success message
+            Toast.makeText(this.getContext(), "Recipe \"" + recipe.getName() + "\" saved",Toast.LENGTH_LONG).show();
+            recipesViewModel.clearNewRecipe();//clears the ingredients section
+            Navigation.findNavController(view).navigate(R.id.action_save_or_cancel_and_return_to_recipe_list);
         }
     }
 }

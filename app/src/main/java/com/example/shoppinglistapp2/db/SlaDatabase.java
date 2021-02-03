@@ -47,20 +47,20 @@ public abstract class SlaDatabase extends RoomDatabase {
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
 
-            //todo - work out how to create a sample recipe to test recycler view
-            databaseWriteExecutor.execute(() -> {
-                RecipeDao dao = INSTANCE.recipeDao();
-
-                Recipe recipe = new Recipe();
-                recipe.setName("Sample recipe");
-                recipe.setCookTime(25);
-                recipe.setNotes("Sample notes would go here...");
-                recipe.setTom_rating(2);
-                recipe.setTier_rating(5);
-                recipe.setUrl("www.google.com.au");
-
-                dao.insertAll(recipe);
-            });
+//            //todo - work out how to create a sample recipe to test recycler view
+//            databaseWriteExecutor.execute(() -> {
+//                RecipeDao dao = INSTANCE.recipeDao();
+//
+//                Recipe recipe = new Recipe();
+//                recipe.setName("Sample recipe");
+//                recipe.setCookTime(25);
+//                recipe.setNotes("Sample notes would go here...");
+//                recipe.setTom_rating(2);
+//                recipe.setTier_rating(5);
+//                recipe.setUrl("www.google.com.au");
+//
+//                dao.insert(recipe);
+//            });
         }
     };
 
