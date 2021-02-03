@@ -105,7 +105,7 @@
         app:layout_constraintTop_toBottomOf="@+id/url_heading" />
 
     <EditText
-        android:id="@+id/edit_text_prep_time"
+        android:id="@+id/prep_time"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -114,7 +114,7 @@
         android:inputType="number|text"
         app:layout_constraintBottom_toBottomOf="@+id/prep_time_heading"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/edit_text_cook_time"
+        app:layout_constraintStart_toStartOf="@+id/cook_time"
         app:layout_constraintTop_toTopOf="@+id/prep_time_heading" />
 
     <TextView
@@ -130,7 +130,7 @@
         app:layout_constraintTop_toBottomOf="@+id/prep_time_heading" />
 
     <EditText
-        android:id="@+id/edit_text_cook_time"
+        android:id="@+id/cook_time"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -159,7 +159,7 @@
         app:layout_constraintTop_toBottomOf="@+id/cook_time_heading" />
 
     <EditText
-        android:id="@+id/edit_text_recipe_notes"
+        android:id="@+id/recipe_notes"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -184,7 +184,7 @@
         app:layout_constraintEnd_toStartOf="@+id/cancel_recipe_button"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_text_recipe_notes" />
+        app:layout_constraintTop_toBottomOf="@+id/recipe_notes" />
 
     <Button
         android:id="@+id/cancel_recipe_button"

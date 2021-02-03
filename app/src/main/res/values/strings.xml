@@ -9,7 +9,7 @@
     <string name="notes_heading">Notes</string>
     <string name="url_heading">Website link:</string>
     <string name="prep_time_heading">Prep time (minutes):</string>
-    <string name="cook_time_heading">Total cooking time (minutes):</string>
+    <string name="cook_time_heading">Cooking time (minutes):</string>
 
     <string name="recipe_name_placeholder">Recipe name...</string>
     <string name="add_ingredient_placeholder">New ingredient...</string>
@@ -20,5 +20,9 @@
     <string name="save_recipe_button">Save Recipe</string>
     <string name="cancel_button">Cancel</string>
 
+    <!-- View recipe page -->
+    <string name="view_recipe_website_button">View recipe online</string>
+    <string name="prep_time_heading_short">Prep:</string>
+    <string name="cook_time_heading_short">Cook:</string>
 
 </resources>

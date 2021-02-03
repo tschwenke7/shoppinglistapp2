@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_recipes"
-        android:name="com.example.shoppinglistapp2.activities.ui.recipes.RecipesFragment"
+        android:name="com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipesFragment"
         android:label="@string/title_recipes"
         tools:layout="@layout/fragment_recipe_list" >
         <action
@@ -22,7 +22,7 @@
         tools:layout="@layout/fragment_shopping_list" />
     <fragment
         android:id="@+id/newRecipeFragment"
-        android:name="com.example.shoppinglistapp2.activities.ui.newrecipe.NewRecipeFragment"
+        android:name="com.example.shoppinglistapp2.activities.ui.recipes.newrecipe.NewRecipeFragment"
         android:label="NewRecipeFragment" >
         <action
             android:id="@+id/action_save_or_cancel_and_return_to_recipe_list"

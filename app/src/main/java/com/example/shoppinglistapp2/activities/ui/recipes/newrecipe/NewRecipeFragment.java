@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2.activities.ui.newrecipe;
+package com.example.shoppinglistapp2.activities.ui.recipes.newrecipe;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -121,20 +121,20 @@ public class NewRecipeFragment extends Fragment {
         //ingredients are already stored in viewModel, and so don't need to be read
 
         //read prep time if provided
-        TextView prepTimeField = root.findViewById(R.id.edit_text_prep_time);
+        TextView prepTimeField = root.findViewById(R.id.prep_time);
         if(!prepTimeField.getText().toString().isEmpty()){
             recipe.setPrepTime(Integer.parseInt(prepTimeField.getText().toString()));
         }
 
 
         //read cook time if provided
-        TextView cookTimeField = root.findViewById(R.id.edit_text_cook_time);
+        TextView cookTimeField = root.findViewById(R.id.cook_time);
         if(!cookTimeField.getText().toString().isEmpty()) {
             recipe.setCookTime(Integer.parseInt(cookTimeField.getText().toString()));
         }
 
         //read notes
-        TextView notesField = root.findViewById(R.id.edit_text_recipe_notes);
+        TextView notesField = root.findViewById(R.id.recipe_notes);
         recipe.setUrl(notesField.getText().toString());
 
         /* VALIDATION */

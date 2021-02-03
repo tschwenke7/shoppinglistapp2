@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2.activities.ui.recipes;
+package com.example.shoppinglistapp2.activities.ui.recipes.recipelist;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class RecipesFragment extends Fragment {
