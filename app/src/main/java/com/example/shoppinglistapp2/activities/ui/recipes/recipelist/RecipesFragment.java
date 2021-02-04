@@ -1,6 +1,7 @@
 package com.example.shoppinglistapp2.activities.ui.recipes.recipelist;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +17,9 @@ import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class RecipesFragment extends Fragment {
+public class RecipesFragment extends Fragment implements RecipeListAdapter.OnRecipeClickListener{
 
+    private View root;
     private RecipesViewModel recipesViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -25,17 +27,17 @@ public class RecipesFragment extends Fragment {
         recipesViewModel =
                 new ViewModelProvider(getActivity()).get(RecipesViewModel.class);
 
-        View root = inflater.inflate(R.layout.fragment_recipe_list, container, false);
+        root = inflater.inflate(R.layout.fragment_recipe_list, container, false);
 
         //setup recipe list recyclerview
         RecyclerView recipeRecyclerView = root.findViewById(R.id.recipe_recyclerview);
-        final RecipeListAdapter adapter = new RecipeListAdapter(new RecipeListAdapter.RecipeDiff());
+        final RecipeListAdapter adapter = new RecipeListAdapter(this);
         recipeRecyclerView.setAdapter(adapter);
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
         //set observer to update recipe list if it changes
         recipesViewModel.getAllRecipes().observe(getViewLifecycleOwner(), recipes -> {
-            adapter.submitList(recipes);
+            adapter.setRecipes(recipes);
         });
 
         //setup the new recipe button
@@ -45,5 +47,12 @@ public class RecipesFragment extends Fragment {
         });
 
         return root;
+    }
+
+    @Override
+    public void onRecipeClick(int position) {
+        Log.d("TOM_TEST", "onRecipeClick triggered for item " + position);
+        recipesViewModel.setRecipeToView(position);
+        Navigation.findNavController(root).navigate(R.id.action_recipe_list_to_view_recipe);
     }
 }

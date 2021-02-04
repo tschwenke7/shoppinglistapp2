@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_add_new_recipe"
             app:destination="@id/newRecipeFragment" />
+        <action
+            android:id="@+id/action_recipe_list_to_view_recipe"
+            app:destination="@id/viewRecipeFragment" />
     </fragment>
 
     <fragment
@@ -23,10 +26,17 @@
     <fragment
         android:id="@+id/newRecipeFragment"
         android:name="com.example.shoppinglistapp2.activities.ui.recipes.newrecipe.NewRecipeFragment"
-        android:label="NewRecipeFragment" >
+        android:label="NewRecipeFragment"
+        tools:layout="@layout/fragment_new_recipe">
         <action
             android:id="@+id/action_save_or_cancel_and_return_to_recipe_list"
             app:destination="@id/navigation_recipes" />
     </fragment>
+
+    <fragment
+        android:id="@+id/viewRecipeFragment"
+        android:name="com.example.shoppinglistapp2.activities.ui.recipes.viewrecipe.ViewRecipeFragment"
+        android:label="View Recipe"
+        tools:layout="@layout/fragment_view_recipe"/>
 
 </navigation>

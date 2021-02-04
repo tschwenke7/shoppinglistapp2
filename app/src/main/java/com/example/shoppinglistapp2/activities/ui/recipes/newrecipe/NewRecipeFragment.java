@@ -135,7 +135,7 @@ public class NewRecipeFragment extends Fragment {
 
         //read notes
         TextView notesField = root.findViewById(R.id.recipe_notes);
-        recipe.setUrl(notesField.getText().toString());
+        recipe.setNotes(notesField.getText().toString());
 
         /* VALIDATION */
         //check that a recipe name was entered

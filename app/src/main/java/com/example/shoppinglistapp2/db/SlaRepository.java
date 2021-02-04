@@ -54,4 +54,8 @@ public class SlaRepository {
             ingredientDao.insertAll(ingredients);
         });
     }
+
+    public LiveData<List<Ingredient>> getIngredientsByRecipeId(int id){
+        return ingredientDao.getIngredientsByRecipeId(id);
+    }
 }
