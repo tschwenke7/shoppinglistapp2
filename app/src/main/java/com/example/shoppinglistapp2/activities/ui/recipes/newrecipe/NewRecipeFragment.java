@@ -3,6 +3,7 @@ package com.example.shoppinglistapp2.activities.ui.recipes.newrecipe;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
@@ -32,6 +34,10 @@ public class NewRecipeFragment extends Fragment {
                 new ViewModelProvider(getActivity()).get(RecipesViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_new_recipe, container, false);
+
+        //setup action bar
+        this.setHasOptionsMenu(true);
+
 
         //setup ingredient list recyclerview
         RecyclerView recipeRecyclerView = root.findViewById(R.id.recipe_ingredients_list);
@@ -157,6 +163,29 @@ public class NewRecipeFragment extends Fragment {
             Toast.makeText(this.getContext(), "Recipe \"" + recipe.getName() + "\" saved",Toast.LENGTH_LONG).show();
             recipesViewModel.clearNewRecipe();//clears the ingredients section
             Navigation.findNavController(view).navigate(R.id.action_save_or_cancel_and_return_to_recipe_list);
+        }
+    }
+
+    //hide back button in action bar for this fragment
+    @Override
+    public void onResume() {
+        super.onResume();
+        MainActivity activity = (MainActivity)getActivity();
+        if (activity != null) {
+            activity.showUpButton();
+        }
+    }
+
+    /** Respond to menu items from action bar being pressed */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d("TOM_TEST", "onOptionsItemSelected: " + item.toString());
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                ((MainActivity) getActivity()).onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }

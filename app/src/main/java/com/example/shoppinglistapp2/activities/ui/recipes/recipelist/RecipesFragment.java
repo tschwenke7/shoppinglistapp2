@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -47,6 +48,16 @@ public class RecipesFragment extends Fragment implements RecipeListAdapter.OnRec
         });
 
         return root;
+    }
+
+    //hide back button in action bar for this fragment
+    @Override
+    public void onResume() {
+        super.onResume();
+        MainActivity activity = (MainActivity)getActivity();
+        if (activity != null) {
+            activity.hideUpButton();
+        }
     }
 
     @Override
