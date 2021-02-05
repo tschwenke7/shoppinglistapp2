@@ -4,6 +4,9 @@
     <string name="title_recipes">Recipes</string>
     <string name="title_shopping_list">Shopping List</string>
 
+    <!-- Recipe list page -->
+    <string name="add_recipe_action_title">Add new recipe</string>
+
     <!-- New recipe page -->
     <string name="ingredients_heading">Ingredients</string>
     <string name="notes_heading">Notes</string>

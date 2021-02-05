@@ -7,11 +7,11 @@
 
     <fragment
         android:id="@+id/navigation_recipes"
-        android:name="com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipesFragment"
+        android:name="com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment"
         android:label="@string/title_recipes"
         tools:layout="@layout/fragment_recipe_list" >
         <action
-            android:id="@+id/action_add_new_recipe"
+            android:id="@+id/action_recipe_list_to_new_recipe"
             app:destination="@id/newRecipeFragment"
             app:enterAnim="@android:anim/slide_in_left" />
         <action
