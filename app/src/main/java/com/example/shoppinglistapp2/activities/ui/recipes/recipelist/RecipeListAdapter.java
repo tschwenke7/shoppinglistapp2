@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.ViewHolder> {
@@ -71,29 +70,73 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
         }
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private final TextView recipeNameView;
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+        private final View itemView;
         private OnRecipeClickListener onRecipeClickListener;
 
         public ViewHolder(@NonNull View itemView, OnRecipeClickListener onRecipeClickListener) {
             super(itemView);
-            recipeNameView = itemView.findViewById(R.id.textView);
+            this.itemView = itemView;
+
 
             this.onRecipeClickListener = onRecipeClickListener;
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         public void bind (Recipe recipe){
+            //set name
+            TextView recipeNameView = itemView.findViewById(R.id.recipe_name);
             recipeNameView.setText(recipe.getName());
+
+            //set prep and cook times
+            String timeUnit = itemView.getContext().getString(R.string.abbreviated_time_unit);
+            TextView prepTimeView = itemView.findViewById(R.id.prep_time);
+            if(0 != recipe.getPrepTime()){
+                prepTimeView.setText(String.format("%d %s",recipe.getPrepTime(), timeUnit));
+            }
+            else{
+                prepTimeView.setText("-");
+            }
+            TextView cookTimeView = itemView.findViewById(R.id.cook_time);
+            if(0 != recipe.getCookTime()){
+                cookTimeView.setText(String.format("%d %s",recipe.getCookTime(),timeUnit));
+            }
+            else{
+                cookTimeView.setText("-");
+            }
+
+            //set ratings
+            TextView tierRatingView = itemView.findViewById(R.id.tier_rating);
+            if(recipe.getTier_rating() != 0){
+                tierRatingView.setText(String.format("%d",recipe.getTier_rating()));
+            }
+            else{
+                tierRatingView.setText("-");
+            }
+
+            TextView tomRatingView = itemView.findViewById(R.id.tom_rating);
+            if(recipe.getTom_rating() != 0){
+                tomRatingView.setText(String.format("%d",recipe.getTom_rating()));
+            }
+            else{
+                tomRatingView.setText("-");
+            }
         }
 
         @Override
         public void onClick(View view) {
             onRecipeClickListener.onRecipeClick(getAdapterPosition());
         }
+        @Override
+        public boolean onLongClick(View view) {
+            onRecipeClickListener.onRecipeLongPress(view, getAdapterPosition());
+            return true;
+        }
     }
 
     public interface OnRecipeClickListener {
         void onRecipeClick(int position);
+        boolean onRecipeLongPress(View view, int position);
     }
 }

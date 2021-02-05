@@ -6,6 +6,7 @@
 
     <!-- Recipe list page -->
     <string name="add_recipe_action_title">Add new recipe</string>
+    <string name="default_rating">0</string>
 
     <!-- New recipe page -->
     <string name="ingredients_heading">Ingredients</string>

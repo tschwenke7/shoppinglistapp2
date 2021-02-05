@@ -8,6 +8,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -19,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class RecipeListFragment extends Fragment implements RecipeListAdapter.OnRecipeClickListener{
 
@@ -87,5 +87,13 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         Log.d("TOM_TEST", "onRecipeClick triggered for item " + position);
         recipesViewModel.setRecipeToView(position);
         Navigation.findNavController(root).navigate(R.id.action_recipe_list_to_view_recipe);
+    }
+
+    @Override
+    public boolean onRecipeLongPress(View view, int position) {
+        view.setAlpha(0.5f);
+        Toast.makeText(getContext(),recipesViewModel.getAllRecipes().getValue().get(position).getName(),Toast.LENGTH_SHORT);
+        Log.d("TOM_TEST", "onRecipeLongPress: ");
+        return true;
     }
 }

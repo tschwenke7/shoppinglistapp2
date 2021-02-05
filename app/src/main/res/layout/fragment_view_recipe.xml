@@ -29,6 +29,17 @@
                 app:srcCompat="@drawable/ic_baseline_access_time_24" />
 
             <TextView
+                android:id="@+id/prep_time_heading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/prep_time_heading_short"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/clock_icon"
+                app:layout_constraintTop_toTopOf="@+id/clock_icon" />
+
+            <TextView
                 android:id="@+id/prep_time"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
@@ -42,6 +53,17 @@
 
 
             <TextView
+                android:id="@+id/cook_time_heading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/cook_time_heading_short"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/prep_time"
+                app:layout_constraintTop_toTopOf="@+id/prep_time_heading" />
+
+            <TextView
                 android:id="@+id/cook_time"
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"
@@ -52,30 +74,6 @@
                 app:layout_constraintBottom_toBottomOf="@+id/cook_time_heading"
                 app:layout_constraintStart_toEndOf="@+id/cook_time_heading"
                 app:layout_constraintTop_toTopOf="@+id/cook_time_heading" />
-
-            <TextView
-                android:id="@+id/cook_time_heading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="@string/cook_time_heading_short"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@+id/prep_time"
-                app:layout_constraintTop_toTopOf="@+id/prep_time_heading" />
-
-            <TextView
-                android:id="@+id/prep_time_heading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="@string/prep_time_heading_short"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@+id/prep_time"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/clock_icon"
-                app:layout_constraintTop_toTopOf="@+id/clock_icon" />
 
             <Button
                 android:id="@+id/recipe_url_button"

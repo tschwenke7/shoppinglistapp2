@@ -127,7 +127,7 @@ public class NewRecipeFragment extends Fragment {
         //ingredients are already stored in viewModel, and so don't need to be read
 
         //read prep time if provided
-        TextView prepTimeField = root.findViewById(R.id.prep_time);
+        TextView prepTimeField = root.findViewById(R.id.prep_time_heading);
         if(!prepTimeField.getText().toString().isEmpty()){
             recipe.setPrepTime(Integer.parseInt(prepTimeField.getText().toString()));
         }
