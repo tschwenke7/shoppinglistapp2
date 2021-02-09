@@ -1,6 +1,5 @@
 package com.example.shoppinglistapp2.db;
 
-import android.app.Application;
 import android.content.Context;
 
 import androidx.lifecycle.LiveData;
@@ -59,9 +58,9 @@ public class SlaRepository {
         return ingredientDao.getIngredientsByRecipeId(id);
     }
 
-    public void deleteRecipe(Recipe recipe){
+    public void deleteRecipe(Recipe... recipes){
         SlaDatabase.databaseWriteExecutor.execute(() -> {
-            recipeDao.delete(recipe);
+            recipeDao.deleteAll(recipes);
         });
     }
 }

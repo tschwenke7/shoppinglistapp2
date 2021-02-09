@@ -6,7 +6,15 @@
 
     <!-- Recipe list page -->
     <string name="add_recipe_action_title">Add new recipe</string>
+    <string name="add_all_to_list_action_title">Add all ingredients to list</string>
+    <string name="delete_recipe_action_title">Delete recipe</string>
     <string name="default_rating">0</string>
+
+    <string name="delete_warning_title">Delete recipes</string>
+    <string name="delete_warning_prompt1">Are you sure you want to permanently delete</string>
+    <string name="delete_warning_prompt2">recipe/s?</string>
+    <string name="delete_warning_yes_button">Delete</string>
+    <string name="delete_warning_cancel_button">Cancel</string>
 
     <!-- New recipe page -->
     <string name="ingredients_heading">Ingredients</string>

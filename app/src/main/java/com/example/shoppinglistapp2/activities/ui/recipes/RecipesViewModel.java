@@ -92,8 +92,7 @@ public class RecipesViewModel extends AndroidViewModel {
         currentRecipeIngredients = slaRepository.getIngredientsByRecipeId(currentRecipe.getId());
     }
 
-    public void deleteRecipe(int position){
-        Recipe recipe = allRecipes.getValue().get(position);
-        slaRepository.deleteRecipe(recipe);
+    public void deleteRecipes(Recipe... recipes){
+        slaRepository.deleteRecipe(recipes);
     }
 }

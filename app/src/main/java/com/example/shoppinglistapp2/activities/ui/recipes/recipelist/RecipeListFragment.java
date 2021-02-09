@@ -1,7 +1,9 @@
 package com.example.shoppinglistapp2.activities.ui.recipes.recipelist;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,6 +13,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -25,6 +30,9 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
     private View root;
     private RecipesViewModel recipesViewModel;
+    private ActionMode actionMode;
+    private ActionMode.Callback actionModeCallback = new ActionModeCallback();
+    private RecipeListAdapter adapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -39,7 +47,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         //setup recipe list recyclerview
         RecyclerView recipeRecyclerView = root.findViewById(R.id.recipe_recyclerview);
-        final RecipeListAdapter adapter = new RecipeListAdapter(this);
+        adapter = new RecipeListAdapter(this);
         recipeRecyclerView.setAdapter(adapter);
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
@@ -91,12 +99,79 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
     @Override
     public boolean onRecipeLongPress(View view, int position) {
+        if (actionMode == null){
+            actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallback);
+        }
+
+        //check if all items have been deselected to close actionMode
+        if (adapter.getSelectedItemCount() == 0){
+            actionMode.finish();
+        }
+        //otherwise update the heading
+        else {
+            //change the title to say how many recipes are selected
+            actionMode.setTitle(String.format("%d recipe/s selected",adapter.getSelectedItemCount()));
+            actionMode.invalidate();
+        }
 
         return true;
     }
 
-//    @Override
-//    public void onRecipeDeleteClick(int position){
-//        recipesViewModel.deleteRecipe(position);
-//    }
+    /**Creates and handles a contextual action bar for when one or more recipes are selected */
+    private class ActionModeCallback implements ActionMode.Callback{
+
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            actionMode.getMenuInflater().inflate(R.menu.recipe_selected_action_bar, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            switch (menuItem.getItemId()){
+                case R.id.action_add_all_to_list:
+
+                    //TODO - add all ingredients from these recipes to the shopping list
+                    actionMode.finish();
+                    return true;
+
+                //Handle clicking of delete button
+                case R.id.action_delete_recipe:
+                    //prompt for confirmation first
+                    new AlertDialog.Builder(root.getContext())
+                            .setTitle(R.string.delete_warning_title)
+                            .setMessage(String.format("%s %d %s",
+                                    root.getContext().getString(R.string.delete_warning_prompt1),
+                                    adapter.getSelectedItemCount(),
+                                    root.getContext().getString(R.string.delete_warning_prompt2)))
+                            .setPositiveButton(R.string.delete_warning_yes_button, new DialogInterface.OnClickListener() {
+                                //actually delete selected recipes if confirmed
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    recipesViewModel.deleteRecipes(adapter.getSelectedItems());
+                                    actionMode.finish();//remove action bar
+                                }
+                            })
+                            //otherwise don't do anything
+                            .setNegativeButton(R.string.delete_warning_cancel_button, null)
+                            .show();
+
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            adapter.clearSelections();
+            actionMode = null;
+        }
+    }
 }
