@@ -24,9 +24,10 @@ import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 
-public class NewRecipeFragment extends Fragment implements IngredientListEditorAdapter.ItemClickListener {
+public class RecipeEditorFragment extends Fragment implements IngredientListEditorAdapter.ItemClickListener {
     private RecipesViewModel recipesViewModel;
     private Recipe currentRecipe;
+    private boolean newRecipeFlag = false;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -38,10 +39,19 @@ public class NewRecipeFragment extends Fragment implements IngredientListEditorA
 
         //load the recipe to be displayed, or a blank one if there was none
         currentRecipe = recipesViewModel.getCurrentRecipe();
+        if(currentRecipe == null){
+            newRecipeFlag = true;
+            recipesViewModel.initialiseNewRecipe();
+            currentRecipe = recipesViewModel.getCurrentRecipe();
+        }
+
+        //if the editor is being opened for an existing recipe, prefill the fields with the saved data
+        if(!newRecipeFlag){
+            populateEditor(root, currentRecipe);
+        }
 
         //setup action bar
         this.setHasOptionsMenu(true);
-
 
         //setup ingredient list recyclerview
         RecyclerView recipeRecyclerView = root.findViewById(R.id.recipe_ingredients_list);
@@ -50,10 +60,10 @@ public class NewRecipeFragment extends Fragment implements IngredientListEditorA
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
         //set observer to update recipe list if it changes
-        recipesViewModel.getNewRecipeIngredients().observe(getViewLifecycleOwner(), newRecipeIngredients -> {
-            adapter.submitList(newRecipeIngredients);
+        recipesViewModel.getCurrentRecipeIngredients().observe(getViewLifecycleOwner(), currentRecipeIngredients -> {
+            adapter.submitList(currentRecipeIngredients);
             Log.d("TOM_TEST", "Ingredients list observer triggered.");
-            for (Ingredient ing: newRecipeIngredients){
+            for (Ingredient ing: currentRecipeIngredients){
                 Log.d("TOM_TEST", ing.getName());
             }
 
@@ -80,12 +90,33 @@ public class NewRecipeFragment extends Fragment implements IngredientListEditorA
         //handle the cancel recipe button
         Button cancelRecipeButton = root.findViewById(R.id.cancel_recipe_button);
         cancelRecipeButton.setOnClickListener(view -> {
-            Toast.makeText(this.getContext(), "Recipe draft discarded",Toast.LENGTH_LONG).show();
-            recipesViewModel.clearNewRecipe();//clears the ingredients section
+            deleteRecipe();
+
+            //navigate back to recipe list
             Navigation.findNavController(view).navigate(R.id.action_save_or_cancel_and_return_to_recipe_list);
         });
 
         return root;
+    }
+
+    private void populateEditor(View root, Recipe currentRecipe) {
+        //name
+        ((TextView) root.findViewById(R.id.recipe_name)).setText(currentRecipe.getName());
+
+        //prep and cook time
+        ((TextView) root.findViewById(R.id.prep_time)).setText(currentRecipe.getPrepTime());
+        ((TextView) root.findViewById(R.id.cook_time)).setText(currentRecipe.getCookTime());
+
+        //ingredients taken care of by recyclerview and currentRecipeIngredients LiveData
+        //url
+        if(null != currentRecipe.getUrl() && !currentRecipe.getUrl().isEmpty()){
+            ((TextView) root.findViewById(R.id.edit_text_url)).setText(currentRecipe.getUrl());
+        }
+
+        //notes
+        if(null != currentRecipe.getNotes() && !currentRecipe.getNotes().isEmpty()){
+            ((TextView) root.findViewById(R.id.recipe_notes)).setText(currentRecipe.getNotes());
+        }
     }
 
     /**
@@ -103,7 +134,7 @@ public class NewRecipeFragment extends Fragment implements IngredientListEditorA
             String[] items = inputText.split("(\\r\\n|\\r|\\n)");
 
             //send all items to viewModel to be processed/stored
-            recipesViewModel.addIngredientToNewRecipe(items);
+            recipesViewModel.addIngredientsToCurrentRecipe(items);
 
             //clear new item input
             input.setText("");
@@ -152,21 +183,37 @@ public class NewRecipeFragment extends Fragment implements IngredientListEditorA
             Toast.makeText(this.getContext(), "Please enter a name for this recipe",Toast.LENGTH_LONG).show();
         }
 
-        //todo - check that recipe name is unique
+        //check that the name is unique
+        else if (!recipesViewModel.recipeNameIsUnique(recipe.getName())){
+            Toast.makeText(this.getContext(), "This recipe name is already in use - please choose another",Toast.LENGTH_LONG).show();
+        }
 
         //save recipe
         else{
-            //save recipe and show error message if it fails
-            if(!recipesViewModel.addNewRecipe(recipe)){
-                Toast.makeText(getContext(),"Error adding recipe. Please try again later.", Toast.LENGTH_SHORT).show();
-            }
+            //update the database entry for recipe accordingly
+            recipesViewModel.updateRecipe(recipe);
 
-            Log.d("TOM_TEST", "Recipe_id: " + recipe.getId());
-            //navigate back to main recipe list page, and display success message
-            Toast.makeText(this.getContext(), "Recipe \"" + recipe.getName() + "\" saved",Toast.LENGTH_LONG).show();
-            recipesViewModel.clearNewRecipe();//clears the ingredients section
-            Navigation.findNavController(view).navigate(R.id.action_save_or_cancel_and_return_to_recipe_list);
+            //if this was a new recipe, return to recipe list
+            if(newRecipeFlag){
+                Toast.makeText(this.getContext(), "Recipe \"" + recipe.getName() + "\" saved",Toast.LENGTH_LONG).show();
+                Navigation.findNavController(view).navigate(R.id.action_save_or_cancel_and_return_to_recipe_list);
+            }
+            //if it was an existing recipe, return to its viewRecipe
+            else{
+                Toast.makeText(this.getContext(), "Recipe \"" + recipe.getName() + "\" updated",Toast.LENGTH_LONG).show();
+                Navigation.findNavController(view).navigate(R.id.action_recipe_editor_to_view_recipe);
+            }
         }
+    }
+
+    private void deleteRecipe() {
+        //if this was a new recipe, the button should fully delete the recipe being edited
+        if (newRecipeFlag){
+            Toast.makeText(this.getContext(), "Recipe draft discarded",Toast.LENGTH_LONG).show();
+            //delete the recipe from db
+            recipesViewModel.deleteRecipes(currentRecipe);
+        }
+
     }
 
     //hide back button in action bar for this fragment
@@ -176,6 +223,22 @@ public class NewRecipeFragment extends Fragment implements IngredientListEditorA
         MainActivity activity = (MainActivity)getActivity();
         if (activity != null) {
             activity.showUpButton();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(newRecipeFlag){
+            deleteRecipe();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(newRecipeFlag){
+            deleteRecipe();
         }
     }
 
@@ -196,4 +259,6 @@ public class NewRecipeFragment extends Fragment implements IngredientListEditorA
     public void onDeleteClicked(int position) {
 
     }
+
+
 }

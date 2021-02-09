@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -94,7 +95,9 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     public void onRecipeClick(int position) {
         Log.d("TOM_TEST", "onRecipeClick triggered for item " + position);
         recipesViewModel.setRecipeToView(position);
-        Navigation.findNavController(root).navigate(R.id.action_recipe_list_to_view_recipe);
+        RecipeListFragmentDirections.ActionRecipeListToViewRecipe action = RecipeListFragmentDirections.actionRecipeListToViewRecipe();
+        action.setRecipePosition(position);
+        Navigation.findNavController(root).navigate(action);
     }
 
     @Override
@@ -153,6 +156,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                                 //actually delete selected recipes if confirmed
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
+                                    Toast.makeText(root.getContext(), String.format("Deleted %d recipes", adapter.getSelectedItemCount()), Toast.LENGTH_LONG).show();
                                     recipesViewModel.deleteRecipes(adapter.getSelectedItems());
                                     actionMode.finish();//remove action bar
                                 }

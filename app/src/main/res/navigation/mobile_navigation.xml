@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_recipe_list" >
         <action
             android:id="@+id/action_recipe_list_to_new_recipe"
-            app:destination="@id/newRecipeFragment"
+            app:destination="@id/recipeEditorFragment"
             app:enterAnim="@android:anim/slide_in_left" />
         <action
             android:id="@+id/action_recipe_list_to_view_recipe"
@@ -26,13 +26,20 @@
         android:label="@string/title_shopping_list"
         tools:layout="@layout/fragment_shopping_list" />
     <fragment
-        android:id="@+id/newRecipeFragment"
-        android:name="com.example.shoppinglistapp2.activities.ui.recipes.newrecipe.NewRecipeFragment"
+        android:id="@+id/recipeEditorFragment"
+        android:name="com.example.shoppinglistapp2.activities.ui.recipes.newrecipe.RecipeEditorFragment"
         android:label="Create New Recipe"
         tools:layout="@layout/fragment_new_recipe">
         <action
             android:id="@+id/action_save_or_cancel_and_return_to_recipe_list"
             app:destination="@id/navigation_recipes" />
+        <action
+            android:id="@+id/action_recipe_editor_to_view_recipe"
+            app:destination="@id/viewRecipeFragment" />
+        <argument
+            android:name="recipePosition"
+            app:argType="integer"
+            android:defaultValue="-1" />
     </fragment>
 
     <fragment
@@ -43,6 +50,12 @@
         <action
             android:id="@+id/action_view_recipe_to_recipe_list"
             app:destination="@id/navigation_recipes" />
+        <action
+            android:id="@+id/action_view_recipe_to_recipe_editor"
+            app:destination="@id/recipeEditorFragment" />
+        <argument android:name="recipePosition"
+            app:argType="integer"
+            android:defaultValue="-1" />
     </fragment>
 
 </navigation>

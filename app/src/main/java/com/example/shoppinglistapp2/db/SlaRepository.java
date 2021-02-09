@@ -63,4 +63,38 @@ public class SlaRepository {
             recipeDao.deleteAll(recipes);
         });
     }
+
+    public Recipe getRecipeByName(String name){
+        Callable<Recipe> queryCallable = () -> recipeDao.getByName(name);
+
+        Future<Recipe> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
+        try {
+            return future.get();
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+            return null;
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean recipeNameIsUnique(String name){
+        Callable<Recipe> queryCallable = () -> recipeDao.getByName(name);
+
+        Future<Recipe> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
+        try {
+            return null == future.get();
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+            return false;
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void updateRecipe(Recipe recipe) {
+        recipeDao.updateRecipe(recipe);
+    }
 }
