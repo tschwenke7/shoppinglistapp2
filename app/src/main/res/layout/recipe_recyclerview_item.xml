@@ -10,20 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="12dp"
-        app:cardBackgroundColor="#D6D6D6"
+        app:cardBackgroundColor="@color/recipe_item_background"
         app:cardCornerRadius="8dp"
         app:cardElevation="2dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.9" />
 
             <TextView
                 android:id="@+id/recipe_name"
@@ -34,21 +27,10 @@
                 android:text="@string/recipe_name_placeholder"
                 android:textAlignment="viewStart"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                app:layout_constraintEnd_toStartOf="@+id/guideline4"
+                android:textColor="@color/recipe_item_text_primary"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/delete_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/guideline4"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_baseline_delete_24" />
 
             <ImageView
                 android:id="@+id/clock_icon"
@@ -59,7 +41,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/recipe_name"
-                app:srcCompat="@drawable/ic_baseline_access_time_24" />
+                app:srcCompat="@drawable/ic_baseline_access_time_24"
+                app:tint="@color/recipe_item_text_secondary"/>
 
             <TextView
                 android:id="@+id/prep_time_heading"
@@ -67,6 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:text="@string/prep_time_heading_short"
+                android:textColor="@color/recipe_item_text_secondary"
                 app:layout_constraintBottom_toBottomOf="@+id/clock_icon"
                 app:layout_constraintStart_toEndOf="@+id/clock_icon"
                 app:layout_constraintTop_toTopOf="@+id/clock_icon" />
@@ -77,6 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
                 android:text="15 mins"
+                android:textColor="@color/recipe_item_text_secondary"
                 app:layout_constraintStart_toEndOf="@+id/prep_time_heading"
                 app:layout_constraintTop_toTopOf="@+id/prep_time_heading" />
 
@@ -86,6 +71,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:text="@string/cook_time_heading_short"
+                android:textColor="@color/recipe_item_text_secondary"
                 app:layout_constraintBottom_toBottomOf="@+id/clock_icon"
                 app:layout_constraintStart_toEndOf="@+id/prep_time"
                 app:layout_constraintTop_toTopOf="@+id/clock_icon" />
@@ -96,6 +82,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
                 android:text="180 mins"
+                android:textColor="@color/recipe_item_text_secondary"
                 app:layout_constraintStart_toEndOf="@+id/cook_time_heading"
                 app:layout_constraintTop_toTopOf="@+id/prep_time_heading" />
 
@@ -103,9 +90,9 @@
                 android:id="@+id/star_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="80dp"
+                android:layout_marginEnd="84dp"
                 app:layout_constraintBottom_toBottomOf="@+id/clock_icon"
-                app:layout_constraintEnd_toStartOf="@+id/guideline4"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/clock_icon"
                 app:srcCompat="@drawable/ic_star_orange" />
 
@@ -116,7 +103,8 @@
                 app:layout_constraintBottom_toBottomOf="@+id/clock_icon"
                 app:layout_constraintStart_toEndOf="@+id/star_icon"
                 app:layout_constraintTop_toTopOf="@+id/clock_icon"
-                app:srcCompat="@drawable/ic_tiernan_face" />
+                app:srcCompat="@drawable/ic_tiernan_face"
+                app:tint="@color/recipe_item_text_secondary" />
 
             <TextView
                 android:id="@+id/tier_rating"
@@ -124,6 +112,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:text="@string/default_rating"
+                android:textColor="@color/recipe_item_text_secondary"
                 app:layout_constraintBottom_toBottomOf="@+id/tiernan_face"
                 app:layout_constraintStart_toEndOf="@+id/tiernan_face"
                 app:layout_constraintTop_toTopOf="@+id/tiernan_face" />
@@ -135,7 +124,8 @@
                 android:layout_marginStart="16dp"
                 app:layout_constraintStart_toEndOf="@+id/tiernan_face"
                 app:layout_constraintTop_toTopOf="@+id/tiernan_face"
-                app:srcCompat="@drawable/ic_tom_face" />
+                app:srcCompat="@drawable/ic_tom_face"
+                app:tint="@color/recipe_item_text_secondary"/>
 
             <TextView
                 android:id="@+id/tom_rating"
@@ -143,9 +133,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:text="0"
+                android:textColor="@color/recipe_item_text_secondary"
                 app:layout_constraintBottom_toBottomOf="@+id/tom_face"
                 app:layout_constraintStart_toEndOf="@+id/tom_face"
-                app:layout_constraintTop_toTopOf="@+id/tom_face" />
+                app:layout_constraintTop_toTopOf="@+id/tom_face"
+                app:layout_constraintVertical_bias="0.4" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

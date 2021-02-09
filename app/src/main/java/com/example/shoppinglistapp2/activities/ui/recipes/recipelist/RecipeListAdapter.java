@@ -17,6 +17,7 @@ import java.util.List;
 public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.ViewHolder> {
     private List<Recipe> recipes;
     private OnRecipeClickListener onRecipeClickListener;
+    private int selectedPos = RecyclerView.NO_POSITION;
 
     public RecipeListAdapter(OnRecipeClickListener onRecipeClickListener){
         this.onRecipeClickListener = onRecipeClickListener;
@@ -32,6 +33,7 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Recipe current = getItem(position);
+        holder.itemView.setSelected(selectedPos == position);
         holder.bind(current);
     }
 
@@ -78,7 +80,7 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
             super(itemView);
             this.itemView = itemView;
 
-
+            //set click listeners
             this.onRecipeClickListener = onRecipeClickListener;
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
@@ -130,6 +132,22 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
         }
         @Override
         public boolean onLongClick(View view) {
+            //if this item was already selected, deselect
+            if(selectedPos == getAdapterPosition()){
+                selectedPos = RecyclerView.NO_POSITION;
+                notifyItemChanged(getAdapterPosition());
+            }
+            //otherwise select this item
+            else{
+                //deselect old selected item
+                notifyItemChanged(selectedPos);
+                //select this item
+                selectedPos = getAdapterPosition();
+                notifyItemChanged(selectedPos);
+            }
+
+
+            //call owner's click handler
             onRecipeClickListener.onRecipeLongPress(view, getAdapterPosition());
             return true;
         }

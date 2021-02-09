@@ -58,4 +58,10 @@ public class SlaRepository {
     public LiveData<List<Ingredient>> getIngredientsByRecipeId(int id){
         return ingredientDao.getIngredientsByRecipeId(id);
     }
+
+    public void deleteRecipe(Recipe recipe){
+        SlaDatabase.databaseWriteExecutor.execute(() -> {
+            recipeDao.delete(recipe);
+        });
+    }
 }

@@ -91,9 +91,12 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
     @Override
     public boolean onRecipeLongPress(View view, int position) {
-        view.setAlpha(0.5f);
-        Toast.makeText(getContext(),recipesViewModel.getAllRecipes().getValue().get(position).getName(),Toast.LENGTH_SHORT);
-        Log.d("TOM_TEST", "onRecipeLongPress: ");
+
         return true;
     }
+
+//    @Override
+//    public void onRecipeDeleteClick(int position){
+//        recipesViewModel.deleteRecipe(position);
+//    }
 }
