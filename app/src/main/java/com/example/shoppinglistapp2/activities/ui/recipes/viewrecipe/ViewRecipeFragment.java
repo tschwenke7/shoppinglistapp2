@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
-import com.example.shoppinglistapp2.activities.ui.recipes.newrecipe.IngredientListAdapter;
+import com.example.shoppinglistapp2.activities.ui.recipes.newrecipe.IngredientListEditorAdapter;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 
 public class ViewRecipeFragment extends Fragment {
@@ -40,7 +40,7 @@ public class ViewRecipeFragment extends Fragment {
 
         //setup ingredient list recyclerview
         RecyclerView recipeRecyclerView = root.findViewById(R.id.recipe_ingredients_list);
-        final IngredientListAdapter adapter = new IngredientListAdapter(new IngredientListAdapter.IngredientDiff());
+        final IngredientListEditorAdapter adapter = new IngredientListEditorAdapter(new IngredientListEditorAdapter.IngredientDiff());
         recipeRecyclerView.setAdapter(adapter);
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 

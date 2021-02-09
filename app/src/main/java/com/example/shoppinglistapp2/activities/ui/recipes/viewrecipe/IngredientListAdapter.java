@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2.activities.ui.recipes.newrecipe;
+package com.example.shoppinglistapp2.activities.ui.recipes.viewrecipe;
 
 import android.view.ViewGroup;
 
@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
+import com.example.shoppinglistapp2.activities.ui.recipes.newrecipe.IngredientListEditorAdapter;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 
 public class IngredientListAdapter extends ListAdapter<Ingredient, IngredientViewHolder> {
@@ -18,6 +19,7 @@ public class IngredientListAdapter extends ListAdapter<Ingredient, IngredientVie
     public IngredientViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return IngredientViewHolder.create(parent);
     }
+
 
     @Override
     public void onBindViewHolder(@NonNull IngredientViewHolder holder, int position) {

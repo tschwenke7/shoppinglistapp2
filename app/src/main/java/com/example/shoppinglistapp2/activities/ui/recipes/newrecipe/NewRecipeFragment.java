@@ -24,8 +24,9 @@ import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 
-public class NewRecipeFragment extends Fragment {
+public class NewRecipeFragment extends Fragment implements IngredientListEditorAdapter.ItemClickListener {
     private RecipesViewModel recipesViewModel;
+    private Recipe currentRecipe;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -35,13 +36,16 @@ public class NewRecipeFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_new_recipe, container, false);
 
+        //load the recipe to be displayed, or a blank one if there was none
+        currentRecipe = recipesViewModel.getCurrentRecipe();
+
         //setup action bar
         this.setHasOptionsMenu(true);
 
 
         //setup ingredient list recyclerview
         RecyclerView recipeRecyclerView = root.findViewById(R.id.recipe_ingredients_list);
-        final IngredientListAdapter adapter = new IngredientListAdapter(new IngredientListAdapter.IngredientDiff());
+        final IngredientListEditorAdapter adapter = new IngredientListEditorAdapter(new IngredientListEditorAdapter.IngredientDiff(), this);
         recipeRecyclerView.setAdapter(adapter);
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
@@ -186,5 +190,10 @@ public class NewRecipeFragment extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onDeleteClicked(int position) {
+
     }
 }

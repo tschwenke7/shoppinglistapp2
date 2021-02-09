@@ -24,8 +24,8 @@ public class RecipesViewModel extends AndroidViewModel {
 
     private MutableLiveData<List<Ingredient>> newRecipeIngredients;
 
-    private Recipe currentRecipe;
-    private LiveData<List<Ingredient>> currentRecipeIngredients;
+    private Recipe currentRecipe = null;
+    private LiveData<List<Ingredient>> currentRecipeIngredients = null;
 
     public RecipesViewModel(@NonNull Application application) {
         super(application);
@@ -49,6 +49,10 @@ public class RecipesViewModel extends AndroidViewModel {
 
     public LiveData<List<Ingredient>> getCurrentRecipeIngredients() {
         return currentRecipeIngredients;
+    }
+
+    public void deleteRecipeIngredientAtPosition(int position){
+
     }
 
     public void addIngredientToNewRecipe(String... ingredients){
