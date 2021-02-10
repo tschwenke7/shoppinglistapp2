@@ -171,7 +171,7 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
         /* VALIDATION */
         Log.d(TAG, "saveRecipe");
         //check that a recipe name was entered
-        if (null == recipeName || recipeName.isEmpty()){
+        if (recipeName.isEmpty()){
             Log.d(TAG, "saveRecipe: no name");
             Toast.makeText(this.getContext(), "Please enter a name for this recipe",Toast.LENGTH_LONG).show();
         }
@@ -250,14 +250,6 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
             deleteRecipe();
         }
     }
-
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        if(newRecipeFlag){
-//            saveRecipe();
-//        }
-//    }
 
     /** Respond to menu items from action bar being pressed */
     @Override

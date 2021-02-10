@@ -36,10 +36,14 @@
         tools:layout="@layout/fragment_recipe_editor">
         <action
             android:id="@+id/action_save_or_cancel_and_return_to_recipe_list"
-            app:destination="@id/navigation_recipes" />
+            app:destination="@id/navigation_recipes"
+            app:popUpTo="@id/navigation_recipes"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_recipe_editor_to_view_recipe"
-            app:destination="@id/viewRecipeFragment" />
+            app:destination="@id/viewRecipeFragment"
+            app:popUpTo="@id/viewRecipeFragment"
+            app:popUpToInclusive="true" />
         <argument
             android:name="recipeId"
             android:defaultValue="-1"
@@ -60,7 +64,8 @@
             app:destination="@id/navigation_recipes" />
         <action
             android:id="@+id/action_view_recipe_to_recipe_editor"
-            app:destination="@id/recipeEditorFragment" >
+            app:destination="@id/recipeEditorFragment"
+            app:popUpToInclusive="false">
             <argument
                 android:name="newRecipeFlag"
                 android:defaultValue="false" />
