@@ -112,4 +112,8 @@ public class SlaRepository {
             return null;
         }
     }
+
+    public void deleteIngredients(Ingredient... ingredients) {
+        SlaDatabase.databaseWriteExecutor.execute(() -> ingredientDao.deleteAll(ingredients));
+    }
 }

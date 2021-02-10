@@ -58,8 +58,8 @@ public class RecipesViewModel extends AndroidViewModel {
         return slaRepository.getIngredientsByRecipeId(id);
     }
 
-    public void deleteRecipeIngredientAtPosition(int position){
-
+    public void deleteIngredients(Ingredient... ingredients){
+        slaRepository.deleteIngredients(ingredients);
     }
 
     public void addIngredientsToRecipe(int recipeId, String... ingredients){

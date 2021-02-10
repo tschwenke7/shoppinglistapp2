@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,11 +22,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
+import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
+
+import java.util.List;
 
 public class RecipeEditorFragment extends Fragment implements IngredientListEditorAdapter.ItemClickListener {
     private RecipesViewModel recipesViewModel;
     private Recipe currentRecipe;
+    private LiveData<List<Ingredient>> currentIngredients;
     private View root;
     private boolean newRecipeFlag;
     private boolean saved = false;
@@ -61,8 +66,8 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
         //set observer to update ingredient list when it changes
-        recipesViewModel.getRecipeIngredientsById(currentRecipe.getId())
-                .observe(getViewLifecycleOwner(), currentRecipeIngredients -> {
+        currentIngredients = recipesViewModel.getRecipeIngredientsById(currentRecipe.getId());
+        currentIngredients.observe(getViewLifecycleOwner(), currentRecipeIngredients -> {
             adapter.submitList(currentRecipeIngredients);
         });
 
@@ -265,7 +270,10 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
     }
 
     @Override
+    /**
+     * Delete a recipe item when its delete icon is clicked
+     */
     public void onDeleteClicked(int position) {
-
+        recipesViewModel.deleteIngredients(currentIngredients.getValue().get(position));
     }
 }
