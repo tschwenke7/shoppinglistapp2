@@ -64,8 +64,7 @@
             app:destination="@id/navigation_recipes" />
         <action
             android:id="@+id/action_view_recipe_to_recipe_editor"
-            app:destination="@id/recipeEditorFragment"
-            app:popUpToInclusive="false">
+            app:destination="@id/recipeEditorFragment">
             <argument
                 android:name="newRecipeFlag"
                 android:defaultValue="false" />

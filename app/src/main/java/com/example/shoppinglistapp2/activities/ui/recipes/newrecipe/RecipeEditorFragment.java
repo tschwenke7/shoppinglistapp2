@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
+import com.example.shoppinglistapp2.activities.ui.KeyboardHider;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
@@ -254,6 +255,7 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
         if(newRecipeFlag && !saved){
             deleteRecipe();
         }
+        KeyboardHider.hideKeyboard(getActivity());
     }
 
     /** Respond to menu items from action bar being pressed */
