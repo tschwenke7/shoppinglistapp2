@@ -44,7 +44,6 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         //setup action bar
         this.setHasOptionsMenu(true);
 
-
         //setup recipe list recyclerview
         RecyclerView recipeRecyclerView = root.findViewById(R.id.recipe_recyclerview);
         adapter = new RecipeListAdapter(this);

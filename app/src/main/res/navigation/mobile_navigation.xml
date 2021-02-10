@@ -32,8 +32,8 @@
     <fragment
         android:id="@+id/recipeEditorFragment"
         android:name="com.example.shoppinglistapp2.activities.ui.recipes.newrecipe.RecipeEditorFragment"
-        android:label="Create New Recipe"
-        tools:layout="@layout/fragment_new_recipe">
+        android:label="@string/title_recipe_editor"
+        tools:layout="@layout/fragment_recipe_editor">
         <action
             android:id="@+id/action_save_or_cancel_and_return_to_recipe_list"
             app:destination="@id/navigation_recipes" />
@@ -42,11 +42,12 @@
             app:destination="@id/viewRecipeFragment" />
         <argument
             android:name="recipeId"
-            app:argType="integer"
-            android:defaultValue="-1" />
-        <argument android:name="newRecipeFlag"
-            app:argType="boolean"
-            android:defaultValue="false" />
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <argument
+            android:name="newRecipeFlag"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </fragment>
 
     <fragment

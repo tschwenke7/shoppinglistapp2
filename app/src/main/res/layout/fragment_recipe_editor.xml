@@ -118,7 +118,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/recipe_ingredients_list" />
 
             <EditText
-                android:id="@+id/prep_time"
+                android:id="@+id/edit_text_prep_time"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -127,7 +127,7 @@
                 android:inputType="number|text"
                 app:layout_constraintBottom_toBottomOf="@+id/prep_time_heading"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/cook_time"
+                app:layout_constraintStart_toStartOf="@+id/edit_text_cook_time"
                 app:layout_constraintTop_toTopOf="@+id/prep_time_heading" />
 
             <TextView
@@ -143,7 +143,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/prep_time_heading" />
 
             <EditText
-                android:id="@+id/cook_time"
+                android:id="@+id/edit_text_cook_time"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"

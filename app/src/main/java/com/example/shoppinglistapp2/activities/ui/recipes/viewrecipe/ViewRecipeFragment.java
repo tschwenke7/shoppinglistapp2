@@ -5,6 +5,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,18 +17,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
-import com.example.shoppinglistapp2.activities.ui.recipes.newrecipe.IngredientListEditorAdapter;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 
 public class ViewRecipeFragment extends Fragment {
     private RecipesViewModel recipesViewModel;
-
+    private int recipeId;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -45,12 +47,8 @@ public class ViewRecipeFragment extends Fragment {
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
         //fill in textViews with saved recipe data where available
-        Recipe recipe = recipesViewModel.getRecipeById(
-                ViewRecipeFragmentArgs.fromBundle(getArguments()).getRecipeId()
-        );
-        Log.d("TOM_TEST", "url: " + recipe.getUrl());
-
-
+        recipeId = ViewRecipeFragmentArgs.fromBundle(getArguments()).getRecipeId();
+        Recipe recipe = recipesViewModel.getRecipeById(recipeId);
 
         //set name as action bar title
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(recipe.getName());
@@ -107,14 +105,31 @@ public class ViewRecipeFragment extends Fragment {
         }
     }
 
+    /** Merges extra menu items into the default activity action bar, according to provided menu xml */
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.view_recipe_action_bar, menu);
+    }
+
     /** Respond to menu items from action bar being pressed */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.d("TOM_TEST", "onOptionsItemSelected: " + item.toString());
         switch (item.getItemId()) {
+            //back button pressed
             case android.R.id.home:
                 ((MainActivity) getActivity()).onBackPressed();
                 return true;
+
+            //edit button pressed
+            case R.id.action_edit_recipe:
+                //send to editor page with recipeId of the recipe being viewed
+                ViewRecipeFragmentDirections.ActionViewRecipeToRecipeEditor action =
+                        ViewRecipeFragmentDirections.actionViewRecipeToRecipeEditor();
+                action.setRecipeId(recipeId);
+                Navigation.findNavController(getView()).navigate(action);
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }

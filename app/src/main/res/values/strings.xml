@@ -3,6 +3,7 @@
     <string name="title_activity_main2">MainActivity</string>
     <string name="title_recipes">Recipes</string>
     <string name="title_shopping_list">Shopping List</string>
+    <string name="title_recipe_editor">Edit Recipe</string>
 
     <!-- Recipe list page -->
     <string name="add_recipe_action_title">Add new recipe</string>
@@ -33,6 +34,7 @@
     <string name="cancel_button">Cancel</string>http://blank.org/blank.html
 
     <!-- View recipe page -->
+    <string name="edit_recipe_action_title">Edit</string>
     <string name="view_recipe_website_button">View recipe online</string>
     <string name="default_url_button_text">No website linked</string>
     <string name="prep_time_heading_short">Prep:</string>

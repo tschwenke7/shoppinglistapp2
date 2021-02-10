@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
-import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 
 public class RecipeEditorFragment extends Fragment implements IngredientListEditorAdapter.ItemClickListener {
@@ -39,7 +38,7 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
         recipesViewModel =
                 new ViewModelProvider(getActivity()).get(RecipesViewModel.class);
 
-        root = inflater.inflate(R.layout.fragment_new_recipe, container, false);
+        root = inflater.inflate(R.layout.fragment_recipe_editor, container, false);
 
         //load the recipe to be edited
         currentRecipe = recipesViewModel.getRecipeById(RecipeEditorFragmentArgs.fromBundle(getArguments()).getRecipeId());
@@ -48,7 +47,7 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
 
         //if the editor is being opened for an existing recipe, prefill the fields with the saved data
         if(!newRecipeFlag){
-            populateEditor(root, currentRecipe);
+            populateEditor();
         }
         saved = false;
 
@@ -90,7 +89,9 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
                 //if it was an existing recipe, return to its viewRecipe
                 else{
                     Toast.makeText(view.getContext(), "Recipe updated",Toast.LENGTH_LONG).show();
-                    Navigation.findNavController(view).navigate(R.id.action_recipe_editor_to_view_recipe);
+                    RecipeEditorFragmentDirections.ActionRecipeEditorToViewRecipe action = RecipeEditorFragmentDirections.actionRecipeEditorToViewRecipe();
+                    action.setRecipeId(currentRecipe.getId());
+                    Navigation.findNavController(view).navigate(action);
                 }
             }
         });
@@ -107,13 +108,15 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
         return root;
     }
 
-    private void populateEditor(View root, Recipe currentRecipe) {
+    private void populateEditor() {
         //name
-        ((TextView) root.findViewById(R.id.recipe_name)).setText(currentRecipe.getName());
+        ((TextView) root.findViewById(R.id.edit_text_recipe_name)).setText(currentRecipe.getName());
 
         //prep and cook time
-        ((TextView) root.findViewById(R.id.prep_time)).setText(currentRecipe.getPrepTime());
-        ((TextView) root.findViewById(R.id.cook_time)).setText(currentRecipe.getCookTime());
+        ((TextView) root.findViewById(R.id.edit_text_prep_time))
+                .setText(Integer.toString(currentRecipe.getPrepTime()));
+        ((TextView) root.findViewById(R.id.edit_text_cook_time))
+                .setText(Integer.toString(currentRecipe.getCookTime()));
 
         //ingredients taken care of by recyclerview and currentRecipeIngredients LiveData
         //url
@@ -166,10 +169,10 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
         String url = ((TextView)  root.findViewById(R.id.edit_text_url)).getText().toString();
 
         //read prep time if provided
-        String prepTime = ((TextView) root.findViewById(R.id.prep_time)).getText().toString();
+        String prepTime = ((TextView) root.findViewById(R.id.edit_text_prep_time)).getText().toString();
 
         //read cook time if provided
-        String cookTime = ((TextView) root.findViewById(R.id.cook_time)).getText().toString();
+        String cookTime = ((TextView) root.findViewById(R.id.edit_text_cook_time)).getText().toString();
 
 
         //read notes
