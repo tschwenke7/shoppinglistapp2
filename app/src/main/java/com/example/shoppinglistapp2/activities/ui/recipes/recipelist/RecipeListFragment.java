@@ -18,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -81,22 +80,24 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_recipe:  {
-                // navigate to new recipe screen when "+" icon clicked
-                Navigation.findNavController(root).navigate(R.id.action_recipe_list_to_new_recipe);
+                //create new empty recipe and navigate to recipe editor screen when "+" icon clicked
+                RecipeListFragmentDirections.ActionRecipeListToNewRecipe action = RecipeListFragmentDirections.actionRecipeListToNewRecipe();
+                action.setRecipeId(recipesViewModel.generateNewRecipeId());
+                Navigation.findNavController(root).navigate(action);
                 return true;
             }
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 
     @Override
     public void onRecipeClick(int position) {
         Log.d("TOM_TEST", "onRecipeClick triggered for item " + position);
-        recipesViewModel.setRecipeToView(position);
+
+        //navigate to view recipe, passing id of clicked recipe along
         RecipeListFragmentDirections.ActionRecipeListToViewRecipe action = RecipeListFragmentDirections.actionRecipeListToViewRecipe();
-        action.setRecipePosition(position);
+        action.setRecipeId(recipesViewModel.getRecipeIdAtPosition(position));
         Navigation.findNavController(root).navigate(action);
     }
 
@@ -177,5 +178,15 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             adapter.clearSelections();
             actionMode = null;
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        //close action bar if user navigates away
+        if(null != actionMode){
+            actionMode.finish();
+        }
+
     }
 }

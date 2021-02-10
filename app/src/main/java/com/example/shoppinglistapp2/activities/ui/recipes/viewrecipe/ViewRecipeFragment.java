@@ -45,7 +45,9 @@ public class ViewRecipeFragment extends Fragment {
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
         //fill in textViews with saved recipe data where available
-        Recipe recipe = recipesViewModel.getCurrentRecipe();
+        Recipe recipe = recipesViewModel.getRecipeById(
+                ViewRecipeFragmentArgs.fromBundle(getArguments()).getRecipeId()
+        );
         Log.d("TOM_TEST", "url: " + recipe.getUrl());
 
 
@@ -87,12 +89,10 @@ public class ViewRecipeFragment extends Fragment {
 
 
         //set observer to update ingredient list if it changes
-        recipesViewModel.getCurrentRecipeIngredients().observe(getViewLifecycleOwner(), currentRecipeIngredients -> {
-
+        recipesViewModel.getRecipeIngredientsById(recipe.getId())
+                .observe(getViewLifecycleOwner(), currentRecipeIngredients -> {
             adapter.submitList(currentRecipeIngredients);
         });
-
-
 
         return root;
     }

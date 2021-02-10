@@ -95,6 +95,21 @@ public class SlaRepository {
     }
 
     public void updateRecipe(Recipe recipe) {
-        recipeDao.updateRecipe(recipe);
+        SlaDatabase.databaseWriteExecutor.execute(() -> recipeDao.updateRecipe(recipe));
+    }
+
+    public Recipe getRecipeById(int id) {
+        Callable<Recipe> queryCallable = () -> recipeDao.getById(id);
+
+        Future<Recipe> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
+        try {
+            return future.get();
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+            return null;
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -13,7 +13,11 @@
         <action
             android:id="@+id/action_recipe_list_to_new_recipe"
             app:destination="@id/recipeEditorFragment"
-            app:enterAnim="@android:anim/slide_in_left" />
+            app:enterAnim="@android:anim/slide_in_left" >
+            <argument
+                android:name="newRecipeFlag"
+                android:defaultValue="true" />
+        </action>
         <action
             android:id="@+id/action_recipe_list_to_view_recipe"
             app:destination="@id/viewRecipeFragment"
@@ -37,9 +41,12 @@
             android:id="@+id/action_recipe_editor_to_view_recipe"
             app:destination="@id/viewRecipeFragment" />
         <argument
-            android:name="recipePosition"
+            android:name="recipeId"
             app:argType="integer"
             android:defaultValue="-1" />
+        <argument android:name="newRecipeFlag"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
 
     <fragment
@@ -52,8 +59,12 @@
             app:destination="@id/navigation_recipes" />
         <action
             android:id="@+id/action_view_recipe_to_recipe_editor"
-            app:destination="@id/recipeEditorFragment" />
-        <argument android:name="recipePosition"
+            app:destination="@id/recipeEditorFragment" >
+            <argument
+                android:name="newRecipeFlag"
+                android:defaultValue="false" />
+        </action>
+        <argument android:name="recipeId"
             app:argType="integer"
             android:defaultValue="-1" />
     </fragment>
