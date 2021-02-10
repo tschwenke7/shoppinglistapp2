@@ -81,18 +81,6 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
             @Override
             public void onClick(View view) {
                 saveRecipe();
-                //if this was a new recipe, return to recipe list
-                if(newRecipeFlag){
-                    Toast.makeText(view.getContext(), "Recipe created successfully",Toast.LENGTH_LONG).show();
-                    Navigation.findNavController(view).navigate(R.id.action_save_or_cancel_and_return_to_recipe_list);
-                }
-                //if it was an existing recipe, return to its viewRecipe
-                else{
-                    Toast.makeText(view.getContext(), "Recipe updated",Toast.LENGTH_LONG).show();
-                    RecipeEditorFragmentDirections.ActionRecipeEditorToViewRecipe action = RecipeEditorFragmentDirections.actionRecipeEditorToViewRecipe();
-                    action.setRecipeId(currentRecipe.getId());
-                    Navigation.findNavController(view).navigate(action);
-                }
             }
         });
 
@@ -181,18 +169,22 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
         //ingredients are already saved, and so don't need to be read
 
         /* VALIDATION */
+        Log.d(TAG, "saveRecipe");
         //check that a recipe name was entered
         if (null == recipeName || recipeName.isEmpty()){
+            Log.d(TAG, "saveRecipe: no name");
             Toast.makeText(this.getContext(), "Please enter a name for this recipe",Toast.LENGTH_LONG).show();
         }
 
-        //check that the name is unique
-        else if (!recipesViewModel.recipeNameIsUnique(recipeName)){
+        //check that the name is unique if it has been changed
+        else if (!recipeName.equals(currentRecipe.getName()) && !recipesViewModel.recipeNameIsUnique(recipeName)){
+            Log.d(TAG, "saveRecipe: not unique: " + recipeName + " vs current: " + currentRecipe.getName());
             Toast.makeText(this.getContext(), "This recipe name is already in use - please choose another",Toast.LENGTH_LONG).show();
         }
 
         /* Save recipe if validation passed*/
         else{
+            Log.d(TAG, "saveRecipe: validated");
             //set all fields to form values
             currentRecipe.setName(recipeName);
             if(!prepTime.isEmpty()){
@@ -212,8 +204,22 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
 
             //update the database entry for recipe accordingly
             recipesViewModel.updateRecipe(currentRecipe);
+            Log.d(TAG, "saveRecipe: " + currentRecipe.getNotes());
             //set saved flag so recipe is not deleted when exiting fragment if its a brand new recipe
             saved = true;
+
+            //if this was a new recipe, return to recipe list
+            if(newRecipeFlag){
+                Toast.makeText(getView().getContext(), "Recipe created successfully",Toast.LENGTH_LONG).show();
+                Navigation.findNavController(getView()).navigate(R.id.action_save_or_cancel_and_return_to_recipe_list);
+            }
+            //if it was an existing recipe, return to its viewRecipe
+            else{
+                Toast.makeText(getView().getContext(), "Recipe updated",Toast.LENGTH_LONG).show();
+                RecipeEditorFragmentDirections.ActionRecipeEditorToViewRecipe action = RecipeEditorFragmentDirections.actionRecipeEditorToViewRecipe();
+                action.setRecipeId(currentRecipe.getId());
+                Navigation.findNavController(getView()).navigate(action);
+            }
         }
     }
 
