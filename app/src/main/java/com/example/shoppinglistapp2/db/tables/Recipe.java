@@ -9,6 +9,7 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity(
     tableName = "recipes",
@@ -120,5 +121,22 @@ public class Recipe {
 
     public void setCookTime(int cookTime) {
         this.cookTime = cookTime;
+    }
+
+    @Ignore
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Recipe recipe = (Recipe) o;
+        return id == recipe.id &&
+                prepTime == recipe.prepTime &&
+                cookTime == recipe.cookTime &&
+                tom_rating == recipe.tom_rating &&
+                tier_rating == recipe.tier_rating &&
+                Objects.equals(name, recipe.name) &&
+                Objects.equals(category, recipe.category) &&
+                Objects.equals(url, recipe.url) &&
+                Objects.equals(notes, recipe.notes);
     }
 }

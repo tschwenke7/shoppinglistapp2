@@ -38,9 +38,11 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
         holder.bind(current);
     }
 
-    public void setRecipes(List<Recipe> recipes) {
-        this.recipes = recipes;
-        notifyDataSetChanged();
+    public void setRecipes(List<Recipe> newRecipes) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new RecipeDiff(newRecipes, recipes));
+        diffResult.dispatchUpdatesTo(this);
+        this.recipes = newRecipes;
+//        notifyDataSetChanged();
     }
 
     @Override
@@ -78,16 +80,39 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
     }
 
 
-    public static class RecipeDiff extends DiffUtil.ItemCallback<Recipe> {
+    public static class RecipeDiff extends DiffUtil.Callback {
+        List<Recipe> newList;
+        List<Recipe> oldList;
 
-        @Override
-        public boolean areItemsTheSame(@NonNull Recipe oldItem, @NonNull Recipe newItem) {
-            return oldItem == newItem;
+        public RecipeDiff (List<Recipe> newList, List<Recipe> oldList){
+            this.newList = newList;
+            this.oldList = oldList;
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull Recipe oldItem, @NonNull Recipe newItem) {
-            return oldItem.getId() == newItem.getId();
+        public int getOldListSize() {
+            if(oldList == null){
+                return 0;
+            }
+            return oldList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            if (newList == null){
+                return 0;
+            }
+            return newList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).getId() == newList.get(newItemPosition).getId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
         }
     }
 

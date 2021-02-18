@@ -39,7 +39,7 @@ public class IngredientListEditorAdapter extends ListAdapter<Ingredient, Ingredi
 
         @Override
         public boolean areItemsTheSame(@NonNull Ingredient oldItem, @NonNull Ingredient newItem) {
-            return oldItem == newItem;
+            return oldItem.getId() == newItem.getId();
         }
 
         @Override
