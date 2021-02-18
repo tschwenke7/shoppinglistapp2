@@ -59,7 +59,9 @@
             app:destination="@id/recipe_list" />
         <action
             android:id="@+id/action_view_recipe_to_recipe_editor"
-            app:destination="@id/recipeEditorFragment">
+            app:destination="@id/recipeEditorFragment"
+            app:popUpTo="@id/viewRecipeFragment"
+            app:popUpToInclusive="true">
             <argument
                 android:name="newRecipeFlag"
                 android:defaultValue="false" />
@@ -71,9 +73,10 @@
     <fragment
         android:id="@+id/createRecipe"
         android:name="com.example.shoppinglistapp2.activities.ui.recipes.creator.CreateRecipeFragment"
-        android:label="@string/create_recipe_title" >
+        android:label="@string/create_recipe_title"
+        tools:layout="@layout/fragment_create_recipe">
         <action
-            android:id="@+id/action_createRecipe_to_recipeEditorFragment"
+            android:id="@+id/action_create_recipe_to_recipe_editor_fragment"
             app:destination="@id/recipeEditorFragment"
             app:popUpTo="@id/createRecipe"
             app:popUpToInclusive="true">

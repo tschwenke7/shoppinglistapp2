@@ -109,9 +109,6 @@ public class CreateRecipeFragment extends Fragment {
 
                     //pass id of newly created recipe
                     action.setRecipeId(recipeId.get());
-                    //set flag to true so this recipe will be discarded if save button not clicked
-                    //before navigating away
-                    action.setNewRecipeFlag(false);
 
                     //navigate
                     Navigation.findNavController(root).navigate(action);

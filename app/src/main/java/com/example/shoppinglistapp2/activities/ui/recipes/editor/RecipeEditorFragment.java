@@ -52,9 +52,9 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
         newRecipeFlag = RecipeEditorFragmentArgs.fromBundle(getArguments()).getNewRecipeFlag();
 
         //if the editor is being opened for an existing recipe, prefill the fields with the saved data
-        if(!newRecipeFlag){
+//        if(!newRecipeFlag){
             populateEditor();
-        }
+//        }
         saved = false;
 
         //setup action bar
@@ -217,11 +217,13 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
             //if this was a new recipe, return to recipe list
             if(newRecipeFlag){
                 Toast.makeText(getView().getContext(), "Recipe created successfully",Toast.LENGTH_LONG).show();
-                Navigation.findNavController(getView()).navigate(R.id.action_save_or_cancel_and_return_to_recipe_list);
+                RecipeEditorFragmentDirections.ActionRecipeEditorToViewRecipe action = RecipeEditorFragmentDirections.actionRecipeEditorToViewRecipe();
+                action.setRecipeId(currentRecipe.getId());
+                Navigation.findNavController(getView()).navigate(action);
             }
             //if it was an existing recipe, return to its viewRecipe
             else{
-                Toast.makeText(getView().getContext(), "Recipe updated",Toast.LENGTH_LONG).show();
+                Toast.makeText(getView().getContext(), "Recipe saved",Toast.LENGTH_LONG).show();
                 RecipeEditorFragmentDirections.ActionRecipeEditorToViewRecipe action = RecipeEditorFragmentDirections.actionRecipeEditorToViewRecipe();
                 action.setRecipeId(currentRecipe.getId());
                 Navigation.findNavController(getView()).navigate(action);
@@ -236,7 +238,6 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
             //delete the recipe from db
             recipesViewModel.deleteRecipes(currentRecipe);
         }
-
     }
 
     //hide back button in action bar for this fragment
