@@ -18,14 +18,25 @@
     <string name="delete_warning_cancel_button">Cancel</string>
 
     <!-- New recipe page -->
+    <string name="create_recipe_title">Create New Recipe</string>
+    <string name="create_recipe_preamble_1">Enter a website to extract a website from. </string>
+    <string name="supported_recipes">Currently supported websites:\n
+    \u25CF\trecipetineats.com</string>
+    <string name="recipe_website_hint">Recipe website…</string>
+    <string name="create_recipe_website_button">Create recipe from website</string>
+    <string name="or_separator">OR</string>
+    <string name="create_recipe_preamble_2">Create a new recipe manually by clicking the button below.</string>
+    <string name="create_recipe_manual_button">Create recipe from scratch</string>
+
+    <!-- Recipe editor page -->
     <string name="ingredients_heading">Ingredients</string>
     <string name="notes_heading">Notes</string>
     <string name="url_heading">Website link:</string>
     <string name="prep_time_heading">Prep time (minutes):</string>
     <string name="cook_time_heading">Cooking time (minutes):</string>
 
-    <string name="recipe_name_placeholder">Recipe name...</string>
-    <string name="add_ingredient_placeholder">New ingredient...</string>
+    <string name="recipe_name_placeholder">Recipe name…</string>
+    <string name="add_ingredient_placeholder">New ingredient…</string>
     <string name="recipe_notes_placeholder">Enter any other notes about your recipe...</string>
     <string name="recipe_url_placeholder">Enter link to online recipe...</string>
 
@@ -41,8 +52,8 @@
     <string name="cook_time_heading_short">Cook:</string>
     <string name="abbreviated_time_unit">mins</string>
     <string name="default_notes_text">You\'ve not written any notes for this recipe.</string>
-
-
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

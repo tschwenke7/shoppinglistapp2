@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2.activities.ui.recipes.newrecipe;
+package com.example.shoppinglistapp2.activities.ui.recipes.editor;
 
 import android.os.Bundle;
 import android.util.Log;

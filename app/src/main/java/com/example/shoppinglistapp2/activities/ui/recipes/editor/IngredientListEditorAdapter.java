@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2.activities.ui.recipes.newrecipe;
+package com.example.shoppinglistapp2.activities.ui.recipes.editor;
 
 import android.view.LayoutInflater;
 import android.view.View;

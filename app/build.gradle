@@ -30,6 +30,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "androidx.appcompat:appcompat:$rootProject.appCompatVersion"
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     //Navigation
     def nav_version = "2.3.3"

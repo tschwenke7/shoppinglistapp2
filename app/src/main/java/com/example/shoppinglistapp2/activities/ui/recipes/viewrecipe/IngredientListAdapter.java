@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
-import com.example.shoppinglistapp2.activities.ui.recipes.newrecipe.IngredientListEditorAdapter;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 
 public class IngredientListAdapter extends ListAdapter<Ingredient, IngredientViewHolder> {

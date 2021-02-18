@@ -31,7 +31,7 @@
         tools:layout="@layout/fragment_shopping_list" />
     <fragment
         android:id="@+id/recipeEditorFragment"
-        android:name="com.example.shoppinglistapp2.activities.ui.recipes.newrecipe.RecipeEditorFragment"
+        android:name="com.example.shoppinglistapp2.activities.ui.recipes.editor.RecipeEditorFragment"
         android:label="@string/title_recipe_editor"
         tools:layout="@layout/fragment_recipe_editor">
         <action
@@ -73,5 +73,9 @@
             app:argType="integer"
             android:defaultValue="-1" />
     </fragment>
+    <fragment
+        android:id="@+id/createRecipeHub"
+        android:name="com.example.shoppinglistapp2.activities.ui.recipes.creator.CreateRecipeFragment"
+        android:label="@string/create_recipe_title" />
 
 </navigation>
