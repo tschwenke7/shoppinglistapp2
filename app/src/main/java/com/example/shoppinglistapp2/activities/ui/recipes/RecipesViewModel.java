@@ -1,26 +1,28 @@
 package com.example.shoppinglistapp2.activities.ui.recipes;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.navigation.Navigation;
 
 import com.example.shoppinglistapp2.db.SlaRepository;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
-import com.example.shoppinglistapp2.helpers.IngredientUtil;
+import com.example.shoppinglistapp2.helpers.IngredientUtils;
+import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RecipesViewModel extends AndroidViewModel {
 
     private final SlaRepository slaRepository;
     private final LiveData<List<Recipe>> allRecipes;
+    private ExecutorService websiteExecutor = Executors.newSingleThreadExecutor();
 
     public RecipesViewModel(@NonNull Application application) {
         super(application);
@@ -49,9 +51,51 @@ public class RecipesViewModel extends AndroidViewModel {
         newRecipe.setName(recipeName);
 
         //persist it to db
-        long id = slaRepository.insertRecipe(newRecipe);
+        return (int) slaRepository.insertRecipe(newRecipe);
+    }
 
-        return (int) id;
+    /**
+     * Creates and persists a recipe from the provided website and returns its rowId,
+     * or -1 if no recipe could be generated (e.g. for an invalid or unsupported website url)
+     * @param url - the website to get a recipe from
+     * @return - the rowId of the newly generated recipe
+     */
+    public int generateRecipeIdFromUrl(String url){
+
+        //scrape the website and fill as many Recipe fields as possible
+        Recipe newRecipe = RecipeWebsiteUtils.getRecipeFromWebsite(url);
+
+        //if this process failed (e.g. due to invalid url), the recipe will be null
+        //and so we should simply return -1 here
+        if(null == newRecipe){
+            return -1;
+        }
+
+        //if no name was provided, generate a unique one
+        if(null == newRecipe.getName()){
+            int i = 1;
+            String recipeName;
+            do {
+                recipeName = String.format("Untitled recipe %d", i);
+                i++;
+            } while(!slaRepository.recipeNameIsUnique(recipeName));
+
+            newRecipe.setName(recipeName);
+        }
+
+        //if provided name exists already, append a number to make it unique
+        int j = 2;
+        while(!slaRepository.recipeNameIsUnique(newRecipe.getName())){
+            newRecipe.setName(String.format("%s (%d)", newRecipe.getName(), j));
+        }
+
+        //persist the recipe to db
+        int id = (int) slaRepository.insertRecipe(newRecipe);
+
+        //persist all recipe's ingredients to db
+        addIngredientsToRecipe(id, newRecipe.getIngredients());
+
+        return id;
     }
 
     public LiveData<List<Ingredient>> getRecipeIngredientsById(int id) {
@@ -66,24 +110,19 @@ public class RecipesViewModel extends AndroidViewModel {
 
         //add each new item to the database
         for (String ingredientText : ingredients){
-            Ingredient ingredient = IngredientUtil.toIngredient(ingredientText);
+            Ingredient ingredient = IngredientUtils.toIngredient(ingredientText);
             ingredient.setRecipeId(recipeId);
             slaRepository.insertIngredient(ingredient);
             Log.d("TOM_TEST", "adding item: " + ingredientText);
         }
     }
 
-
-    public boolean addNewRecipe(Recipe recipe){
-        //insert recipe
-        long rowId = slaRepository.insertRecipe(recipe);
-
-        if(rowId == -1){
-            Log.d("TOM_TEST","Error adding recipe. Please try again later.");
-            return false;
+    private void addIngredientsToRecipe(int recipeId, List<Ingredient> ingredients){
+        //add each new item to the database
+        for (Ingredient ingredient : ingredients){
+            ingredient.setRecipeId(recipeId);
+            slaRepository.insertIngredient(ingredient);
         }
-
-        return true;
     }
 
     public void deleteRecipes(Recipe... recipes){

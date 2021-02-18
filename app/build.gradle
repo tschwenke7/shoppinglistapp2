@@ -63,4 +63,14 @@ dependencies {
     })
     androidTestImplementation "androidx.test.ext:junit:$rootProject.androidxJunitVersion"
 
+    // URL validator
+    // https://mvnrepository.com/artifact/commons-validator/commons-validator
+    implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'
+
+    //Web scraper
+    // https://mvnrepository.com/artifact/org.jsoup/jsoup
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
+
+
+
 }

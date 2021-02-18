@@ -5,17 +5,43 @@ import com.example.shoppinglistapp2.db.tables.Ingredient;
 import java.util.Arrays;
 import java.util.List;
 
-public class IngredientUtil {
+public class IngredientUtils {
 
     private static final List<String> unitsOfMeasurement = Arrays.asList(
             "cup",
             "cups",
             "kg",
+            "kilograms",
+            "kilogram",
             "g",
+            "gram",
+            "grams",
             "ml",
+            "millilitres",
+            "millilitre",
+            "milliliters",
+            "milliliter",
             "l",
+            "litre",
+            "litres",
+            "liter",
+            "liters",
             "tsp",
-            "tbsp"
+            "teaspoons",
+            "teaspoon",
+            "tbsp",
+            "tablespoon",
+            "tablespoons"
+    );
+
+    public static final List<String> foreignUnitsOfMeasurement = Arrays.asList(
+            "lb",
+            "lbs",
+            "pound",
+            "pounds",
+            "oz",
+            "ounce",
+            "ounces"
     );
 
     public static Ingredient toIngredient(String ingText){
@@ -98,14 +124,65 @@ public class IngredientUtil {
             }
         }
 
-        //capitalise Litres
-        if ("l".equals(unit)){
-            unit = "L";
-        }
-        else if ("ml".equals(unit)){
-            unit = "mL";
+        //normalise the units to make them easier to combine quantities later
+        if(null != unit) {
+            unit = normaliseUnits(unit);
         }
 
         return new Ingredient(name.trim(),qty.trim(),unit);
     }
+
+    /**
+     * Converts any units written in different ways to one normalised form for consistency,
+     * simplifying adding quantities later. e.g. "teaspoon," "teaspoons" or "tsp" all return "tsp".
+     * @param unit the Ingredient unit to be normalised
+     * @return the standard way of writing that unit for this app
+     */
+    private static String normaliseUnits(String unit){
+        //g
+        if (
+            "gram".equals(unit) ||
+            "grams".equals(unit)
+        ){ return "g"; }
+
+        //kg
+        else if (
+            "kilogram".equals(unit) ||
+            "kilograms".equals(unit)
+        ){ return "kg"; }
+
+        //L
+        else if (
+            "l".equals(unit) ||
+            "liter".equals(unit) ||
+            "liters".equals(unit) ||
+            "litre".equals(unit) ||
+            "litres".equals(unit)
+        ){ return "L"; }
+
+        //mL
+        else if (
+            "ml".equals(unit) ||
+            "milliliter".equals(unit) ||
+            "milliliters".equals(unit) ||
+            "millilitre".equals(unit) ||
+            "millilitres".equals(unit)
+        ){ return "mL"; }
+
+        //tsp
+        else if (
+            "teaspoon".equals(unit) ||
+            "teaspoons".equals(unit)
+        ){ return "tsp"; }
+        //tbsp
+        else if (
+            "tablespoon".equals(unit) ||
+            "tablespoon".equals(unit)
+        ){ return "tbsp"; }
+
+
+        return unit;
+    }
+
+
 }
