@@ -3,6 +3,8 @@ package com.example.shoppinglistapp2.activities.ui.recipes.editor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -250,6 +252,12 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
         KeyboardHider.hideKeyboard(getActivity());
     }
 
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.recipe_editor_action_bar, menu);
+    }
+
     /** Respond to menu items from action bar being pressed */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -258,6 +266,8 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
             case android.R.id.home:
                 ((MainActivity) getActivity()).onBackPressed();
                 return true;
+            case R.id.action_save_recipe:
+                saveRecipe();
             default:
                 return super.onOptionsItemSelected(item);
         }

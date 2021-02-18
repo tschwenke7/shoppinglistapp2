@@ -35,23 +35,25 @@ public class ViewRecipeFragment extends Fragment {
         recipesViewModel =
                 new ViewModelProvider(getActivity()).get(RecipesViewModel.class);
 
+        //retrieve recipe to be edited
+        recipeId = ViewRecipeFragmentArgs.fromBundle(getArguments()).getRecipeId();
+        Recipe recipe = recipesViewModel.getRecipeById(recipeId);
+
+        //set name as action bar title
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(recipe.getName());
+
         View root = inflater.inflate(R.layout.fragment_view_recipe, container, false);
 
         //setup action bar
         this.setHasOptionsMenu(true);
 
+        /* fill in textViews with saved recipe data where available */
         //setup ingredient list recyclerview
         RecyclerView recipeRecyclerView = root.findViewById(R.id.recipe_ingredients_list);
         final IngredientListAdapter adapter = new IngredientListAdapter(new IngredientListAdapter.IngredientDiff());
         recipeRecyclerView.setAdapter(adapter);
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
-        //fill in textViews with saved recipe data where available
-        recipeId = ViewRecipeFragmentArgs.fromBundle(getArguments()).getRecipeId();
-        Recipe recipe = recipesViewModel.getRecipeById(recipeId);
-
-        //set name as action bar title
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(recipe.getName());
 
         //prep and cook times
         TextView prepTimeField = root.findViewById(R.id.prep_time);
