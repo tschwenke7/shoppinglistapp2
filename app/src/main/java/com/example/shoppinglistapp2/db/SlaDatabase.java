@@ -1,5 +1,6 @@
 package com.example.shoppinglistapp2.db;
 
+import android.app.slice.Slice;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -10,16 +11,19 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.shoppinglistapp2.db.dao.IngredientDao;
 import com.example.shoppinglistapp2.db.dao.RecipeDao;
+import com.example.shoppinglistapp2.db.dao.SlItemDao;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
+import com.example.shoppinglistapp2.db.tables.SlItem;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Recipe.class, Ingredient.class}, version = 2, exportSchema = false)
+@Database(entities = {Recipe.class, Ingredient.class, SlItem.class}, version = 3, exportSchema = false)
 public abstract class SlaDatabase extends RoomDatabase {
     public abstract RecipeDao recipeDao();
     public abstract IngredientDao ingredientDao();
+    public abstract SlItemDao slItemDao();
 
     private static volatile SlaDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;
@@ -31,7 +35,7 @@ public abstract class SlaDatabase extends RoomDatabase {
             synchronized (SlaDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            SlaDatabase.class, "word_database")
+                            SlaDatabase.class, "sla_database")
                             .addCallback(sRoomDatabaseCallback)
                             .fallbackToDestructiveMigration()
                             .build();
@@ -46,21 +50,6 @@ public abstract class SlaDatabase extends RoomDatabase {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
-
-//            //todo - work out how to create a sample recipe to test recycler view
-//            databaseWriteExecutor.execute(() -> {
-//                RecipeDao dao = INSTANCE.recipeDao();
-//
-//                Recipe recipe = new Recipe();
-//                recipe.setName("Sample recipe");
-//                recipe.setCookTime(25);
-//                recipe.setNotes("Sample notes would go here...");
-//                recipe.setTom_rating(2);
-//                recipe.setTier_rating(5);
-//                recipe.setUrl("www.google.com.au");
-//
-//                dao.insert(recipe);
-//            });
         }
     };
 
