@@ -19,7 +19,7 @@
 
     <!-- New recipe page -->
     <string name="create_recipe_title">Create New Recipe</string>
-    <string name="create_recipe_preamble_1">Enter a website to extract a website from. </string>
+    <string name="create_recipe_preamble_1">Enter a website to create a recipe from. </string>
     <string name="supported_recipes">Currently supported websites:\n
     \u25CF\trecipetineats.com</string>
     <string name="recipe_website_hint">Recipe website…</string>

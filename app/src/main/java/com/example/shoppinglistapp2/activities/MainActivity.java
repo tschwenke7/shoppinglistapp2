@@ -2,7 +2,6 @@ package com.example.shoppinglistapp2.activities;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 
 import com.example.shoppinglistapp2.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -25,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_recipes, R.id.navigation_shopping_list)
+                R.id.recipe_list, R.id.navigation_shopping_list)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);

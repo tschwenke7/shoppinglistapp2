@@ -79,10 +79,8 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_recipe:  {
-                //create new empty recipe and navigate to recipe editor screen when "+" icon clicked
-                RecipeListFragmentDirections.ActionRecipeListToNewRecipe action = RecipeListFragmentDirections.actionRecipeListToNewRecipe();
-                action.setRecipeId(recipesViewModel.generateNewRecipeId());
-                Navigation.findNavController(root).navigate(action);
+                //navigate to recipe creation hub
+                Navigation.findNavController(root).navigate(R.id.action_recipe_list_to_create_recipe);
                 return true;
             }
             default:

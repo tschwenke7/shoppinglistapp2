@@ -3,25 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_recipes">
+    app:startDestination="@+id/recipe_list">
 
     <fragment
-        android:id="@+id/navigation_recipes"
+        android:id="@+id/recipe_list"
         android:name="com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment"
         android:label="@string/title_recipes"
         tools:layout="@layout/fragment_recipe_list" >
         <action
-            android:id="@+id/action_recipe_list_to_new_recipe"
-            app:destination="@id/recipeEditorFragment"
-            app:enterAnim="@android:anim/slide_in_left" >
-            <argument
-                android:name="newRecipeFlag"
-                android:defaultValue="true" />
-        </action>
-        <action
             android:id="@+id/action_recipe_list_to_view_recipe"
             app:destination="@id/viewRecipeFragment"
             app:enterAnim="@android:anim/slide_in_left" />
+        <action
+            android:id="@+id/action_recipe_list_to_create_recipe"
+            app:destination="@id/createRecipe" />
     </fragment>
 
     <fragment
@@ -36,8 +31,8 @@
         tools:layout="@layout/fragment_recipe_editor">
         <action
             android:id="@+id/action_save_or_cancel_and_return_to_recipe_list"
-            app:destination="@id/navigation_recipes"
-            app:popUpTo="@id/navigation_recipes"
+            app:destination="@id/recipe_list"
+            app:popUpTo="@id/recipe_list"
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_recipe_editor_to_view_recipe"
@@ -61,7 +56,7 @@
         tools:layout="@layout/fragment_view_recipe">
         <action
             android:id="@+id/action_view_recipe_to_recipe_list"
-            app:destination="@id/navigation_recipes" />
+            app:destination="@id/recipe_list" />
         <action
             android:id="@+id/action_view_recipe_to_recipe_editor"
             app:destination="@id/recipeEditorFragment">
@@ -74,8 +69,16 @@
             android:defaultValue="-1" />
     </fragment>
     <fragment
-        android:id="@+id/createRecipeHub"
+        android:id="@+id/createRecipe"
         android:name="com.example.shoppinglistapp2.activities.ui.recipes.creator.CreateRecipeFragment"
-        android:label="@string/create_recipe_title" />
+        android:label="@string/create_recipe_title" >
+        <action
+            android:id="@+id/action_createRecipe_to_recipeEditorFragment"
+            app:destination="@id/recipeEditorFragment" >
+            <argument
+                android:name="newRecipeFlag"
+                android:defaultValue="true" />
+        </action>
+    </fragment>
 
 </navigation>
