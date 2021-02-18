@@ -90,15 +90,6 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
             }
         });
 
-        //handle the cancel recipe button
-        Button cancelRecipeButton = root.findViewById(R.id.cancel_recipe_button);
-        cancelRecipeButton.setOnClickListener(view -> {
-            deleteRecipe();
-
-            //navigate back to recipe list
-            Navigation.findNavController(view).navigate(R.id.action_save_or_cancel_and_return_to_recipe_list);
-        });
-
         return root;
     }
 
@@ -217,7 +208,7 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
             //if this was a new recipe, return to recipe list
             if(newRecipeFlag){
                 Toast.makeText(getView().getContext(), "Recipe created successfully",Toast.LENGTH_LONG).show();
-                RecipeEditorFragmentDirections.ActionRecipeEditorToViewRecipe action = RecipeEditorFragmentDirections.actionRecipeEditorToViewRecipe();
+                RecipeEditorFragmentDirections.ActionNewRecipeEditorToViewRecipe action = RecipeEditorFragmentDirections.actionNewRecipeEditorToViewRecipe();
                 action.setRecipeId(currentRecipe.getId());
                 Navigation.findNavController(getView()).navigate(action);
             }

@@ -115,9 +115,9 @@ public class CreateRecipeFragment extends Fragment {
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                Toast.makeText(getContext(), getContext().getString(R.string.recipe_url_error),Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getContext().getString(R.string.recipe_url_timeout_error),Toast.LENGTH_LONG).show();
             } catch (ExecutionException e) {
-                Toast.makeText(getContext(), getContext().getString(R.string.recipe_url_error),Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getContext().getString(R.string.recipe_url_timeout_error),Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
         }

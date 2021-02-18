@@ -37,7 +37,7 @@
         <action
             android:id="@+id/action_recipe_editor_to_view_recipe"
             app:destination="@id/viewRecipeFragment"
-            app:popUpTo="@id/recipeEditorFragment"
+            app:popUpTo="@id/viewRecipeFragment"
             app:popUpToInclusive="true" />
         <argument
             android:name="recipeId"
@@ -47,6 +47,11 @@
             android:name="newRecipeFlag"
             android:defaultValue="false"
             app:argType="boolean" />
+        <action
+            android:id="@+id/action_new_recipe_editor_to_view_recipe"
+            app:destination="@id/viewRecipeFragment"
+            app:popUpTo="@id/recipeEditorFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -61,7 +66,7 @@
             android:id="@+id/action_view_recipe_to_recipe_editor"
             app:destination="@id/recipeEditorFragment"
             app:popUpTo="@id/viewRecipeFragment"
-            app:popUpToInclusive="true">
+            app:popUpToInclusive="false">
             <argument
                 android:name="newRecipeFlag"
                 android:defaultValue="false" />

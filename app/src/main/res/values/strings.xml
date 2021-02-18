@@ -32,6 +32,7 @@
     <string name="recipe_url_invalid">The website you have provided is not a valid url. Be sure to include the full \"https://www.\" address.</string>
     <string name="recipe_url_unsupported">The website you have provided is not currently supported. Check the list above for supported sites.</string>
     <string name="recipe_url_error">Error - a recipe could not be read from this website. Please check the link you\'ve provided.</string>
+    <string name="recipe_url_timeout_error">Error - website too long to respond. Check your internet connection and try again.</string>
 
     <!-- Recipe editor page -->
     <string name="ingredients_heading">Ingredients</string>
