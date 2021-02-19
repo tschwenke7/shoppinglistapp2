@@ -3,6 +3,7 @@ package com.example.shoppinglistapp2.db.tables;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
@@ -19,12 +20,12 @@ public class SlItem {
     @NonNull
     private String name;
 
-    private int qty1;
+    private String qty1;
 
     /** Store "na" if unit is just generic "item/s"*/
     private String unit1;
 
-    private int qty2;
+    private String qty2;
 
     /** Store "na" if unit is just generic "item/s"*/
     private String unit2;
@@ -38,6 +39,7 @@ public class SlItem {
      * @param o object for comparison
      * @return true if same type of item/is checked or not
      */
+    @Ignore
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -52,6 +54,7 @@ public class SlItem {
      * Does not consider qty
      * @return - hashcode for this type of item
      */
+    @Ignore
     @Override
     public int hashCode() {
         return Objects.hash(name, checked);
@@ -74,11 +77,11 @@ public class SlItem {
         this.name = name;
     }
 
-    public int getQty1() {
+    public String getQty1() {
         return qty1;
     }
 
-    public void setQty1(int qty1) {
+    public void setQty1(String qty1) {
         this.qty1 = qty1;
     }
 
@@ -90,11 +93,11 @@ public class SlItem {
         this.unit1 = unit1;
     }
 
-    public int getQty2() {
+    public String getQty2() {
         return qty2;
     }
 
-    public void setQty2(int qty2) {
+    public void setQty2(String qty2) {
         this.qty2 = qty2;
     }
 
@@ -112,5 +115,22 @@ public class SlItem {
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    @Ignore
+    @Override
+    public String toString(){
+        String str = qty1;
+        if(null != unit1 && !"na".equals(unit1)){
+            str += " " + unit1;
+        }
+        if(qty2 != null){
+            str += " " + qty2;
+            if(null != unit2 && !"na".equals(unit2)){
+                str += " " + unit2;
+            }
+        }
+        str += " " + name;
+        return str;
     }
 }

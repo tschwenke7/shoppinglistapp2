@@ -16,7 +16,7 @@ public interface SlItemDao {
     @Insert
     public void insertAll(SlItem... slItems);
 
-    @Query("SELECT * FROM slitems")
+    @Query("SELECT * FROM slitems ORDER BY checked")
     public LiveData<List<SlItem>> getAll();
 
     @Delete

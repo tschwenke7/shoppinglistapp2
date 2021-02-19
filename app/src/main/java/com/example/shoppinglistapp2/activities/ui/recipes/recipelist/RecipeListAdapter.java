@@ -42,7 +42,6 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new RecipeDiff(newRecipes, recipes));
         diffResult.dispatchUpdatesTo(this);
         this.recipes = newRecipes;
-//        notifyDataSetChanged();
     }
 
     @Override

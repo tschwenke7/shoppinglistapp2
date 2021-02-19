@@ -58,8 +58,11 @@
     <string name="cook_time_heading_short">Cook:</string>
     <string name="abbreviated_time_unit">mins</string>
     <string name="default_notes_text">You\'ve not written any notes for this recipe.</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Shopping list page -->
+    <string name="new_list_item_button">Add</string>
+    <string name="new_list_item_field_placeholder">New item…</string>
+    <string name="error_no_list_item_entered">No item entered</string>
 
 
 </resources>

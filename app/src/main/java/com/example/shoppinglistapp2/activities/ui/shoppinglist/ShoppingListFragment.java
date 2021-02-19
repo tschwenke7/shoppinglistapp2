@@ -4,33 +4,69 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.R;
 
-
-public class ShoppingListFragment extends Fragment {
-
+public class ShoppingListFragment extends Fragment implements ShoppingListAdapter.SlItemClickListener {
     private ShoppingListViewModel shoppingListViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        //get viewModel
         shoppingListViewModel =
-                ViewModelProviders.of(this).get(ShoppingListViewModel.class);
+                new ViewModelProvider(getActivity()).get(ShoppingListViewModel.class);
+
+        //inflate fragment
         View root = inflater.inflate(R.layout.fragment_shopping_list, container, false);
-        final TextView textView = root.findViewById(R.id.text_dashboard);
-        shoppingListViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
+
+        //setup action bar
+        this.setHasOptionsMenu(true);
+
+        //setup shopping list recyclerview
+        RecyclerView shoppingListRecyclerView = root.findViewById(R.id.shopping_list_recyclerview);
+        final ShoppingListAdapter adapter = new ShoppingListAdapter(this);
+        shoppingListRecyclerView.setAdapter(adapter);
+        shoppingListRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+
+        //set observer to update shopping list when it changes
+        shoppingListViewModel.getAllItems().observe(getViewLifecycleOwner(), slItems -> {
+            adapter.setItems(slItems);
         });
+
+        //listen to add item button
+        ((Button) root.findViewById(R.id.button_new_list_item)).setOnClickListener(view -> {
+            addItems(view);
+        });
+
+
         return root;
+    }
+
+    private void addItems(View view){
+        EditText input = view.getRootView().findViewById(R.id.edit_text_new_list_item);
+        String inputText = input.getText().toString();
+
+        if(!inputText.isEmpty()){
+            shoppingListViewModel.addItems(inputText);
+        }
+        else{
+            Toast.makeText(this.getContext(), getContext().getString(R.string.error_no_list_item_entered), Toast.LENGTH_LONG).show();
+        }
+
+        //clear input box
+        input.setText("");
+    }
+
+    @Override
+    public void onSlItemClick(int position) {
+        shoppingListViewModel.toggleChecked(position);
     }
 }

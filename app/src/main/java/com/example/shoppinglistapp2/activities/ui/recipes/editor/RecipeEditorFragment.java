@@ -139,7 +139,7 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
         }
         //if nothing was entered, then simply display an error message instead
         else{
-            Toast.makeText(this.getContext(), "No ingredient entered", Toast.LENGTH_LONG);
+            Toast.makeText(this.getContext(), "No ingredient entered", Toast.LENGTH_LONG).show();
         }
     }
 
