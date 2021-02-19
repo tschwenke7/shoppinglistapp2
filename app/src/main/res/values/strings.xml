@@ -11,7 +11,7 @@
     <string name="delete_recipe_action_title">Delete recipe</string>
     <string name="default_rating">0</string>
 
-    <string name="delete_warning_title">Delete recipes</string>
+    <string name="delete_recipes_warning_title">Delete recipes</string>
     <string name="delete_warning_prompt1">Are you sure you want to permanently delete</string>
     <string name="delete_warning_prompt2">recipe/s?</string>
     <string name="delete_warning_yes_button">Delete</string>
@@ -61,8 +61,15 @@
 
     <!-- Shopping list page -->
     <string name="new_list_item_button">Add</string>
-    <string name="new_list_item_field_placeholder">New item…</string>
+    <string name="new_list_item_field_placeholder">New item/s…</string>
     <string name="error_no_list_item_entered">No item entered</string>
+    <string name="clear_checked_list_items_title">Clear crossed-off items</string>
+    <string name="clear_all_list_items_title">Clear ALL items</string>
+    <string name="clear_list_warning_title">Clear ALL items</string>
+    <string name="clear_list_warning_message">Are you sure you want to clear all items from this list?</string>
+    <string name="clear_list_positive_button">Clear list</string>
+    <string name="clear_list_negative_button">Cancel</string>
+
 
 
 </resources>

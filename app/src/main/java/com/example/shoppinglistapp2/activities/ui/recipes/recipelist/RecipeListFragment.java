@@ -145,7 +145,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                 case R.id.action_delete_recipe:
                     //prompt for confirmation first
                     new AlertDialog.Builder(root.getContext())
-                            .setTitle(R.string.delete_warning_title)
+                            .setTitle(R.string.delete_recipes_warning_title)
                             .setMessage(String.format("%s %d %s",
                                     root.getContext().getString(R.string.delete_warning_prompt1),
                                     adapter.getSelectedItemCount(),

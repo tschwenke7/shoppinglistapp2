@@ -44,7 +44,7 @@
         android:id="@+id/button_new_list_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/new_list_item_button"
         app:layout_constraintBottom_toBottomOf="@+id/edit_text_new_list_item"
         app:layout_constraintEnd_toEndOf="parent"

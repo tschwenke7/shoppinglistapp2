@@ -1,7 +1,11 @@
 package com.example.shoppinglistapp2.activities.ui.shoppinglist;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -9,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -63,6 +68,36 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
 
         //clear input box
         input.setText("");
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.shopping_list_action_bar, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_clear_checked_list_items:
+                shoppingListViewModel.deleteCheckedSlItems();
+                break;
+            case R.id.action_clear_all_list_items:
+                //prompt for confirmation first
+                new AlertDialog.Builder(getContext())
+                        .setTitle(R.string.clear_list_warning_title)
+                        .setMessage(R.string.clear_list_warning_message)
+                        .setPositiveButton(R.string.clear_list_positive_button, (dialogInterface, i) -> {
+                            //delete all items from the shopping list
+                            shoppingListViewModel.deleteAllSlItems();
+                        })
+                        //otherwise don't do anything
+                        .setNegativeButton(R.string.clear_list_negative_button, null)
+                        .show();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return false;
     }
 
     @Override
