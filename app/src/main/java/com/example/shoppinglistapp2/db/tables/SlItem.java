@@ -125,7 +125,7 @@ public class SlItem {
             str += " " + unit1;
         }
         if(qty2 != null){
-            str += " " + qty2;
+            str += " + " + qty2;
             if(null != unit2 && !"na".equals(unit2)){
                 str += " " + unit2;
             }

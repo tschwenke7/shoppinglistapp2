@@ -2,6 +2,7 @@ package com.example.shoppinglistapp2.helpers;
 
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,25 +11,31 @@ public class IngredientUtils {
     private static final List<String> unitsOfMeasurement = Arrays.asList(
             "cup",
             "cups",
+
             "kg",
             "kilograms",
             "kilogram",
+
             "g",
             "gram",
             "grams",
+
             "ml",
             "millilitres",
             "millilitre",
             "milliliters",
             "milliliter",
+
             "l",
             "litre",
             "litres",
             "liter",
             "liters",
+
             "tsp",
             "teaspoons",
             "teaspoon",
+
             "tbsp",
             "tablespoon",
             "tablespoons"
@@ -125,31 +132,34 @@ public class IngredientUtils {
         }
 
         //normalise the units to make them easier to combine quantities later
+        Ingredient ingredient = new Ingredient(name.trim(),qty.trim(),unit);
         if(null != unit) {
-            unit = normaliseUnits(unit);
+            normaliseUnits(ingredient);
         }
 
-        return new Ingredient(name.trim(),qty.trim(),unit);
+        return ingredient;
     }
 
     /**
      * Converts any units written in different ways to one normalised form for consistency,
      * simplifying adding quantities later. e.g. "teaspoon," "teaspoons" or "tsp" all return "tsp".
-     * @param unit the Ingredient unit to be normalised
+     * Also converts any imperial units into equivalent metric units and adjusts qty accordingly
+     * @param ingredient the Ingredient to be normalised
      * @return the standard way of writing that unit for this app
      */
-    private static String normaliseUnits(String unit){
+    private static void normaliseUnits(Ingredient ingredient){
+        String unit = ingredient.getUnit();
         //g
         if (
             "gram".equals(unit) ||
             "grams".equals(unit)
-        ){ return "g"; }
+        ){ ingredient.setUnit("g"); }
 
         //kg
         else if (
             "kilogram".equals(unit) ||
             "kilograms".equals(unit)
-        ){ return "kg"; }
+        ){ ingredient.setUnit("kg"); }
 
         //L
         else if (
@@ -158,7 +168,7 @@ public class IngredientUtils {
             "liters".equals(unit) ||
             "litre".equals(unit) ||
             "litres".equals(unit)
-        ){ return "L"; }
+        ){ ingredient.setUnit("L"); }
 
         //mL
         else if (
@@ -167,22 +177,73 @@ public class IngredientUtils {
             "milliliters".equals(unit) ||
             "millilitre".equals(unit) ||
             "millilitres".equals(unit)
-        ){ return "mL"; }
+        ){ ingredient.setUnit("mL"); }
 
         //tsp
         else if (
             "teaspoon".equals(unit) ||
             "teaspoons".equals(unit)
-        ){ return "tsp"; }
+        ){ ingredient.setUnit("tsp"); }
         //tbsp
         else if (
             "tablespoon".equals(unit) ||
             "tablespoon".equals(unit)
-        ){ return "tbsp"; }
-
-
-        return unit;
+        ){ ingredient.setUnit("tbsp"); }
+        else if (
+            "cup".equals(unit)
+        ){ ingredient.setUnit("cups"); }
+        //todo - deal with imperial units here
+//        else if (
+//            "lb".equals(unit) ||
+//            "lbs".equals(unit)
+//        ){ ingredient.setUnit("kg"); }
     }
 
 
+    /**
+     * Converts a qty string into a double value. This can handle fractions or decimals, but always
+     * outputs to a double.
+     * @param qty - the qty string
+     * @return the double value equivalent
+     */
+    public static double qtyAsDouble(String qty){
+        //if there's no fraction bar, simply parse as a double
+        if(!qty.contains("/")){
+            return Double.parseDouble(qty);
+        }
+
+        double result = 0;
+        BigDecimal numerator;
+        BigDecimal denominator;
+
+        //otherwise, split either side of fraction bar
+        String[] components = qty.split("/");
+        //denominator should always be second part
+        denominator = BigDecimal.valueOf(Double.parseDouble(components[1].trim()));
+
+        //check for mixed numerals
+        components[0] = components[0].trim();
+        String[] wholeNumAndNumerator = components[0].split(" ");
+
+        //if it is a mixed numeral
+        if(wholeNumAndNumerator.length == 2){
+            //add whole number part just as number
+            result = Double.parseDouble(wholeNumAndNumerator[0].trim());
+            //record numerator
+            numerator = new BigDecimal(wholeNumAndNumerator[1].trim());
+        }
+        //if just a standard fraction, the first component is the numerator
+        else{
+            numerator = new BigDecimal(components[0]);
+        }
+
+        //compute the value of the fraction, and add to whole number part if applicable
+        result += (numerator.divide(denominator)).doubleValue();
+
+        return result;
+    }
+
+    public static boolean qtyHasFraction(String qty){
+        return qty.contains("/");
+    }
 }

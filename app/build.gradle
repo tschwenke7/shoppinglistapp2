@@ -31,6 +31,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "androidx.appcompat:appcompat:$rootProject.appCompatVersion"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation files('libs\\Fraction-0.0.2.jar')//https://github.com/MrRefactoring/Fraction.java
 
     //Navigation
     def nav_version = "2.3.3"

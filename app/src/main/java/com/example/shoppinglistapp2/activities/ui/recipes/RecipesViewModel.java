@@ -22,7 +22,6 @@ public class RecipesViewModel extends AndroidViewModel {
 
     private final SlaRepository slaRepository;
     private final LiveData<List<Recipe>> allRecipes;
-    private ExecutorService websiteExecutor = Executors.newSingleThreadExecutor();
 
     public RecipesViewModel(@NonNull Application application) {
         super(application);
@@ -143,5 +142,9 @@ public class RecipesViewModel extends AndroidViewModel {
 
     public Recipe getRecipeById(int id){
         return slaRepository.getRecipeById(id);
+    }
+
+    public void getIngredientIds(int recipeId){
+
     }
 }

@@ -19,15 +19,20 @@ public interface SlItemDao {
     @Query("SELECT * FROM slitems ORDER BY checked")
     public LiveData<List<SlItem>> getAll();
 
+    @Query("SELECT * FROM slitems WHERE checked = 0")
+    List<SlItem> getAllUncheckedNonLive();
+
     @Delete
     public void deleteAll(SlItem... slItems);
 
     @Update
-    public void update(SlItem slItem);
+    public void update(SlItem... slItems);
 
     @Query("DELETE FROM slitems WHERE checked = 1")
     public void clearAllChecked();
 
     @Query("DELETE FROM slitems")
     public void clearAll();
+
+
 }
