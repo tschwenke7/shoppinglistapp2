@@ -22,6 +22,9 @@ public interface SlItemDao {
     @Query("SELECT * FROM slitems WHERE checked = 0")
     List<SlItem> getAllUncheckedNonLive();
 
+    @Query("SELECT * FROM slitems WHERE name = :name")
+    public SlItem getByName(String name);
+
     @Delete
     public void deleteAll(SlItem... slItems);
 
@@ -33,6 +36,4 @@ public interface SlItemDao {
 
     @Query("DELETE FROM slitems")
     public void clearAll();
-
-
 }

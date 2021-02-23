@@ -34,8 +34,19 @@ public class ShoppingListViewModel extends AndroidViewModel {
         slaRepository.deleteSlItems(slItems);
     }
 
-    private void insertSlItems(SlItem... slItems){
-        slaRepository.insertSlItems(slItems);
+    private void insertOrMergeItem(SlItem newItem){
+        //attempt to find an existing item with the same name
+        SlItem existingItemWithSameName = slaRepository.getSlItemByName(newItem.getName());
+
+        //if none found, just insert
+        if(null == existingItemWithSameName){
+            slaRepository.insertSlItems(newItem);
+        }
+        //if one was found, merge their quantities then persist the change
+        else{
+            SlItemUtils.mergeQuantities(existingItemWithSameName, newItem);
+            slaRepository.updateSlItems(existingItemWithSameName);
+        }
     }
 
     public void updateSlItem(SlItem slItem){
@@ -64,38 +75,21 @@ public class ShoppingListViewModel extends AndroidViewModel {
         //split input in case of multiple lines
         String[] items = inputText.split("(\\r\\n|\\r|\\n)");
 
-        //convert each line to an item to add and persist to db
+        //convert each line to an item
+        //and either add it or merge it with an existing item of same name
         for (String item : items){
-            insertSlItems(SlItemUtils.toSlItem(item.trim()));
+            insertOrMergeItem(SlItemUtils.toSlItem(item.trim()));
         }
     }
 
     public void addItemsFromRecipe(List<Ingredient> ingredients){
-
-        //compile hashmap of slItems to more quickly find duplicate list items
-        HashMap<SlItem, SlItem> existingItems = new HashMap<>();
-        for(SlItem slItem : slaRepository.getSlItemsNonLive()){
-            existingItems.put(slItem, slItem);
-        }
-
         //record list of items to update in db afterwards, if their qtys are edited during the merge
         List<SlItem> itemsToUpdate = new ArrayList<>();
         //for each ingredient, convert it to an SLItem
         //either add that item if it's new,
         for (Ingredient ingredient : ingredients){
             SlItem item = SlItemUtils.toSlItem(ingredient);
-            //either merge the qtys if item is already on the list
-            if (existingItems.containsKey(item)){
-                SlItemUtils.mergeQuantities(existingItems.get(item), item);
-                //record reference to this object so we can persist changes to db later
-                itemsToUpdate.add(existingItems.get(item));
-            }
-            //or add a new item to the list
-            else{
-                insertSlItems(item);
-
-                //todo - allow items being added to be considered as "existing items" for following items
-            }
+            insertOrMergeItem(item);
         }
 
         //update all items with modified qtys in db

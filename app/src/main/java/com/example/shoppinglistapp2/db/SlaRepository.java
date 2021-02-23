@@ -132,10 +132,10 @@ public class SlaRepository {
         return allSlItems;
     }
 
-    public List<SlItem> getSlItemsNonLive(){
-        Callable<List<SlItem>> queryCallable = () -> slItemDao.getAllUncheckedNonLive();
+    public SlItem getSlItemByName(String name){
+        Callable<SlItem> queryCallable = () -> slItemDao.getByName(name);
 
-        Future<List<SlItem>> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
+        Future<SlItem> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
         try {
             return future.get();
         } catch (InterruptedException e1) {
