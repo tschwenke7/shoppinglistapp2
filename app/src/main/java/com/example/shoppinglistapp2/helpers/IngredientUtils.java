@@ -3,10 +3,13 @@ package com.example.shoppinglistapp2.helpers;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 
 public class IngredientUtils {
+    private static DecimalFormat twodp = new DecimalFormat("#.##");
+    private static DecimalFormat zerodp = new DecimalFormat("#");
 
     private static final List<String> unitsOfMeasurement = Arrays.asList(
             "cup",
@@ -38,7 +41,17 @@ public class IngredientUtils {
 
             "tbsp",
             "tablespoon",
-            "tablespoons"
+            "tablespoons",
+
+            //foreign units
+            "lb",
+            "lbs",
+            "pound",
+            "pounds",
+
+            "oz",
+            "ounce",
+            "ounces"
     );
 
     public static final List<String> foreignUnitsOfMeasurement = Arrays.asList(
@@ -187,16 +200,49 @@ public class IngredientUtils {
         //tbsp
         else if (
             "tablespoon".equals(unit) ||
-            "tablespoon".equals(unit)
+            "tablespoons".equals(unit)
         ){ ingredient.setUnit("tbsp"); }
         else if (
             "cup".equals(unit)
         ){ ingredient.setUnit("cups"); }
-        //todo - deal with imperial units here
-//        else if (
-//            "lb".equals(unit) ||
-//            "lbs".equals(unit)
-//        ){ ingredient.setUnit("kg"); }
+
+        /* convert any imperial units to an appropriate metric one */
+        //convert pounds to g/kg
+        else if(
+            "lb".equals(unit) ||
+            "lbs".equals(unit) ||
+            "pound".equals(unit) ||
+            "pounds".equals(unit)
+        ){
+            //~454.592 grams per lb
+            double grams = IngredientUtils.qtyAsDouble(ingredient.getQty()) * 453.592;
+            //write as kg if >= 1000g
+            if(grams >= 1000){
+                ingredient.setQty(twodp.format(grams/1000));
+                ingredient.setUnit("kg");
+            }
+            else{
+                ingredient.setQty(zerodp.format(grams));
+                ingredient.setUnit("g");
+            }
+
+        }
+        else if (
+                "oz".equals(unit) ||
+                "ounce".equals(unit) ||
+                "ounces".equals(unit)
+        ){
+            //~28.3495g per oz.
+            double grams = IngredientUtils.qtyAsDouble(ingredient.getQty()) * 28.3495;
+            if(grams >= 1000){
+                ingredient.setQty(twodp.format(grams/1000));
+                ingredient.setUnit("kg");
+            }
+            else{
+                ingredient.setQty(zerodp.format(grams));
+                ingredient.setUnit("g");
+            }
+        }
     }
 
 
