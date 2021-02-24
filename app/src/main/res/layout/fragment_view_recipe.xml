@@ -205,6 +205,56 @@
             app:layout_constraintStart_toEndOf="@+id/layout_cook_time"
             app:layout_constraintTop_toTopOf="@+id/layout_cook_time" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ratings_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layout_prep_time">
+
+            <ImageView
+                android:id="@+id/tiernan_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/tiernan_rating_bar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tiernan_rating_bar"
+                app:srcCompat="@drawable/ic_tiernan_face" />
+
+            <RatingBar
+                android:id="@+id/tiernan_rating_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintStart_toEndOf="@+id/tiernan_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:rating="1.5"/>
+
+            <ImageView
+                android:id="@+id/tom_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/tom_rating_bar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tom_rating_bar"
+                app:srcCompat="@drawable/ic_tom_face" />
+
+            <RatingBar
+                android:id="@+id/tom_rating_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                app:layout_constraintStart_toEndOf="@+id/tom_icon"
+                app:layout_constraintTop_toBottomOf="@+id/tiernan_rating_bar"
+                tools:rating="3.5"
+                android:isIndicator="true"
+               />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <FrameLayout
             android:id="@+id/frame_layout_url"
             android:layout_width="match_parent"
@@ -214,7 +264,7 @@
             android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layout_prep_time">
+            app:layout_constraintTop_toBottomOf="@+id/ratings_layout">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/url_editor"
@@ -238,13 +288,13 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
+                    android:autofillHints="uri"
                     android:ems="10"
                     android:hint="@string/recipe_url_placeholder"
                     android:inputType="textUri|text"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/url_heading"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:autofillHints="uri"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

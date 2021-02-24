@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
     private List<Recipe> recipes;
     private OnRecipeClickListener onRecipeClickListener;
     private List<Integer> selectedPositions = new ArrayList<>();
+    private DecimalFormat ratingFormat = new DecimalFormat("#.#");
 
     public RecipeListAdapter(OnRecipeClickListener onRecipeClickListener){
         this.onRecipeClickListener = onRecipeClickListener;
@@ -156,7 +158,8 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
             //set ratings
             TextView tierRatingView = itemView.findViewById(R.id.tier_rating);
             if(recipe.getTier_rating() != 0){
-                tierRatingView.setText(String.format("%d",recipe.getTier_rating()));
+                float tierRating = ((float) recipe.getTier_rating()) / 2.0f;
+                tierRatingView.setText(ratingFormat.format(tierRating));
             }
             else{
                 tierRatingView.setText("-");
@@ -164,7 +167,8 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
 
             TextView tomRatingView = itemView.findViewById(R.id.tom_rating);
             if(recipe.getTom_rating() != 0){
-                tomRatingView.setText(String.format("%d",recipe.getTom_rating()));
+                float tomRating = ((float) recipe.getTom_rating()) / 2.0f;
+                tomRatingView.setText(ratingFormat.format(tomRating));
             }
             else{
                 tomRatingView.setText("-");

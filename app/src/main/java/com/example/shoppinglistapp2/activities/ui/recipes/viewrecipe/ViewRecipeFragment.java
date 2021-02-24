@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -106,8 +107,6 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //prefill recipe name field
         ((TextView) root.findViewById(R.id.edit_text_recipe_name)).setText(recipe.getName());
 
-
-
         //prep and cook times
         ((TextView) root.findViewById(R.id.edit_text_prep_time)).setText(Integer.toString(recipe.getPrepTime()));
         ((TextView) root.findViewById(R.id.text_view_prep_time)).setText(Integer.toString(recipe.getPrepTime()));
@@ -130,6 +129,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         else{
             websiteButton.setText(getString(R.string.default_url_button_text));
         }
+
+        //ratings
+        ((RatingBar) root.findViewById(R.id.tiernan_rating_bar)).setRating(((float) currentRecipe.getTier_rating()) / 2f);
+        ((RatingBar) root.findViewById(R.id.tom_rating_bar)).setRating(((float) currentRecipe.getTom_rating()) / 2f);
 
         //url field
         if(null != recipe.getUrl()){
@@ -196,6 +199,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         root.findViewById(R.id.edit_text_cook_time).setVisibility(View.VISIBLE);
         root.findViewById(R.id.text_view_cook_time).setVisibility(View.GONE);
 
+        //enable ratings bars
+        ((RatingBar) root.findViewById(R.id.tiernan_rating_bar)).setIsIndicator(false);
+        ((RatingBar) root.findViewById(R.id.tom_rating_bar)).setIsIndicator(false);
+
         //swap url button for field/title
         root.findViewById(R.id.url_editor).setVisibility(View.VISIBLE);
         root.findViewById(R.id.recipe_url_button).setVisibility(View.GONE);
@@ -204,7 +211,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         root.findViewById(R.id.edit_text_recipe_notes).setVisibility(View.VISIBLE);
         root.findViewById(R.id.recipe_notes).setVisibility(View.GONE);
 
-        //todo - show per-ingredient delete icons
+        //show per-ingredient delete icons
         adapter.setEditMode(true);
         ingredientRecyclerView.setAdapter(adapter);
 
@@ -229,6 +236,9 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         TextView cookTimeTextView = root.findViewById(R.id.text_view_cook_time);
         cookTimeTextView.setVisibility(View.VISIBLE);
 
+        //disable ratings bars
+        ((RatingBar) root.findViewById(R.id.tiernan_rating_bar)).setIsIndicator(true);
+        ((RatingBar) root.findViewById(R.id.tom_rating_bar)).setIsIndicator(true);
 
         //swap url field/title for button
         root.findViewById(R.id.url_editor).setVisibility(View.GONE);
@@ -241,7 +251,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         notesTextView.setVisibility(View.VISIBLE);
 
 
-        //todo - hide per-ingredient delete icons
+        //hide per-ingredient delete icons
         adapter.setEditMode(false);
         ingredientRecyclerView.setAdapter(adapter);
     }
@@ -267,6 +277,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
         //read notes
         String notes = ((TextView) root.findViewById(R.id.edit_text_recipe_notes)).getText().toString();
+
+        //read ratings - * 2 and cast to int so we can store half stars as ints
+        int tierRating = (int) (((RatingBar) root.findViewById(R.id.tiernan_rating_bar)).getRating() * 2);
+        int tomRating = (int) (((RatingBar) root.findViewById(R.id.tom_rating_bar)).getRating() * 2);
 
         //ingredients are already saved, and so don't need to be read
 
@@ -298,6 +312,9 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             else{
                 currentRecipe.setCookTime(0);
             }
+
+            currentRecipe.setTier_rating(tierRating);
+            currentRecipe.setTom_rating(tomRating);
             currentRecipe.setUrl(url);
             currentRecipe.setNotes(notes);
 

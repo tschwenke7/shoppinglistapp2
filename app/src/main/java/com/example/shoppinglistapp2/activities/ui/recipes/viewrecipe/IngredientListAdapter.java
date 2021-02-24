@@ -71,12 +71,8 @@ public class IngredientListAdapter extends ListAdapter<Ingredient, IngredientLis
             else{
                 itemView.findViewById(R.id.delete_icon).setVisibility(View.VISIBLE);
                 //attach click listener to delete icon
-                itemView.findViewById(R.id.delete_icon).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        itemClickListener.onDeleteClicked(getAdapterPosition());
-                    }
-                });
+                itemView.findViewById(R.id.delete_icon).setOnClickListener(view ->
+                        itemClickListener.onDeleteClicked(getAdapterPosition()));
             }
         }
 
