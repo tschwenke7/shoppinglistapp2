@@ -49,9 +49,9 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
         root = inflater.inflate(R.layout.fragment_recipe_editor, container, false);
 
         //load the recipe to be edited
-        currentRecipe = recipesViewModel.getRecipeById(RecipeEditorFragmentArgs.fromBundle(getArguments()).getRecipeId());
-        //read new recipe flag
-        newRecipeFlag = RecipeEditorFragmentArgs.fromBundle(getArguments()).getNewRecipeFlag();
+//        currentRecipe = recipesViewModel.getRecipeById(RecipeEditorFragmentArgs.fromBundle(getArguments()).getRecipeId());
+//        //read new recipe flag
+//        newRecipeFlag = RecipeEditorFragmentArgs.fromBundle(getArguments()).getNewRecipeFlag();
 
         //if the editor is being opened for an existing recipe, prefill the fields with the saved data
 //        if(!newRecipeFlag){
@@ -113,7 +113,7 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
 
         //notes
         if(null != currentRecipe.getNotes() && !currentRecipe.getNotes().isEmpty()){
-            ((TextView) root.findViewById(R.id.recipe_notes)).setText(currentRecipe.getNotes());
+            ((TextView) root.findViewById(R.id.edit_text_recipe_notes)).setText(currentRecipe.getNotes());
         }
     }
 
@@ -149,6 +149,7 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
      */
     private void saveRecipe(){
 
+
         /* Read all fields */
         String recipeName = ((TextView) root.findViewById(R.id.edit_text_recipe_name))
                 .getText().toString();
@@ -163,7 +164,7 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
 
 
         //read notes
-        String notes = ((TextView) root.findViewById(R.id.recipe_notes)).getText().toString();
+        String notes = ((TextView) root.findViewById(R.id.edit_text_recipe_notes)).getText().toString();
 
         //ingredients are already saved, and so don't need to be read
 
@@ -209,17 +210,17 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
 
             //if this was a new recipe, return to recipe list
             if(newRecipeFlag){
-                Toast.makeText(getView().getContext(), "Recipe created successfully",Toast.LENGTH_LONG).show();
-                RecipeEditorFragmentDirections.ActionNewRecipeEditorToViewRecipe action = RecipeEditorFragmentDirections.actionNewRecipeEditorToViewRecipe();
-                action.setRecipeId(currentRecipe.getId());
-                Navigation.findNavController(getView()).navigate(action);
-            }
-            //if it was an existing recipe, return to its viewRecipe
-            else{
-                Toast.makeText(getView().getContext(), "Recipe saved",Toast.LENGTH_LONG).show();
-                RecipeEditorFragmentDirections.ActionRecipeEditorToViewRecipe action = RecipeEditorFragmentDirections.actionRecipeEditorToViewRecipe();
-                action.setRecipeId(currentRecipe.getId());
-                Navigation.findNavController(getView()).navigate(action);
+//                Toast.makeText(getView().getContext(), "Recipe created successfully",Toast.LENGTH_LONG).show();
+//                RecipeEditorFragmentDirections.ActionNewRecipeEditorToViewRecipe action = RecipeEditorFragmentDirections.actionNewRecipeEditorToViewRecipe();
+//                action.setRecipeId(currentRecipe.getId());
+//                Navigation.findNavController(getView()).navigate(action);
+//            }
+//            //if it was an existing recipe, return to its viewRecipe
+//            else{
+//                Toast.makeText(getView().getContext(), "Recipe saved",Toast.LENGTH_LONG).show();
+//                RecipeEditorFragmentDirections.ActionRecipeEditorToViewRecipe action = RecipeEditorFragmentDirections.actionRecipeEditorToViewRecipe();
+//                action.setRecipeId(currentRecipe.getId());
+//                Navigation.findNavController(getView()).navigate(action);
             }
         }
     }

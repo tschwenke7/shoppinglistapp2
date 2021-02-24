@@ -65,8 +65,8 @@ public class CreateRecipeFragment extends Fragment {
         Button manualButton = root.findViewById(R.id.create_recipe_manually_button);
         manualButton.setOnClickListener(view -> {
             //create new empty recipe and navigate to recipe editor screen when "+" icon clicked
-            CreateRecipeFragmentDirections.ActionCreateRecipeToRecipeEditorFragment action =
-                    CreateRecipeFragmentDirections.actionCreateRecipeToRecipeEditorFragment();
+            CreateRecipeFragmentDirections.ActionCreateRecipeToViewRecipe action =
+                    CreateRecipeFragmentDirections.actionCreateRecipeToViewRecipe();
             action.setRecipeId(recipesViewModel.generateNewRecipeId());
             Navigation.findNavController(root).navigate(action);
         });
@@ -104,8 +104,8 @@ public class CreateRecipeFragment extends Fragment {
                 }
                 //otherwise, navigate to editor for the new recipe
                 else{
-                    CreateRecipeFragmentDirections.ActionCreateRecipeToRecipeEditorFragment action =
-                            CreateRecipeFragmentDirections.actionCreateRecipeToRecipeEditorFragment();
+                    CreateRecipeFragmentDirections.ActionCreateRecipeToViewRecipe action =
+                            CreateRecipeFragmentDirections.actionCreateRecipeToViewRecipe();
 
                     //pass id of newly created recipe
                     action.setRecipeId(recipeId.get());

@@ -56,7 +56,7 @@
                 app:layout_constraintTop_toTopOf="@+id/clock_icon" />
 
             <TextView
-                android:id="@+id/prep_time"
+                android:id="@+id/edit_text_prep_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
@@ -73,7 +73,7 @@
                 android:text="@string/cook_time_heading_short"
                 android:textColor="@color/recipe_item_text_secondary"
                 app:layout_constraintBottom_toBottomOf="@+id/clock_icon"
-                app:layout_constraintStart_toEndOf="@+id/prep_time"
+                app:layout_constraintStart_toEndOf="@+id/edit_text_prep_time"
                 app:layout_constraintTop_toTopOf="@+id/clock_icon" />
 
             <TextView

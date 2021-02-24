@@ -13,7 +13,14 @@
         <action
             android:id="@+id/action_recipe_list_to_view_recipe"
             app:destination="@id/viewRecipeFragment"
-            app:enterAnim="@android:anim/slide_in_left" />
+            app:enterAnim="@android:anim/slide_in_left" >
+            <argument
+                android:name="newRecipeFlag"
+                android:defaultValue="false" />
+            <argument
+                android:name="editingFlag"
+                android:defaultValue="false" />
+        </action>
         <action
             android:id="@+id/action_recipe_list_to_create_recipe"
             app:destination="@id/createRecipe" />
@@ -24,35 +31,6 @@
         android:name="com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListFragment"
         android:label="@string/title_shopping_list"
         tools:layout="@layout/fragment_shopping_list" />
-    <fragment
-        android:id="@+id/recipeEditorFragment"
-        android:name="com.example.shoppinglistapp2.activities.ui.recipes.editor.RecipeEditorFragment"
-        android:label="@string/title_recipe_editor"
-        tools:layout="@layout/fragment_recipe_editor">
-        <action
-            android:id="@+id/action_save_or_cancel_and_return_to_recipe_list"
-            app:destination="@id/recipe_list"
-            app:popUpTo="@id/recipe_list"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_recipe_editor_to_view_recipe"
-            app:destination="@id/viewRecipeFragment"
-            app:popUpTo="@id/viewRecipeFragment"
-            app:popUpToInclusive="true" />
-        <argument
-            android:name="recipeId"
-            android:defaultValue="-1"
-            app:argType="integer" />
-        <argument
-            android:name="newRecipeFlag"
-            android:defaultValue="false"
-            app:argType="boolean" />
-        <action
-            android:id="@+id/action_new_recipe_editor_to_view_recipe"
-            app:destination="@id/viewRecipeFragment"
-            app:popUpTo="@id/recipeEditorFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
 
     <fragment
         android:id="@+id/viewRecipeFragment"
@@ -62,18 +40,17 @@
         <action
             android:id="@+id/action_view_recipe_to_recipe_list"
             app:destination="@id/recipe_list" />
-        <action
-            android:id="@+id/action_view_recipe_to_recipe_editor"
-            app:destination="@id/recipeEditorFragment"
-            app:popUpTo="@id/viewRecipeFragment"
-            app:popUpToInclusive="false">
-            <argument
-                android:name="newRecipeFlag"
-                android:defaultValue="false" />
-        </action>
         <argument android:name="recipeId"
             app:argType="integer"
             android:defaultValue="-1" />
+        <argument
+            android:name="newRecipeFlag"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="editingFlag"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
     <fragment
         android:id="@+id/createRecipe"
@@ -81,10 +58,11 @@
         android:label="@string/create_recipe_title"
         tools:layout="@layout/fragment_create_recipe">
         <action
-            android:id="@+id/action_create_recipe_to_recipe_editor_fragment"
-            app:destination="@id/recipeEditorFragment"
-            app:popUpTo="@id/createRecipe"
-            app:popUpToInclusive="true">
+            android:id="@+id/action_create_recipe_to_view_recipe"
+            app:destination="@id/viewRecipeFragment" >
+            <argument
+                android:name="editingFlag"
+                android:defaultValue="true" />
             <argument
                 android:name="newRecipeFlag"
                 android:defaultValue="true" />

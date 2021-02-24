@@ -138,7 +138,7 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
 
             //set prep and cook times
             String timeUnit = itemView.getContext().getString(R.string.abbreviated_time_unit);
-            TextView prepTimeView = itemView.findViewById(R.id.prep_time);
+            TextView prepTimeView = itemView.findViewById(R.id.edit_text_prep_time);
             if(0 != recipe.getPrepTime()){
                 prepTimeView.setText(String.format("%d %s",recipe.getPrepTime(), timeUnit));
             }

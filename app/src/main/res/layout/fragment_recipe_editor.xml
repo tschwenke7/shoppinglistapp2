@@ -168,18 +168,19 @@ xmlns:tools="http://schemas.android.com/tools"
             app:layout_constraintTop_toBottomOf="@+id/url_heading" />
 
         <EditText
-            android:id="@+id/recipe_notes"
+            android:id="@+id/edit_text_recipe_notes"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
             android:ems="10"
             android:hint="@string/recipe_notes_placeholder"
             android:inputType="textMultiLine|textCapSentences"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/recipe_notes_heading" />
+            app:layout_constraintTop_toBottomOf="@+id/recipe_notes_heading"
+             />
 
         <Button
             android:id="@+id/save_recipe_button"
@@ -195,7 +196,7 @@ xmlns:tools="http://schemas.android.com/tools"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/recipe_notes" />
+            app:layout_constraintTop_toBottomOf="@+id/edit_text_recipe_notes" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

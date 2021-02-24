@@ -20,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -37,6 +36,7 @@ public class ViewRecipeFragment extends Fragment {
     private RecipesViewModel recipesViewModel;
     private ShoppingListViewModel shoppingListViewModel;
     private int recipeId;
+    private boolean editingFlag;
     private LiveData<List<Ingredient>> ingredients;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -46,12 +46,12 @@ public class ViewRecipeFragment extends Fragment {
         shoppingListViewModel =
                 new ViewModelProvider(getActivity()).get(ShoppingListViewModel.class);
 
-        //retrieve recipe to be edited
+        //retrieve recipe to be viewed
         recipeId = ViewRecipeFragmentArgs.fromBundle(getArguments()).getRecipeId();
         Recipe recipe = recipesViewModel.getRecipeById(recipeId);
 
-        //set name as action bar title
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(recipe.getName());
+        //decide whether to start in edit mode or not
+        editingFlag = ViewRecipeFragmentArgs.fromBundle(getArguments()).getEditingFlag();
 
         View root = inflater.inflate(R.layout.fragment_view_recipe, container, false);
 
@@ -59,19 +59,43 @@ public class ViewRecipeFragment extends Fragment {
         this.setHasOptionsMenu(true);
 
         /* fill in textViews with saved recipe data where available */
+        populateViews(root, recipe);
+
+        if(editingFlag){
+            enterEditMode(root);
+        }
+        else{
+            enterViewMode(root);
+        }
+
+        return root;
+    }
+
+    private void populateViews(View root, Recipe recipe){
+        //set name as action bar title
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(recipe.getName());
+
+        //prefill recipe name field
+        ((TextView) root.findViewById(R.id.edit_text_recipe_name)).setText(recipe.getName());
+
         //setup ingredient list recyclerview
         RecyclerView recipeRecyclerView = root.findViewById(R.id.recipe_ingredients_list);
         final IngredientListAdapter adapter = new IngredientListAdapter(new IngredientListAdapter.IngredientDiff());
         recipeRecyclerView.setAdapter(adapter);
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
+        //set observer to update ingredient list if it changes
+        ingredients = recipesViewModel.getRecipeIngredientsById(recipe.getId());
+        ingredients.observe(getViewLifecycleOwner(), currentRecipeIngredients -> {
+            adapter.submitList(currentRecipeIngredients);
+        });
 
         //prep and cook times
-        TextView prepTimeField = root.findViewById(R.id.prep_time);
-        prepTimeField.setText(recipe.getPrepTime() + " " +  getString(R.string.abbreviated_time_unit));
+        ((TextView) root.findViewById(R.id.edit_text_prep_time)).setText(Integer.toString(recipe.getPrepTime()));
+        ((TextView) root.findViewById(R.id.text_view_prep_time)).setText(Integer.toString(recipe.getPrepTime()));
 
-        TextView cookTimeField = root.findViewById(R.id.cook_time);
-        cookTimeField.setText(recipe.getCookTime() + " " +  getString(R.string.abbreviated_time_unit));
+        ((TextView) root.findViewById(R.id.edit_text_cook_time)).setText(Integer.toString(recipe.getCookTime()));
+        ((TextView) root.findViewById(R.id.text_view_cook_time)).setText(Integer.toString(recipe.getCookTime()));
 
         //website link
         Button websiteButton = root.findViewById(R.id.recipe_url_button);
@@ -89,6 +113,11 @@ public class ViewRecipeFragment extends Fragment {
             websiteButton.setText(getString(R.string.default_url_button_text));
         }
 
+        //url field
+        if(null != recipe.getUrl()){
+            ((TextView) root.findViewById(R.id.edit_text_url)).setText(recipe.getUrl());
+        }
+
         //notes
         TextView notesField = root.findViewById(R.id.recipe_notes);
         if (null != recipe.getNotes() && !recipe.getNotes().isEmpty()){
@@ -97,15 +126,40 @@ public class ViewRecipeFragment extends Fragment {
         else{
             notesField.setText(getString(R.string.default_notes_text));
         }
+    }
 
+    private void enterEditMode(View root){
 
-        //set observer to update ingredient list if it changes
-        ingredients = recipesViewModel.getRecipeIngredientsById(recipe.getId());
-        ingredients.observe(getViewLifecycleOwner(), currentRecipeIngredients -> {
-            adapter.submitList(currentRecipeIngredients);
-        });
+    }
 
-        return root;
+    private void enterViewMode(View root){
+        //hide recipe name field
+        root.findViewById(R.id.edit_text_recipe_name).setVisibility(View.GONE);
+
+        //hide new ingredient field and button
+        root.findViewById(R.id.recipe_add_ingredient_button).setVisibility(View.GONE);
+        root.findViewById(R.id.edit_text_ingredient).setVisibility(View.GONE);
+
+        //swap prep and cook time editTexts to textViews
+        TextView prepTimeEditText = root.findViewById(R.id.edit_text_prep_time);
+        prepTimeEditText.setVisibility(View.GONE);
+        TextView prepTimeTextView = root.findViewById(R.id.text_view_prep_time);
+        prepTimeTextView.setVisibility(View.VISIBLE);
+        prepTimeTextView.setText(prepTimeEditText.getText());
+
+        TextView cookTimeEditText = root.findViewById(R.id.edit_text_cook_time);
+        cookTimeEditText.setVisibility(View.GONE);
+        TextView cookTimeTextView = root.findViewById(R.id.text_view_cook_time);
+        cookTimeTextView.setVisibility(View.VISIBLE);
+        cookTimeTextView.setText(cookTimeEditText.getText());
+
+        //swap url field/title for button
+        root.findViewById(R.id.url_editor).setVisibility(View.GONE);
+        root.findViewById(R.id.recipe_url_button).setVisibility(View.VISIBLE);
+
+        //cancel action mode, reverting top bar back to normal
+
+        //hide per-ingredient delete icons
     }
 
     //hide back button in action bar for this fragment
@@ -136,11 +190,7 @@ public class ViewRecipeFragment extends Fragment {
 
             //edit button pressed
             case R.id.action_edit_recipe:
-                //send to editor page with recipeId of the recipe being viewed
-                ViewRecipeFragmentDirections.ActionViewRecipeToRecipeEditor action =
-                        ViewRecipeFragmentDirections.actionViewRecipeToRecipeEditor();
-                action.setRecipeId(recipeId);
-                Navigation.findNavController(getView()).navigate(action);
+                //todo - switch to edit mode
                 return true;
 
             case R.id.action_add_all_to_list:
