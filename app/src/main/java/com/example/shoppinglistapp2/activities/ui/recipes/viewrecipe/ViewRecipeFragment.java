@@ -142,6 +142,15 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     }
 
     private void enterEditMode(View root){
+        //start edit mode - replacing the action bar with edit mode bar
+        if (actionMode == null){
+            actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallback);
+        }
+
+        //set the title to tell user they're editing the recipe
+        actionMode.setTitle(R.string.edit_mode_title);
+        actionMode.invalidate();
+
         //show recipe name field
         root.findViewById(R.id.edit_text_recipe_name).setVisibility(View.VISIBLE);
 
@@ -295,15 +304,6 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
             //edit button pressed
             case R.id.action_edit_recipe:
-                //start edit mode
-                if (actionMode == null){
-                    actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallback);
-                }
-
-                //set the title to tell user they're editing the recipe
-                actionMode.setTitle(R.string.edit_mode_title);
-                actionMode.invalidate();
-
                 //modify UI to edit mode
                 enterEditMode(getView());
                 return true;
@@ -377,7 +377,13 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             switch (menuItem.getItemId()){
                 //Handle clicking of save button
                 case R.id.action_save_recipe:
+                    //ends the actionmode, returning control of action bar back to the fragment
+                    //and calling onDestroyActionMode
                     actionMode.finish();
+                    //save recipe
+                    saveRecipe();
+                    //notify user
+                    Toast.makeText(getContext(),R.string.save_recipe_toat,Toast.LENGTH_SHORT).show();
                     return true;
 
                 default:
@@ -388,9 +394,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             actionMode = null;
-            saveRecipe();
+            //revert display to view-only UI
             enterViewMode(getView());
-            Toast.makeText(getContext(),R.string.save_recipe_toat,Toast.LENGTH_SHORT).show();
+            //hide keyboard if it was open
+            KeyboardHider.hideKeyboard(getActivity());
         }
     }
 }
