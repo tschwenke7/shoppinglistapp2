@@ -275,22 +275,39 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/frame_layout_url" />
 
-        <TextView
-            android:id="@+id/recipe_notes"
-            android:layout_width="0dp"
+        <RelativeLayout
+            android:id="@+id/layout_recipe_notes"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            android:ems="10"
-            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/recipe_notes_heading"
-            tools:text="Notes about the recipe\nOver multiple lines." />
+            app:layout_constraintTop_toBottomOf="@+id/recipe_notes_heading">
 
+            <TextView
+                android:id="@+id/recipe_notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ems="10"
+                android:gravity="top"
+                android:textSize="18sp"
+                tools:text="Notes about the recipe\nOver multiple lines." />
 
+            <EditText
+                android:id="@+id/edit_text_recipe_notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:gravity="top"
+                android:inputType="textMultiLine|textCapSentences"
+                android:textSize="18sp"
+                android:hint="@string/recipe_notes_placeholder"
+                tools:text="Notes about the recipe\nOver multiple lines." />
+
+        </RelativeLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

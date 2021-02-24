@@ -17,7 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,12 +24,13 @@ import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.KeyboardHider;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
+import com.example.shoppinglistapp2.activities.ui.recipes.viewrecipe.IngredientListAdapter;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 
 import java.util.List;
 
-public class RecipeEditorFragment extends Fragment implements IngredientListEditorAdapter.ItemClickListener {
+public class RecipeEditorFragment extends Fragment implements IngredientListAdapter.ItemClickListener {
     private RecipesViewModel recipesViewModel;
     private Recipe currentRecipe;
     private LiveData<List<Ingredient>> currentIngredients;
@@ -64,7 +64,7 @@ public class RecipeEditorFragment extends Fragment implements IngredientListEdit
 
         //setup ingredient list recyclerview
         RecyclerView recipeRecyclerView = root.findViewById(R.id.recipe_ingredients_list);
-        final IngredientListEditorAdapter adapter = new IngredientListEditorAdapter(new IngredientListEditorAdapter.IngredientDiff(), this);
+        final IngredientListAdapter adapter = new IngredientListAdapter(new IngredientListAdapter.IngredientDiff(), this);
         recipeRecyclerView.setAdapter(adapter);
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
