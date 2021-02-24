@@ -15,6 +15,7 @@ import com.example.shoppinglistapp2.db.tables.Ingredient;
 
 public class IngredientListAdapter extends ListAdapter<Ingredient, IngredientListAdapter.ViewHolder> {
     private IngredientListAdapter.ItemClickListener itemClickListener;
+    private boolean editMode = false;
 
     public IngredientListAdapter(@NonNull DiffUtil.ItemCallback<Ingredient> diffCallback, IngredientListAdapter.ItemClickListener itemClickListener) {
         super(diffCallback);
@@ -33,6 +34,10 @@ public class IngredientListAdapter extends ListAdapter<Ingredient, IngredientLis
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Ingredient current = getItem(position);
         holder.bind(current);
+    }
+
+    public void setEditMode(boolean isEditMode){
+        this.editMode = isEditMode;
     }
 
     public static class IngredientDiff extends DiffUtil.ItemCallback<Ingredient> {
@@ -59,13 +64,20 @@ public class IngredientListAdapter extends ListAdapter<Ingredient, IngredientLis
             super(itemView);
             ingredientNameView = itemView.findViewById(R.id.ingredient_name);
 
-            //attach click listener to delete icon
-            itemView.findViewById(R.id.delete_icon).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    itemClickListener.onDeleteClicked(getAdapterPosition());
-                }
-            });
+            //hide delete button if edit mode is disabled
+            if(!editMode){
+                itemView.findViewById(R.id.delete_icon).setVisibility(View.INVISIBLE);
+            }
+            else{
+                itemView.findViewById(R.id.delete_icon).setVisibility(View.VISIBLE);
+                //attach click listener to delete icon
+                itemView.findViewById(R.id.delete_icon).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        itemClickListener.onDeleteClicked(getAdapterPosition());
+                    }
+                });
+            }
         }
 
         public void bind (Ingredient ingredient){

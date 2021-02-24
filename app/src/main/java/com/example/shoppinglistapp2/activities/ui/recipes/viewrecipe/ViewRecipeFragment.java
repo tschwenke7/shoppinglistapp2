@@ -1,6 +1,5 @@
 package com.example.shoppinglistapp2.activities.ui.recipes.viewrecipe;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +47,8 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     private LiveData<List<Ingredient>> ingredients;
     private ActionMode actionMode;
     private ActionMode.Callback actionModeCallback = new ViewRecipeFragment.ActionModeCallback();
+    private IngredientListAdapter adapter;
+    private RecyclerView ingredientRecyclerView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -72,6 +74,19 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         /* fill in textViews with saved recipe data where available */
         populateViews(root, currentRecipe);
 
+        //setup ingredient list recyclerview
+        ingredientRecyclerView = root.findViewById(R.id.recipe_ingredients_list);
+        adapter = new IngredientListAdapter(new IngredientListAdapter.IngredientDiff(), this);
+        ingredientRecyclerView.setAdapter(adapter);
+        ingredientRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        //set observer to update ingredient list if it changes
+        ingredients = recipesViewModel.getRecipeIngredientsById(recipeId);
+        ingredients.observe(getViewLifecycleOwner(), adapter::submitList);
+
+        //handle ingredient being added
+        Button addIngredientButton = root.findViewById(R.id.recipe_add_ingredient_button);
+        addIngredientButton.setOnClickListener(view -> addIngredients(view));
+
         if(editingFlag){
             enterEditMode(root);
         }
@@ -91,17 +106,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //prefill recipe name field
         ((TextView) root.findViewById(R.id.edit_text_recipe_name)).setText(recipe.getName());
 
-        //setup ingredient list recyclerview
-        RecyclerView recipeRecyclerView = root.findViewById(R.id.recipe_ingredients_list);
-        final IngredientListAdapter adapter = new IngredientListAdapter(new IngredientListAdapter.IngredientDiff(), this);
-        recipeRecyclerView.setAdapter(adapter);
-        recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
-        //set observer to update ingredient list if it changes
-        ingredients = recipesViewModel.getRecipeIngredientsById(recipe.getId());
-        ingredients.observe(getViewLifecycleOwner(), currentRecipeIngredients -> {
-            adapter.submitList(currentRecipeIngredients);
-        });
 
         //prep and cook times
         ((TextView) root.findViewById(R.id.edit_text_prep_time)).setText(Integer.toString(recipe.getPrepTime()));
@@ -141,6 +146,32 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         }
     }
 
+    /**
+     * Adds the ingredient/s (separated by newlines) in the edit_text_ingredient
+     * textview to this recipe.
+     * @param view
+     */
+    private void addIngredients(View view){
+        EditText input = view.getRootView().findViewById(R.id.edit_text_ingredient);
+        String inputText = input.getText().toString();
+        Log.d("TEST", "inputText: " + inputText);
+
+        if (!(inputText.isEmpty())){
+            //split input in case of multiple lines
+            String[] items = inputText.split("(\\r\\n|\\r|\\n)");
+
+            //send all items to viewModel to be processed/stored
+            recipesViewModel.addIngredientsToRecipe(currentRecipe.getId(), items);
+
+            //clear new item input
+            input.setText("");
+        }
+        //if nothing was entered, then simply display an error message instead
+        else{
+            Toast.makeText(this.getContext(), "No ingredient entered", Toast.LENGTH_LONG).show();
+        }
+    }
+
     private void enterEditMode(View root){
         //start edit mode - replacing the action bar with edit mode bar
         if (actionMode == null){
@@ -174,6 +205,9 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         root.findViewById(R.id.recipe_notes).setVisibility(View.GONE);
 
         //todo - show per-ingredient delete icons
+        adapter.setEditMode(true);
+        ingredientRecyclerView.setAdapter(adapter);
+
     }
 
     private void enterViewMode(View root){
@@ -208,6 +242,8 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
 
         //todo - hide per-ingredient delete icons
+        adapter.setEditMode(false);
+        ingredientRecyclerView.setAdapter(adapter);
     }
 
     /**
