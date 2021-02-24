@@ -377,8 +377,6 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             switch (menuItem.getItemId()){
                 //Handle clicking of save button
                 case R.id.action_save_recipe:
-                    saveRecipe();
-                    enterViewMode(getView());
                     actionMode.finish();
                     return true;
 
@@ -390,6 +388,9 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             actionMode = null;
+            saveRecipe();
+            enterViewMode(getView());
+            Toast.makeText(getContext(),R.string.save_recipe_toat,Toast.LENGTH_SHORT).show();
         }
     }
 }

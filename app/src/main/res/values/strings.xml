@@ -65,6 +65,7 @@
 
     <string name="add_ingredient_button">Add</string>
     <string name="save_recipe_button">Save</string>
+    <string name="save_recipe_toat">Recipe saved.</string>
 
     <!-- Shopping list page -->
     <string name="new_list_item_button">Add</string>
@@ -76,7 +77,5 @@
     <string name="clear_list_warning_message">Are you sure you want to clear all items from this list?</string>
     <string name="clear_list_positive_button">Clear list</string>
     <string name="clear_list_negative_button">Cancel</string>
-
-
 
 </resources>
