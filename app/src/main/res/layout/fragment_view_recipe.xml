@@ -222,17 +222,6 @@
                 android:layout_height="match_parent"
                 android:visibility="visible">
 
-                <EditText
-                    android:id="@+id/edit_text_url"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:ems="10"
-                    android:hint="@string/recipe_url_placeholder"
-                    android:inputType="textUri|text"
-                    app:layout_constraintStart_toEndOf="@+id/url_heading"
-                    app:layout_constraintTop_toTopOf="parent" />
-
                 <TextView
                     android:id="@+id/url_heading"
                     android:layout_width="wrap_content"
@@ -243,6 +232,20 @@
                     app:layout_constraintBottom_toBottomOf="@+id/edit_text_url"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/edit_text_url" />
+
+                <EditText
+                    android:id="@+id/edit_text_url"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:ems="10"
+                    android:hint="@string/recipe_url_placeholder"
+                    android:inputType="textUri|text"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/url_heading"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:autofillHints="uri"/>
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <Button
