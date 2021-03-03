@@ -1,6 +1,5 @@
 package com.example.shoppinglistapp2.activities.ui.recipes;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
 import android.util.Log;
 
@@ -15,8 +14,6 @@ import com.example.shoppinglistapp2.helpers.IngredientUtils;
 import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class RecipesViewModel extends AndroidViewModel {
 
@@ -144,7 +141,7 @@ public class RecipesViewModel extends AndroidViewModel {
         return slaRepository.getRecipeById(id);
     }
 
-    public void getIngredientIds(int recipeId){
-
+    public void deleteTag(int recipeId, String tag){
+        slaRepository.deleteTag(recipeId, tag);
     }
 }

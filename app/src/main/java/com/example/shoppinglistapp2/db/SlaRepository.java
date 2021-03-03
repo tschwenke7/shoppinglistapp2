@@ -3,13 +3,18 @@ package com.example.shoppinglistapp2.db;
 import android.content.Context;
 
 import androidx.lifecycle.LiveData;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.Query;
 
 import com.example.shoppinglistapp2.db.dao.IngredientDao;
 import com.example.shoppinglistapp2.db.dao.RecipeDao;
 import com.example.shoppinglistapp2.db.dao.SlItemDao;
+import com.example.shoppinglistapp2.db.dao.TagDao;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.SlItem;
+import com.example.shoppinglistapp2.db.tables.Tag;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -20,6 +25,7 @@ public class SlaRepository {
     private IngredientDao ingredientDao;
     private RecipeDao recipeDao;
     private SlItemDao slItemDao;
+    private TagDao tagDao;
 
     private LiveData<List<Recipe>> allRecipes;
     private LiveData<List<SlItem>> allSlItems;
@@ -29,6 +35,7 @@ public class SlaRepository {
         ingredientDao = db.ingredientDao();
         recipeDao = db.recipeDao();
         slItemDao = db.slItemDao();
+        tagDao = db.tagDao();
         allRecipes = recipeDao.getAllAlphabetical();
         allSlItems = slItemDao.getAll();
     }
@@ -165,5 +172,46 @@ public class SlaRepository {
 
     public void deleteAllSlItems(){
         SlaDatabase.databaseWriteExecutor.execute(() -> slItemDao.clearAll());
+    }
+
+    /* "Tag" functions */
+    public void insert(Tag tag){
+        SlaDatabase.databaseWriteExecutor.execute(() -> tagDao.insert(tag));
+    }
+
+    public void deleteTag(Tag tag){
+        SlaDatabase.databaseWriteExecutor.execute(() -> tagDao.delete(tag));
+    }
+
+    public void deleteTag(int recipeId, String tag) {
+        SlaDatabase.databaseWriteExecutor.execute(() -> tagDao.delete(recipeId, tag));
+    }
+
+    public List<String> getAllTags(){
+        Future<List<String>> future = SlaDatabase.databaseWriteExecutor.submit(
+                () -> tagDao.getAllTags());
+        try {
+            return future.get();
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+            return null;
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<String> getTagsByRecipe(int recipeId){
+        Future<List<String>> future = SlaDatabase.databaseWriteExecutor.submit(
+                () -> tagDao.getTagsByRecipe(recipeId));
+        try {
+            return future.get();
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+            return null;
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

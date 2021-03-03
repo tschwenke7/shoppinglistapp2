@@ -12,18 +12,21 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.example.shoppinglistapp2.db.dao.IngredientDao;
 import com.example.shoppinglistapp2.db.dao.RecipeDao;
 import com.example.shoppinglistapp2.db.dao.SlItemDao;
+import com.example.shoppinglistapp2.db.dao.TagDao;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.SlItem;
+import com.example.shoppinglistapp2.db.tables.Tag;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Recipe.class, Ingredient.class, SlItem.class}, version = 4, exportSchema = false)
+@Database(entities = {Recipe.class, Ingredient.class, SlItem.class, Tag.class}, version = 5, exportSchema = false)
 public abstract class SlaDatabase extends RoomDatabase {
     public abstract RecipeDao recipeDao();
     public abstract IngredientDao ingredientDao();
     public abstract SlItemDao slItemDao();
+    public abstract TagDao tagDao();
 
     private static volatile SlaDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;

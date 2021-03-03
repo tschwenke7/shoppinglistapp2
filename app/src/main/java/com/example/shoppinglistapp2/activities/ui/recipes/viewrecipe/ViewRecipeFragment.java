@@ -3,6 +3,9 @@ package com.example.shoppinglistapp2.activities.ui.recipes.viewrecipe;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.Spanned;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,10 +33,12 @@ import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.KeyboardHider;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
-import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListViewModel;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipDrawable;
+import com.google.android.material.chip.ChipGroup;
 
 import java.util.List;
 
@@ -72,6 +77,16 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //setup action bar
         this.setHasOptionsMenu(true);
 
+        setupViews(root);
+
+
+
+        saved = false;
+
+        return root;
+    }
+
+    private void setupViews(View root){
         /* fill in textViews with saved recipe data where available */
         populateViews(root, currentRecipe);
 
@@ -88,16 +103,26 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         Button addIngredientButton = root.findViewById(R.id.recipe_add_ingredient_button);
         addIngredientButton.setOnClickListener(view -> addIngredients(view));
 
+        //add a sample tag
+        String tagName = "Test 123";
+        Chip chip = (Chip) getLayoutInflater().inflate(R.layout.tag_chip, null, false);
+        chip.setText(tagName);
+        ChipGroup chipGroup = root.findViewById(R.id.recipe_tags);
+
+        chip.setOnCloseIconClickListener((view -> {
+//            recipesViewModel.deleteTag(recipeId, tagName);
+            chipGroup.removeView(view);
+        }));
+
+        chipGroup.addView(chip);
+
+        //configure either in edit mode or view only mode
         if(editingFlag){
             enterEditMode(root);
         }
         else{
             enterViewMode(root);
         }
-
-        saved = false;
-
-        return root;
     }
 
     private void populateViews(View root, Recipe recipe){
