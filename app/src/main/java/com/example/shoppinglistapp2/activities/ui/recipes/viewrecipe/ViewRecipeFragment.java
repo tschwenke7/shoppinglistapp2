@@ -145,6 +145,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //prefill recipe name field
         ((TextView) root.findViewById(R.id.edit_text_recipe_name)).setText(recipe.getName());
 
+        //number of serves
+        ((TextView) root.findViewById(R.id.edit_text_serves)).setText(Integer.toString(recipe.getServes()));
+        ((TextView) root.findViewById(R.id.text_view_serves)).setText(Integer.toString(recipe.getServes()));
+
         //prep and cook times
         ((TextView) root.findViewById(R.id.edit_text_prep_time)).setText(Integer.toString(recipe.getPrepTime()));
         ((TextView) root.findViewById(R.id.text_view_prep_time)).setText(Integer.toString(recipe.getPrepTime()));
@@ -256,6 +260,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             chip.setCloseIconVisible(true);
         }
 
+        //swap serves textView to editText
+        root.findViewById(R.id.edit_text_serves).setVisibility(View.VISIBLE);
+        root.findViewById(R.id.text_view_serves).setVisibility(View.GONE);
+
         //swap prep and cook time textViews to editTexts
         root.findViewById(R.id.edit_text_prep_time).setVisibility(View.VISIBLE);
         root.findViewById(R.id.text_view_prep_time).setVisibility(View.GONE);
@@ -299,6 +307,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             Chip chip = (Chip) tagContainer.getChildAt(i);
             chip.setCloseIconVisible(false);
         }
+
+        //swap serves editText to textview
+        root.findViewById(R.id.edit_text_serves).setVisibility(View.GONE);
+        root.findViewById(R.id.text_view_serves).setVisibility(View.VISIBLE);
 
         //swap prep and cook time editTexts to textViews
         TextView prepTimeEditText = root.findViewById(R.id.edit_text_prep_time);
@@ -344,6 +356,9 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //read website link
         String url = ((TextView)  root.findViewById(R.id.edit_text_url)).getText().toString();
 
+        //read number of serves
+        String serves = ((TextView) root.findViewById(R.id.edit_text_serves)).getText().toString();
+
         //read prep time if provided
         String prepTime = ((TextView) root.findViewById(R.id.edit_text_prep_time)).getText().toString();
 
@@ -375,6 +390,14 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         else{
             //set all fields to form values
             currentRecipe.setName(recipeName);
+
+            if(!serves.isEmpty()){
+                currentRecipe.setServes(Integer.parseInt(serves));
+            }
+            else{
+                currentRecipe.setServes(0);
+            }
+
             if(!prepTime.isEmpty()){
                 currentRecipe.setPrepTime(Integer.parseInt(prepTime));
             }
@@ -401,6 +424,9 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
             //update any fields with their newly saved values
             populateViews(getView(), currentRecipe);
+
+            //hide keyboard in case it was open
+            KeyboardHider.hideKeyboard(getActivity());
         }
     }
 

@@ -33,6 +33,8 @@ public class Recipe {
     @ColumnInfo(name = "cook_time")
     private int cookTime;
 
+    private int serves;
+
     private String url;
     private String notes;
 
@@ -121,6 +123,14 @@ public class Recipe {
 
     public void setCookTime(int cookTime) {
         this.cookTime = cookTime;
+    }
+
+    public int getServes() {
+        return serves;
+    }
+
+    public void setServes(int serves) {
+        this.serves = serves;
     }
 
     @Ignore

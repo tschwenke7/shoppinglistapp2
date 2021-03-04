@@ -79,5 +79,6 @@
     <string name="clear_list_warning_message">Are you sure you want to clear all items from this list?</string>
     <string name="clear_list_positive_button">Clear list</string>
     <string name="clear_list_negative_button">Cancel</string>
+    <string name="serves_heading">Serves:</string>
 
 </resources>

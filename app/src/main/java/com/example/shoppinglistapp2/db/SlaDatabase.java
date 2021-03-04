@@ -21,7 +21,7 @@ import com.example.shoppinglistapp2.db.tables.Tag;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Recipe.class, Ingredient.class, SlItem.class, Tag.class}, version = 6, exportSchema = false)
+@Database(entities = {Recipe.class, Ingredient.class, SlItem.class, Tag.class}, version = 7, exportSchema = false)
 public abstract class SlaDatabase extends RoomDatabase {
     public abstract RecipeDao recipeDao();
     public abstract IngredientDao ingredientDao();

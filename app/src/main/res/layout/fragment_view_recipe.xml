@@ -79,18 +79,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_text_ingredient"
-            tools:listitem="@layout/ingredient_list_item_editor" />
+            tools:listitem="@layout/ingredient_list_item_editor" >
 
-        <ImageView
-            android:id="@+id/clock_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:contentDescription="clock icon"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_text_tag"
-            app:srcCompat="@drawable/ic_baseline_access_time_24" />
+        </androidx.recyclerview.widget.RecyclerView>
 
         <TextView
             android:id="@+id/tags_heading"
@@ -103,31 +94,6 @@
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/recipe_ingredients_list" />
-
-        <AutoCompleteTextView
-            android:id="@+id/edit_text_tag"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:ems="10"
-            android:hint="@string/tags_hint"
-            android:completionThreshold="1"
-            android:inputType="textCapSentences"
-            app:layout_constraintEnd_toStartOf="@+id/recipe_add_ingredient_button"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tags_heading" />
-
-        <Button
-            android:id="@+id/add_tag_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:text="@string/add_ingredient_button"
-            app:layout_constraintBottom_toBottomOf="@+id/edit_text_tag"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/edit_text_tag" />
 
         <LinearLayout
             android:id="@+id/tags_container"
@@ -160,6 +126,85 @@
             </HorizontalScrollView>
         </LinearLayout>
 
+        <AutoCompleteTextView
+            android:id="@+id/edit_text_tag"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:ems="10"
+            android:hint="@string/tags_hint"
+            android:completionThreshold="1"
+            android:inputType="textCapSentences"
+            app:layout_constraintEnd_toStartOf="@+id/recipe_add_ingredient_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tags_heading" />
+
+        <Button
+            android:id="@+id/add_tag_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="@string/add_ingredient_button"
+            app:layout_constraintBottom_toBottomOf="@+id/edit_text_tag"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/edit_text_tag" />
+
+        <TextView
+            android:id="@+id/serves_heading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/serves_heading"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edit_text_tag" />
+
+        <RelativeLayout
+            android:id="@+id/layout_serves"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            app:layout_constraintBottom_toBottomOf="@+id/serves_heading"
+            app:layout_constraintStart_toEndOf="@id/serves_heading"
+            app:layout_constraintTop_toTopOf="@+id/serves_heading">
+
+            <TextView
+                android:id="@+id/text_view_serves"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignStart="@id/edit_text_serves"
+                android:layout_alignTop="@id/edit_text_serves"
+                android:layout_alignEnd="@id/edit_text_serves"
+                android:layout_alignBottom="@id/edit_text_serves"
+                android:layout_marginLeft="3dp"
+                android:gravity="left|center_vertical"
+                android:textSize="18sp"
+                tools:text="20" />
+
+            <EditText
+                android:id="@+id/edit_text_serves"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:inputType="number"
+                android:textSize="18sp"
+                tools:text="20" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/clock_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            android:contentDescription="clock icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/serves_heading"
+            app:srcCompat="@drawable/ic_baseline_access_time_24" />
 
 
         <TextView
