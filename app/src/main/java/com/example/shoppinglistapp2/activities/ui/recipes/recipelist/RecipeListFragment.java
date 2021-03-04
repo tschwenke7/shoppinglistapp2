@@ -55,6 +55,9 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             adapter.setRecipes(recipes);
         });
 
+        //this will delete ALL recipes and load recipetineats websites from the spreadsheet in res/raw/<name>.csv
+//        recipesViewModel.loadFromBackup(this);
+
         return root;
     }
 

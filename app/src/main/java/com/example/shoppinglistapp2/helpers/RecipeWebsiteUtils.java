@@ -137,12 +137,18 @@ public class RecipeWebsiteUtils {
 
             Elements course = doc.getElementsByClass("wprm-recipe-course");
             if(course.size() > 0){
-                tags.add(course.get(0).text());
+                String[] courses = course.text().split(",");
+                for(int i = 0; i < courses.length; i++){
+                    tags.add(courses[i].trim());
+                }
             }
 
             Elements cuisine = doc.getElementsByClass("wprm-recipe-cuisine");
             if(cuisine.size() > 0){
-                tags.add(cuisine.get(0).text());
+                String[] cuisines = cuisine.text().split(",");
+                for(int i = 0; i < cuisines.length; i++){
+                    tags.add(cuisines[i].trim());
+                }
             }
 
             recipe.setTags(tags);

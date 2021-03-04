@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2.activities.ui;
+package com.example.shoppinglistapp2.helpers;
 
 import android.app.Activity;
 import android.content.Context;

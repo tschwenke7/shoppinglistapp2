@@ -7,12 +7,17 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment;
 import com.example.shoppinglistapp2.db.SlaRepository;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.helpers.IngredientUtils;
 import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.List;
 
 public class RecipesViewModel extends AndroidViewModel {
@@ -160,5 +165,53 @@ public class RecipesViewModel extends AndroidViewModel {
 
     public void insertTag(int recipeId, String tagName){
         slaRepository.insertTag(recipeId, tagName);
+    }
+
+    public void loadFromBackup(RecipeListFragment frag){
+        slaRepository.deleteAllRecipes();
+        Log.d("TOM_TEST", "loadFromBackup started");
+        Thread t1 = new Thread(() -> {
+
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(frag.getResources().openRawResource(R.raw.recipe_backup_2021_03_04p));
+            BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(bufferedInputStream));
+            try {
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    String[] row = line.split("\\|");
+                    //1- notes
+                    //2- tomrating
+                    //3- tierrating
+                    //4- link
+                    //5- tag
+                    Log.d("TOM_TEST", line);
+//                    Log.d("TOM_TEST", String.format("%s\n%s\n%s\n%s\n%s",row[1],row[2],row[3],row[4],row[5]));
+
+                    try {
+                        Recipe recipe = getRecipeById(generateRecipeIdFromUrl(row[4]));
+
+                        if(null != row[1] && !row[1].isEmpty()) {
+                            recipe.setNotes(row[1].trim());
+                        }
+
+                        recipe.setTom_rating(Integer.parseInt(row[2]) * 2);
+                        recipe.setTier_rating(Integer.parseInt(row[3]) * 2);
+
+                        if(row.length > 5 && null != row[5] && !row[5].isEmpty()) {
+                            insertTag(recipe.getId(), row[5]);
+                        }
+
+                        updateRecipe(recipe);
+                    }
+                    catch (NullPointerException e){
+                        e.printStackTrace();
+                    }
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        t1.start();
     }
 }

@@ -218,4 +218,8 @@ public class SlaRepository {
     public void insertTag(int recipeId, String tagName) {
         SlaDatabase.databaseWriteExecutor.execute(() -> tagDao.insert(new Tag(recipeId, tagName)));
     }
+
+    public void deleteAllRecipes() {
+        SlaDatabase.databaseWriteExecutor.execute(()-> recipeDao.deleteEverything());
+    }
 }
