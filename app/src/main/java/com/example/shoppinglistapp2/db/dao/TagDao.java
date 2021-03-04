@@ -22,7 +22,7 @@ public interface TagDao {
     void delete(int recipeId, String tagName);
 
     @Query("SELECT DISTINCT name FROM tags")
-    List<String> getAllTags();
+    String[] getAllTags();
 
     @Query("SELECT name FROM tags WHERE recipe_id = :recipeId")
     List<String> getTagsByRecipe(int recipeId);

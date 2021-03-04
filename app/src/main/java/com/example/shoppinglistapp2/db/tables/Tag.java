@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "tags",
@@ -19,11 +20,20 @@ public class Tag {
     @PrimaryKey(autoGenerate = true)
     private int id;
 
+    @NonNull
     private String name;
 
     @NonNull
     @ColumnInfo(name = "recipe_id")
     private int recipeId;
+
+    public Tag(){};
+
+    @Ignore
+    public Tag(int recipeId, String tagName) {
+        this.recipeId = recipeId;
+        this.name = tagName;
+    }
 
     public int getId() {
         return id;

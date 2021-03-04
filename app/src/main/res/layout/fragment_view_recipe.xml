@@ -89,7 +89,7 @@
             android:layout_marginTop="16dp"
             android:contentDescription="clock icon"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tags_heading"
+            app:layout_constraintTop_toBottomOf="@+id/edit_text_tag"
             app:srcCompat="@drawable/ic_baseline_access_time_24" />
 
         <TextView
@@ -100,8 +100,34 @@
             android:layout_marginTop="16dp"
             android:text="@string/tags_heading"
             android:textSize="18sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/recipe_ingredients_list" />
+
+        <AutoCompleteTextView
+            android:id="@+id/edit_text_tag"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:ems="10"
+            android:hint="@string/tags_hint"
+            android:completionThreshold="1"
+            android:inputType="textCapSentences"
+            app:layout_constraintEnd_toStartOf="@+id/recipe_add_ingredient_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tags_heading" />
+
+        <Button
+            android:id="@+id/add_tag_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="@string/add_ingredient_button"
+            app:layout_constraintBottom_toBottomOf="@+id/edit_text_tag"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/edit_text_tag" />
 
         <LinearLayout
             android:id="@+id/tags_container"
@@ -120,6 +146,7 @@
                 android:layout_height="match_parent">
 
                 <LinearLayout
+                    android:id="@+id/tags_container_2"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
@@ -128,7 +155,7 @@
                         android:id="@+id/recipe_tags"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        app:singleLine="true"/>
+                        app:singleLine="true" />
                 </LinearLayout>
             </HorizontalScrollView>
         </LinearLayout>

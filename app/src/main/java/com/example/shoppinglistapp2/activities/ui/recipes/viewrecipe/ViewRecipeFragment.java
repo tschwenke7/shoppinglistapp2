@@ -3,9 +3,6 @@ package com.example.shoppinglistapp2.activities.ui.recipes.viewrecipe;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.Spanned;
-import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,8 +10,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,7 +37,6 @@ import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListViewM
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipDrawable;
 import com.google.android.material.chip.ChipGroup;
 
 import java.util.List;
@@ -103,18 +102,32 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         Button addIngredientButton = root.findViewById(R.id.recipe_add_ingredient_button);
         addIngredientButton.setOnClickListener(view -> addIngredients(view));
 
-        //add a sample tag
-        String tagName = "Test 123";
-        Chip chip = (Chip) getLayoutInflater().inflate(R.layout.tag_chip, null, false);
-        chip.setText(tagName);
-        ChipGroup chipGroup = root.findViewById(R.id.recipe_tags);
+        //add existing tags
+        for (String tag : recipesViewModel.getTagsByRecipe(recipeId)){
+            addTag(root, tag);
+        }
 
-        chip.setOnCloseIconClickListener((view -> {
-//            recipesViewModel.deleteTag(recipeId, tagName);
-            chipGroup.removeView(view);
-        }));
+        //handle new tag being added
+        Button addTagButton = root.findViewById(R.id.add_tag_button);
+        addTagButton.setOnClickListener((view) -> {
+            TextView tagField =  root.findViewById(R.id.edit_text_tag);
+            String tagName = tagField.getText().toString();
+            if (!tagName.isEmpty()){
+                //persist to db
+                recipesViewModel.insertTag(recipeId, tagName);
+                //add tag chip to ui
+                addTag(root, tagName);
 
-        chipGroup.addView(chip);
+                //clear input field
+                tagField.setText("");
+            }
+        });
+
+        //setup tag input autocomplete
+        AutoCompleteTextView tagField = root.findViewById(R.id.edit_text_tag);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                getContext(), android.R.layout.simple_dropdown_item_1line,recipesViewModel.getAllTags());
+        tagField.setAdapter(adapter);
 
         //configure either in edit mode or view only mode
         if(editingFlag){
@@ -174,6 +187,21 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         }
     }
 
+    private void addTag(View root, String tagName){
+
+        //add a sample tag
+        Chip chip = (Chip) getLayoutInflater().inflate(R.layout.tag_chip, null, false);
+        chip.setText(tagName);
+        ChipGroup chipGroup = root.findViewById(R.id.recipe_tags);
+
+        chip.setOnCloseIconClickListener((view -> {
+            recipesViewModel.deleteTag(recipeId, tagName);
+            chipGroup.removeView(view);
+        }));
+
+        chipGroup.addView(chip);
+    }
+
     /**
      * Adds the ingredient/s (separated by newlines) in the edit_text_ingredient
      * textview to this recipe.
@@ -217,6 +245,17 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         root.findViewById(R.id.recipe_add_ingredient_button).setVisibility(View.VISIBLE);
         root.findViewById(R.id.edit_text_ingredient).setVisibility(View.VISIBLE);
 
+        //show add tag field and button
+        root.findViewById(R.id.add_tag_button).setVisibility(View.VISIBLE);
+        root.findViewById(R.id.edit_text_tag).setVisibility(View.VISIBLE);
+
+        //show delete tag icons
+        ChipGroup tagContainer = root.findViewById(R.id.recipe_tags);
+        for (int i = 0; i < tagContainer.getChildCount(); i++){
+            Chip chip = (Chip) tagContainer.getChildAt(i);
+            chip.setCloseIconVisible(true);
+        }
+
         //swap prep and cook time textViews to editTexts
         root.findViewById(R.id.edit_text_prep_time).setVisibility(View.VISIBLE);
         root.findViewById(R.id.text_view_prep_time).setVisibility(View.GONE);
@@ -249,6 +288,17 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //hide new ingredient field and button
         root.findViewById(R.id.recipe_add_ingredient_button).setVisibility(View.GONE);
         root.findViewById(R.id.edit_text_ingredient).setVisibility(View.GONE);
+
+        //show add tag field and button
+        root.findViewById(R.id.add_tag_button).setVisibility(View.GONE);
+        root.findViewById(R.id.edit_text_tag).setVisibility(View.GONE);
+
+        //hide delete tag icons
+        ChipGroup tagContainer = root.findViewById(R.id.recipe_tags);
+        for (int i = 0; i < tagContainer.getChildCount(); i++){
+            Chip chip = (Chip) tagContainer.getChildAt(i);
+            chip.setCloseIconVisible(false);
+        }
 
         //swap prep and cook time editTexts to textViews
         TextView prepTimeEditText = root.findViewById(R.id.edit_text_prep_time);

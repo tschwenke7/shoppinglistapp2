@@ -187,8 +187,8 @@ public class SlaRepository {
         SlaDatabase.databaseWriteExecutor.execute(() -> tagDao.delete(recipeId, tag));
     }
 
-    public List<String> getAllTags(){
-        Future<List<String>> future = SlaDatabase.databaseWriteExecutor.submit(
+    public String[] getAllTags(){
+        Future<String[]> future = SlaDatabase.databaseWriteExecutor.submit(
                 () -> tagDao.getAllTags());
         try {
             return future.get();
@@ -213,5 +213,9 @@ public class SlaRepository {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public void insertTag(int recipeId, String tagName) {
+        SlaDatabase.databaseWriteExecutor.execute(() -> tagDao.insert(new Tag(recipeId, tagName)));
     }
 }

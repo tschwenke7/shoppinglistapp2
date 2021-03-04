@@ -58,6 +58,7 @@
     <string name="prep_time_heading">Prep time (minutes):</string>
     <string name="cook_time_heading">Cooking time (minutes):</string>
     <string name="tags_heading">Tags:</string>
+    <string name="tags_hint">Add tag…</string>
 
     <string name="recipe_name_placeholder">Recipe name…</string>
     <string name="add_ingredient_placeholder">New ingredient…</string>

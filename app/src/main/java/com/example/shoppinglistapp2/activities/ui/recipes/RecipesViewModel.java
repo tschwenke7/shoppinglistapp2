@@ -144,4 +144,16 @@ public class RecipesViewModel extends AndroidViewModel {
     public void deleteTag(int recipeId, String tag){
         slaRepository.deleteTag(recipeId, tag);
     }
+
+    public List<String> getTagsByRecipe(int recipeId){
+        return slaRepository.getTagsByRecipe(recipeId);
+    }
+
+    public String[] getAllTags(){
+        return slaRepository.getAllTags();
+    }
+
+    public void insertTag(int recipeId, String tagName){
+        slaRepository.insertTag(recipeId, tagName);
+    }
 }
