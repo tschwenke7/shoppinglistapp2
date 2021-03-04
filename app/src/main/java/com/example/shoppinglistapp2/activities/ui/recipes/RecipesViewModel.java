@@ -91,6 +91,11 @@ public class RecipesViewModel extends AndroidViewModel {
         //persist all recipe's ingredients to db
         addIngredientsToRecipe(id, newRecipe.getIngredients());
 
+        //persist any tags also to db
+        for(String tagName : newRecipe.getTags()){
+            insertTag(id, tagName);
+        }
+
         return id;
     }
 

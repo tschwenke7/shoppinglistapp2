@@ -121,6 +121,31 @@ public class RecipeWebsiteUtils {
 
             recipe.setCookTime(cookTime);
 
+            /* Get number of serves */
+            Elements serves = doc.getElementsByClass("wprm-recipe-servings");
+            if(serves.size() > 0){
+                try{
+                    recipe.setServes(Integer.parseInt(serves.get(0).text()));
+                }
+                catch (NumberFormatException e){
+                    e.printStackTrace();
+                }
+            }
+
+            /* Read "course" and "cuisine" as tags if present */
+            List<String> tags = new ArrayList<>();
+
+            Elements course = doc.getElementsByClass("wprm-recipe-course");
+            if(course.size() > 0){
+                tags.add(course.get(0).text());
+            }
+
+            Elements cuisine = doc.getElementsByClass("wprm-recipe-cuisine");
+            if(cuisine.size() > 0){
+                tags.add(cuisine.get(0).text());
+            }
+
+            recipe.setTags(tags);
 
             /* get ingredients */
             ArrayList<Ingredient> ingredients = new ArrayList<>();

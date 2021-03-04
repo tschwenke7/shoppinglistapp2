@@ -44,6 +44,9 @@ public class Recipe {
     @Ignore
     private List<Ingredient> ingredients;
 
+    @Ignore
+    private List<String> tags;
+
     public int getId() {
         return id;
     }
@@ -131,6 +134,14 @@ public class Recipe {
 
     public void setServes(int serves) {
         this.serves = serves;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     @Ignore
