@@ -1,6 +1,7 @@
 package com.example.shoppinglistapp2.activities.ui.recipes.recipelist;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
@@ -30,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
+import com.example.shoppinglistapp2.helpers.KeyboardHider;
 
 public class RecipeListFragment extends Fragment implements RecipeListAdapter.OnRecipeClickListener, AdapterView.OnItemSelectedListener {
 
@@ -88,6 +91,11 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         //setup search bar
         SearchView searchView = (SearchView) root.findViewById(R.id.search_bar);
+        //hide default underline of searchview
+        int searchPlateId = searchView.getContext().getResources().getIdentifier("android:id/search_plate", null, null);
+        View searchPlate = searchView.findViewById(searchPlateId);
+        searchPlate.setBackgroundColor(Color.TRANSPARENT);
+        //have it listen and update results in realtime as the user types
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -96,6 +104,10 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                //end mutli-select if user changes search, as list weill change
+                if(actionMode != null){
+                    actionMode.finish();
+                }
                 adapter.getFilter().filter(newText);
                 return false;
             }
