@@ -1,6 +1,5 @@
 package com.example.shoppinglistapp2.activities.ui.recipes.creator;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,13 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
-import com.example.shoppinglistapp2.activities.ui.recipes.viewrecipe.ViewRecipeFragmentDirections;
 import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
 
 import java.util.concurrent.Callable;

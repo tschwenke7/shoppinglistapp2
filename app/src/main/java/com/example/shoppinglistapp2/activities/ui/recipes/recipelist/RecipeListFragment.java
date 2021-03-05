@@ -10,6 +10,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,6 +36,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     private ActionMode actionMode;
     private ActionMode.Callback actionModeCallback = new ActionModeCallback();
     private RecipeListAdapter adapter;
+    private boolean advancedSearchVisible;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -41,6 +45,15 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         root = inflater.inflate(R.layout.fragment_recipe_list, container, false);
 
+        setupViews(root);
+
+        //this will delete ALL recipes and load recipetineats websites from the spreadsheet in res/raw/<name>.csv
+//        recipesViewModel.loadFromBackup(this);
+
+        return root;
+    }
+
+    private void setupViews(View root){
         //setup action bar
         this.setHasOptionsMenu(true);
 
@@ -51,14 +64,48 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
         //set observer to update recipe list if it changes
-        recipesViewModel.getAllRecipes().observe(getViewLifecycleOwner(), recipes -> {
-            adapter.setRecipes(recipes);
-        });
+        recipesViewModel.getAllRecipes().observe(getViewLifecycleOwner(),
+                recipes -> adapter.setRecipes(recipes));
 
-        //this will delete ALL recipes and load recipetineats websites from the spreadsheet in res/raw/<name>.csv
-//        recipesViewModel.loadFromBackup(this);
+        //populate advanced search spinners
+        Spinner searchCriteriaSpinner = root.findViewById(R.id.search_criteria_spinner);
+        ArrayAdapter<CharSequence> scAdapter = ArrayAdapter.createFromResource(
+                this.getContext(), R.array.search_criteria_options,android.R.layout.simple_spinner_item);
+        scAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        searchCriteriaSpinner.setAdapter(scAdapter);
 
-        return root;
+        Spinner orderBySpinner = root.findViewById(R.id.order_by_spinner);
+        ArrayAdapter<CharSequence> obAdapter = ArrayAdapter.createFromResource(
+                this.getContext(), R.array.order_by_options,android.R.layout.simple_spinner_item);
+        obAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        orderBySpinner.setAdapter(obAdapter);
+
+        //setup advanced search show/hide prompt
+        ((TextView) root.findViewById(R.id.advanced_search_prompt)).setOnClickListener((view -> toggleAdvancedSearch()));
+    }
+
+    /**
+     * Flips the visibility of the advanced search criteria viewgroup
+     * to the inverse of its current state.
+     */
+    private void toggleAdvancedSearch(){
+        ViewGroup advancedSearch = root.findViewById(R.id.viewgroup_advanced_search);
+        TextView advancedSearchPrompt = root.findViewById(R.id.advanced_search_prompt);
+
+        //if it was visible
+        if (advancedSearchVisible){
+            //hide advanced search and change prompt back to 'show'
+            advancedSearch.setVisibility(View.GONE);
+            advancedSearchPrompt.setText(R.string.show_advanced_search_prompt);
+        }
+        //if it was hidden
+        else{
+            //show advanced search and change prompt to 'hide'
+            advancedSearch.setVisibility(View.VISIBLE);
+            advancedSearchPrompt.setText(R.string.hide_advanced_search_prompt);
+        }
+
+        advancedSearchVisible = !advancedSearchVisible;
     }
 
     //hide back button in action bar for this fragment

@@ -10,6 +10,23 @@
     <string name="add_all_to_list_action_title">Add all ingredients to list</string>
     <string name="delete_recipe_action_title">Delete recipe</string>
     <string name="default_rating">0</string>
+    <string name="show_advanced_search_prompt">Advanced search ▼</string>
+    <string name="hide_advanced_search_prompt">Hide ▲</string>
+    <string name="search_criteria_heading">Search by</string>
+    <string-array name="search_criteria_options">
+        <item>Recipe name</item>
+        <item>Includes ingredient/s</item>
+        <item>Includes tag/s</item>
+    </string-array>
+    <string name="order_by_heading">Order by</string>
+    <string-array name="order_by_options">
+        <item>Recipe name A-Z</item>
+        <item>Prep time</item>
+        <item>Total time</item>
+        <item>Tom\'s rating</item>
+        <item>Tiernan\'s rating</item>
+        <item>Combined rating</item>
+    </string-array>
 
     <string name="delete_recipes_warning_title">Delete recipes</string>
     <string name="delete_warning_prompt1">Are you sure you want to permanently delete</string>
