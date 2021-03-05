@@ -3,6 +3,8 @@ package com.example.shoppinglistapp2.activities.ui.recipes.recipelist;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,8 +18,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.ViewHolder> {
+public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.ViewHolder> implements Filterable {
     private List<Recipe> recipes;
+    private List<Recipe> recipesFull;
+
     private OnRecipeClickListener onRecipeClickListener;
     private List<Integer> selectedPositions = new ArrayList<>();
     private DecimalFormat ratingFormat = new DecimalFormat("#.#");
@@ -44,6 +48,7 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new RecipeDiff(newRecipes, recipes));
         diffResult.dispatchUpdatesTo(this);
         this.recipes = newRecipes;
+        this.recipesFull = new ArrayList<>(newRecipes);
     }
 
     @Override
@@ -79,6 +84,49 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
         }
         selectedPositions.clear();
     }
+
+    @Override
+    public Filter getFilter() {
+        return recipeFilter;
+    }
+
+    /**
+     * Filters recipes to match those whose name contains the query string
+     */
+    private Filter recipeFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Recipe> filteredList = new ArrayList<>();
+
+            if(constraint == null || constraint.length() == 0){
+                filteredList.addAll(recipesFull);
+            }
+            else{
+                String filterPattern = constraint.toString().toLowerCase().trim();
+
+                //find all recipes whose name contains the query string
+                for (Recipe recipe : recipesFull){
+                    if(recipe.getName().toLowerCase().contains(filterPattern)) {
+                        filteredList.add(recipe);
+                    }
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            recipes.clear();
+            if(filterResults.values != null){
+                recipes.addAll((List) filterResults.values);
+            }
+            notifyDataSetChanged();
+        }
+    };
 
 
     public static class RecipeDiff extends DiffUtil.Callback {

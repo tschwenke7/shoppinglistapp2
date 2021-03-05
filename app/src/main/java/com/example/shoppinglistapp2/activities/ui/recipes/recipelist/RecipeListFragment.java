@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -82,6 +83,21 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         //setup advanced search show/hide prompt
         ((TextView) root.findViewById(R.id.advanced_search_prompt)).setOnClickListener((view -> toggleAdvancedSearch()));
+
+        //setup search bar
+        SearchView searchView = (SearchView) root.findViewById(R.id.search_bar);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
     }
 
     /**
