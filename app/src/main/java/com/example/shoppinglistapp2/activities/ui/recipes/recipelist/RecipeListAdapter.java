@@ -13,9 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.db.tables.Recipe;
+import com.example.shoppinglistapp2.helpers.RecipeComparators;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.ViewHolder> implements Filterable {
@@ -49,6 +52,43 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
         diffResult.dispatchUpdatesTo(this);
         this.recipes = newRecipes;
         this.recipesFull = new ArrayList<>(newRecipes);
+    }
+
+    public void sort(int orderingCriteria){
+        //choose a comparator depending on which option was selected by the user
+        Comparator<Recipe> comparator = null;
+        switch (orderingCriteria){
+            //alphabetically by recipe name
+            case 0:
+                comparator = new RecipeComparators.CompareRecipeName();
+                break;
+            //by prep time
+            case 1:
+                comparator = new RecipeComparators.ComparePrepTime();
+                break;
+            //by total time
+            case 2:
+                comparator = new RecipeComparators.CompareTotalTime();
+                break;
+            //by Tom rating
+            case 3:
+                comparator = new RecipeComparators.CompareTomRating();
+                break;
+            //by Tiernan rating
+            case 4:
+                comparator = new RecipeComparators.CompareTiernanRating();
+                break;
+            //by combined rating
+            case 5:
+                comparator = new RecipeComparators.CompareCombinedRating();
+                break;
+        }
+
+        //now sort both the filtered and full lists using this comparator
+        Collections.sort(recipes, comparator);
+        Collections.sort(recipesFull, comparator);
+        //notify the adapter of the change
+        notifyDataSetChanged();
     }
 
     @Override

@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.SearchView;
 import android.widget.Spinner;
@@ -30,7 +31,7 @@ import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 
-public class RecipeListFragment extends Fragment implements RecipeListAdapter.OnRecipeClickListener{
+public class RecipeListFragment extends Fragment implements RecipeListAdapter.OnRecipeClickListener, AdapterView.OnItemSelectedListener {
 
     private View root;
     private RecipesViewModel recipesViewModel;
@@ -80,6 +81,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                 this.getContext(), R.array.order_by_options,android.R.layout.simple_spinner_item);
         obAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         orderBySpinner.setAdapter(obAdapter);
+        orderBySpinner.setOnItemSelectedListener(this);
 
         //setup advanced search show/hide prompt
         ((TextView) root.findViewById(R.id.advanced_search_prompt)).setOnClickListener((view -> toggleAdvancedSearch()));
@@ -182,6 +184,28 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         }
 
         return true;
+    }
+
+    /**
+     * Respond to inputs to the advanced search spinners
+     */
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
+        switch (adapterView.getId()){
+            //when an option is selected in the "search by" spinner
+            case R.id.search_criteria_spinner:
+                //respond to option selection here
+                break;
+
+            //when an option is selected in the "order by" spinner
+            case R.id.order_by_spinner:
+                adapter.sort(pos);
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+        //neither spinner has a "nothing" option
     }
 
     /**Creates and handles a contextual action bar for when one or more recipes are selected */
