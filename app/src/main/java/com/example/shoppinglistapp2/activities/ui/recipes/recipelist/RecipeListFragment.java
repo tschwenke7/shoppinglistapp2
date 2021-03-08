@@ -91,7 +91,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         //setup search bar
         SearchView searchView = (SearchView) root.findViewById(R.id.search_bar);
-        //hide default underline of searchview
+        //hide default underline style of searchview
         int searchPlateId = searchView.getContext().getResources().getIdentifier("android:id/search_plate", null, null);
         View searchPlate = searchView.findViewById(searchPlateId);
         searchPlate.setBackgroundColor(Color.TRANSPARENT);

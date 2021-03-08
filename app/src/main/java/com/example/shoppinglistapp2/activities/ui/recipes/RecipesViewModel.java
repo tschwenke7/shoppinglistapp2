@@ -6,6 +6,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment;
@@ -18,18 +20,36 @@ import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecipesViewModel extends AndroidViewModel {
 
     private final SlaRepository slaRepository;
-    private final LiveData<List<Recipe>> allRecipes;
+    /** Contains the Recipes as found in the Recipe table of db */
+    private final LiveData<List<Recipe>> allRecipesBase;
+    /** Contains the Recipes with their ingredients and tags combined in */
+    private final MutableLiveData<List<Recipe>> allRecipes = new MutableLiveData<>();
+
+    private Observer<List<Recipe>> recipeObserver = recipes -> {
+        //when db changes, retrieve ingredients and tags for recipes returned
+        List<Recipe> populatedRecipes = new ArrayList<>();
+        for (Recipe recipe : recipes){
+            populatedRecipes.add(populateIngredientsAndTags(recipe));
+        }
+
+        //update the populated list livedata
+        allRecipes.setValue(populatedRecipes);
+    };
 
     public RecipesViewModel(@NonNull Application application) {
         super(application);
         slaRepository = new SlaRepository(application);
-        allRecipes = slaRepository.getAllRecipes();
+        allRecipesBase = slaRepository.getAllRecipes();
+        //observe recipes db for changes so we can maintain populated list
+        allRecipesBase.observeForever(recipeObserver);
     }
+
 
     public LiveData<List<Recipe>> getAllRecipes(){
         return allRecipes;
@@ -213,5 +233,22 @@ public class RecipesViewModel extends AndroidViewModel {
             }
         });
         t1.start();
+    }
+
+    private Recipe populateIngredientsAndTags(Recipe recipe) {
+        //combine ingredients
+        recipe.setIngredients(getRecipeIngredientsById(recipe.getId()).getValue());
+
+        //combine tags
+        recipe.setTags(getTagsByRecipe(recipe.getId()));
+
+        //return populated recipe
+        return recipe;
+    }
+
+    @Override
+    protected void onCleared() {
+        allRecipesBase.removeObserver(recipeObserver);
+        super.onCleared();
     }
 }
