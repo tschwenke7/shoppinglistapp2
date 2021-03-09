@@ -22,7 +22,7 @@ public interface SlItemDao {
     @Query("SELECT * FROM slitems WHERE checked = 0")
     List<SlItem> getAllUncheckedNonLive();
 
-    @Query("SELECT * FROM slitems WHERE name = :name")
+    @Query("SELECT * FROM slitems WHERE name = :name AND checked = 0")
     SlItem getByName(String name);
 
     @Delete

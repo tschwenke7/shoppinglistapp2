@@ -23,8 +23,6 @@ public class Recipe {
     @NonNull
     private String name;
 
-    private String category;
-
     /**Preparation time in minutes*/
     @ColumnInfo(name="prep_time")
     private int prepTime;
@@ -62,14 +60,6 @@ public class Recipe {
 
     public void setName(@NonNull String name) {
         this.name = name;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
     }
 
     public String getUrl() {
@@ -156,7 +146,6 @@ public class Recipe {
                 tom_rating == recipe.tom_rating &&
                 tier_rating == recipe.tier_rating &&
                 Objects.equals(name, recipe.name) &&
-                Objects.equals(category, recipe.category) &&
                 Objects.equals(url, recipe.url) &&
                 Objects.equals(notes, recipe.notes);
     }

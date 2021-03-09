@@ -10,8 +10,7 @@ import androidx.room.PrimaryKey;
 import java.util.Objects;
 
 @Entity(
-        tableName = "slitems",
-        indices = {@Index(value = {"name"}, unique = true)}//the list item name must be unique)
+        tableName = "slitems"
         )
 public class SlItem {
     @PrimaryKey(autoGenerate = true)
