@@ -12,7 +12,6 @@ import com.example.shoppinglistapp2.db.tables.SlItem;
 import com.example.shoppinglistapp2.helpers.SlItemUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -40,7 +39,16 @@ public class ShoppingListViewModel extends AndroidViewModel {
 
         //if none found, just insert
         if(null == existingItemWithSameName){
-            slaRepository.insertSlItems(newItem);
+            try {
+                //calling "get()" forces the insert to have completed before checking if the next item
+                //is already on the list
+                slaRepository.insertSlItem(newItem).get();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
         //if one was found, merge their quantities then persist the change
         else{

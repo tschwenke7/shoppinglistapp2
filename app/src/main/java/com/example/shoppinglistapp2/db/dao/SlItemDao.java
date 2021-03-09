@@ -14,26 +14,26 @@ import java.util.List;
 @Dao
 public interface SlItemDao {
     @Insert
-    public void insertAll(SlItem... slItems);
+    long insert(SlItem slItem);
 
     @Query("SELECT * FROM slitems ORDER BY checked")
-    public LiveData<List<SlItem>> getAll();
+    LiveData<List<SlItem>> getAll();
 
     @Query("SELECT * FROM slitems WHERE checked = 0")
     List<SlItem> getAllUncheckedNonLive();
 
     @Query("SELECT * FROM slitems WHERE name = :name")
-    public SlItem getByName(String name);
+    SlItem getByName(String name);
 
     @Delete
-    public void deleteAll(SlItem... slItems);
+    void deleteAll(SlItem... slItems);
 
     @Update
-    public void update(SlItem... slItems);
+    void update(SlItem... slItems);
 
     @Query("DELETE FROM slitems WHERE checked = 1")
-    public void clearAllChecked();
+    void clearAllChecked();
 
     @Query("DELETE FROM slitems")
-    public void clearAll();
+    void clearAll();
 }

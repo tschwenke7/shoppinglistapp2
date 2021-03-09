@@ -3,9 +3,6 @@ package com.example.shoppinglistapp2.db;
 import android.content.Context;
 
 import androidx.lifecycle.LiveData;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
 
 import com.example.shoppinglistapp2.db.dao.IngredientDao;
 import com.example.shoppinglistapp2.db.dao.RecipeDao;
@@ -89,11 +86,8 @@ public class SlaRepository {
         Future<Recipe> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
         try {
             return future.get();
-        } catch (InterruptedException e1) {
+        } catch (InterruptedException | ExecutionException e1) {
             e1.printStackTrace();
-            return null;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -159,8 +153,9 @@ public class SlaRepository {
         SlaDatabase.databaseWriteExecutor.execute(() -> slItemDao.deleteAll(slItems));
     }
 
-    public void insertSlItems(SlItem... slItems){
-        SlaDatabase.databaseWriteExecutor.execute(() -> slItemDao.insertAll(slItems));
+    public Future<Long> insertSlItem(SlItem slItem){
+        Callable<Long> queryCallable = () -> slItemDao.insert(slItem);
+        return SlaDatabase.databaseWriteExecutor.submit(queryCallable);
     }
 
     public void updateSlItems(SlItem... slItems){
@@ -176,7 +171,7 @@ public class SlaRepository {
     }
 
     /* "Tag" functions */
-    public void insert(Tag tag){
+    public void insertTag(Tag tag){
         SlaDatabase.databaseWriteExecutor.execute(() -> tagDao.insert(tag));
     }
 

@@ -19,10 +19,10 @@ public interface IngredientDao {
     List<Ingredient> getIngredientsByRecipeIdNonLive(int id);
 
     @Insert
-    public void insertAll(Ingredient... ingredients);
+    void insertAll(Ingredient... ingredients);
 
     @Delete
-    public void deleteAll(Ingredient... ingredients);
+    void deleteAll(Ingredient... ingredients);
 
 
 }

@@ -182,8 +182,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
         //notes
         TextView notesField = root.findViewById(R.id.recipe_notes);
+        TextView editNotesField = root.findViewById(R.id.edit_text_recipe_notes);
         if (null != recipe.getNotes() && !recipe.getNotes().isEmpty()){
             notesField.setText(recipe.getNotes());
+            editNotesField.setText(recipe.getNotes());
         }
         else{
             notesField.setText(getString(R.string.default_notes_text));
