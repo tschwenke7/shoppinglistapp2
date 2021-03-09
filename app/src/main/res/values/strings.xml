@@ -27,6 +27,8 @@
         <item>Tiernan\'s rating</item>
         <item>Combined rating</item>
     </string-array>
+    <string name="ingredient_search_hint">Enter one or more ingredients separated by commas</string>
+    <string name="tag_search_hint">Enter one or more tags separated by commas</string>
 
     <string name="delete_recipes_warning_title">Delete recipes</string>
     <string name="delete_warning_prompt1">Are you sure you want to permanently delete</string>

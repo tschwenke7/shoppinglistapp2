@@ -209,6 +209,21 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             case R.id.search_criteria_spinner:
                 //respond to option selection here
                 adapter.setSearchCriteria(pos);
+                //show appropriate hint
+                TextView hintTextView = root.findViewById(R.id.search_hint);
+                switch (pos){
+                    case 0:
+                        hintTextView.setVisibility(View.GONE);
+                        break;
+                    case 1:
+                        hintTextView.setText(R.string.ingredient_search_hint);
+                        hintTextView.setVisibility(View.VISIBLE);
+                        break;
+                    case 2:
+                        hintTextView.setText(R.string.tag_search_hint);
+                        hintTextView.setVisibility(View.VISIBLE);
+                        break;
+                }
                 break;
 
             //when an option is selected in the "order by" spinner

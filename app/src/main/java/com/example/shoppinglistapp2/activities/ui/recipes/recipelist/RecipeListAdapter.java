@@ -442,7 +442,7 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
             //add tags
             for (String tagName : recipe.getTags()){
                 //add a sample tag
-                Chip chip = (Chip) LayoutInflater.from(itemView.getContext()).inflate(R.layout.tag_chip, null, false);
+                Chip chip = (Chip) LayoutInflater.from(itemView.getContext()).inflate(R.layout.tag_chip_recipe_card, null, false);
                 chip.setText(tagName);
 
                 chipGroup.addView(chip);
