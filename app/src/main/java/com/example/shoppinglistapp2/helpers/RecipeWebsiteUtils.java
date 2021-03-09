@@ -187,8 +187,9 @@ public class RecipeWebsiteUtils {
 
                 //sometimes the alternative amounts are separated instead by a "/"
                 else if(ingAmount.contains("/")){
-                    //if "/" occurs at index 1, it's a fraction bar rather than a separator (e.g. '3/4 cup')
-                    if(ingAmount.indexOf("/") == 1){
+                    //if the characters either side of the "/" are digits, then this is a fraction bar instead
+                    if(Character.isDigit(ingAmount.charAt(ingAmount.indexOf("/") + 1))
+                            && Character.isDigit(ingAmount.charAt(ingAmount.indexOf("/") - 1))){
                         //check further in string for potential second "/" which IS a separator
                         if(ingAmount.indexOf("/", ingAmount.indexOf("/") + 1) != -1) {
                             //split string on second "/"
@@ -200,7 +201,6 @@ public class RecipeWebsiteUtils {
 
                             //take the alternative which doesn't use imperial measurement
                             ingAmount = ingAmountComponents[0].trim();
-                            boolean firstGood = true;
                             for(String unit : IngredientUtils.foreignUnitsOfMeasurement){
                                 if(ingAmountComponents[0].contains(unit)){
                                     ingAmount = ingAmountComponents[1].trim();
@@ -217,7 +217,6 @@ public class RecipeWebsiteUtils {
                         };
                         //take the part which doesn't use imperial measurements
                         ingAmount = ingAmountComponents[0].trim();
-                        boolean firstGood = true;
                         for(String unit : IngredientUtils.foreignUnitsOfMeasurement){
                             if(ingAmountComponents[0].contains(unit)){
                                 ingAmount = ingAmountComponents[1].trim();
