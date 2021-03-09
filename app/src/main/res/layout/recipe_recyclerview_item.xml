@@ -37,12 +37,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginBottom="4dp"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/recipe_name"
                 app:srcCompat="@drawable/ic_baseline_access_time_24"
-                app:tint="@color/recipe_item_text_secondary"/>
+                app:tint="@color/recipe_item_text_secondary" />
 
             <TextView
                 android:id="@+id/prep_time_heading"
@@ -138,6 +136,30 @@
                 app:layout_constraintTop_toTopOf="@+id/tom_face"
                 app:layout_constraintVertical_bias="0.4"
                 tools:text="4.5" />
+
+            <HorizontalScrollView
+                android:id="@id/tags_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/clock_icon">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/recipe_tags"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:singleLine="true" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

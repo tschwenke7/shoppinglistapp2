@@ -78,6 +78,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                 this.getContext(), R.array.search_criteria_options,android.R.layout.simple_spinner_item);
         scAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         searchCriteriaSpinner.setAdapter(scAdapter);
+        searchCriteriaSpinner.setOnItemSelectedListener(this);
 
         Spinner orderBySpinner = root.findViewById(R.id.order_by_spinner);
         ArrayAdapter<CharSequence> obAdapter = ArrayAdapter.createFromResource(
@@ -207,11 +208,13 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             //when an option is selected in the "search by" spinner
             case R.id.search_criteria_spinner:
                 //respond to option selection here
+                adapter.setSearchCriteria(pos);
                 break;
 
             //when an option is selected in the "order by" spinner
             case R.id.order_by_spinner:
                 adapter.sort(pos);
+                break;
         }
     }
 

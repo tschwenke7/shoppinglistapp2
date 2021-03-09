@@ -12,8 +12,11 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.helpers.RecipeComparators;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -28,9 +31,17 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
     private OnRecipeClickListener onRecipeClickListener;
     private List<Integer> selectedPositions = new ArrayList<>();
     private DecimalFormat ratingFormat = new DecimalFormat("#.#");
+    private SearchCriteria searchCriteria;
+
+    public enum SearchCriteria {
+        NAME,
+        INGREDIENT,
+        TAG
+    };
 
     public RecipeListAdapter(OnRecipeClickListener onRecipeClickListener){
         this.onRecipeClickListener = onRecipeClickListener;
+        searchCriteria = SearchCriteria.NAME;
     }
 
     @NonNull
@@ -52,6 +63,20 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
         diffResult.dispatchUpdatesTo(this);
         this.recipes = newRecipes;
         this.recipesFull = new ArrayList<>(newRecipes);
+    }
+
+    public void setSearchCriteria(int searchCriteria){
+        switch (searchCriteria){
+            case 0:
+                this.searchCriteria = SearchCriteria.NAME;
+                break;
+            case 1:
+                this.searchCriteria = SearchCriteria.INGREDIENT;
+                break;
+            case 2:
+                this.searchCriteria = SearchCriteria.TAG;
+                break;
+        }
     }
 
     public void sort(int orderingCriteria){
@@ -127,18 +152,31 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
 
     @Override
     public Filter getFilter() {
-        return recipeFilter;
+        switch (searchCriteria){
+            case INGREDIENT:
+                return ingredientFilter;
+            case TAG:
+                return tagFilter;
+            default:
+                return nameFilter;
+        }
     }
 
-    /**
-     * Filters recipes to match those whose name contains the query string
-     */
-    private Filter recipeFilter = new Filter() {
+    /** Filters recipes to match those whose name contains the query string */
+    private Filter nameFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             List<Recipe> filteredList = new ArrayList<>();
 
             if(constraint == null || constraint.length() == 0){
+                //if recipes haven't finished loading yet, wait until they have
+                while (recipesFull == null){
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
                 filteredList.addAll(recipesFull);
             }
             else{
@@ -168,6 +206,142 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
         }
     };
 
+    /** Matches recipes which contain ingredients containing each comma-separated string in query */
+    private Filter ingredientFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Recipe> filteredList = new ArrayList<>();
+
+            if (constraint == null || constraint.length() == 0) {
+                //if recipes haven't finished loading yet, wait until they have
+                while (recipesFull == null) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                filteredList.addAll(recipesFull);
+            } else {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+                String[] ingredientsToMatch = filterPattern.split(",");
+
+                //trim ingredient names
+                for (int i = 0; i < ingredientsToMatch.length; i++){
+                    ingredientsToMatch[i] = ingredientsToMatch[i].trim();
+                }
+
+                //find all recipes who have ingredients matching each of these
+                for (Recipe recipe : recipesFull) {
+                    //this array maintains which ingredients have been matched
+                    // as we iterate through the list of ingredients
+                    boolean[] found = new boolean[ingredientsToMatch.length];
+                    //for each ingredient of the recipe
+                    for(Ingredient ing : recipe.getIngredients()) {
+                        //check its name against all search parameter ingredients which haven't yet been found
+                        int i = 0;
+                        while(i < ingredientsToMatch.length && !isAllTrue(found)){
+                            if (!found[i] && ing.getName().toLowerCase().contains(ingredientsToMatch[i])) {
+                                found[i] = true;
+                            }
+                            i++;
+                        }
+                    }
+                    //if we found all search parameter ingredients, then add this to the list
+                    if (isAllTrue((found))) {
+                        filteredList.add(recipe);
+                    }
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+
+            return results;
+        }
+
+
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            recipes.clear();
+            if (filterResults.values != null) {
+                recipes.addAll((List) filterResults.values);
+            }
+            notifyDataSetChanged();
+        }
+    };
+
+    /** Matches recipes which contain tags containing each comma-separated string in query */
+    private Filter tagFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Recipe> filteredList = new ArrayList<>();
+
+            if (constraint == null || constraint.length() == 0) {
+                //if recipes haven't finished loading yet, wait until they have
+                while (recipesFull == null) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                filteredList.addAll(recipesFull);
+            } else {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+                String[] tagsToMatch = filterPattern.split(",");
+
+                //trim ingredient names
+                for (int i = 0; i < tagsToMatch.length; i++){
+                    tagsToMatch[i] = tagsToMatch[i].trim();
+                }
+
+                //find all recipes who have ingredients matching each of these
+                for (Recipe recipe : recipesFull) {
+                    //this array maintains which ingredients have been matched
+                    // as we iterate through the list of ingredients
+                    boolean[] found = new boolean[tagsToMatch.length];
+                    //for each ingredient of the recipe
+                    for(String tag : recipe.getTags()) {
+                        //check its name against all search parameter tags which haven't yet been found
+                        int i = 0;
+                        while(i < tagsToMatch.length && !isAllTrue(found)){
+                            if (!found[i] && tag.toLowerCase().contains(tagsToMatch[i])) {
+                                found[i] = true;
+                            }
+                            i++;
+                        }
+                    }
+                    //if we found all search parameter ingredients, then add this to the list
+                    if (isAllTrue((found))) {
+                        filteredList.add(recipe);
+                    }
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+
+            return results;
+        }
+
+
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            recipes.clear();
+            if (filterResults.values != null) {
+                recipes.addAll((List) filterResults.values);
+            }
+            notifyDataSetChanged();
+        }
+    };
+
+    private boolean isAllTrue(boolean... array){
+        for (boolean b: array){
+            if(!b) return false;
+        }
+        return true;
+    }
 
     public static class RecipeDiff extends DiffUtil.Callback {
         List<Recipe> newList;
@@ -260,6 +434,18 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
             }
             else{
                 tomRatingView.setText("-");
+            }
+
+            //remove any previous tags
+            ChipGroup chipGroup = itemView.findViewById(R.id.recipe_tags);
+            chipGroup.removeAllViews();
+            //add tags
+            for (String tagName : recipe.getTags()){
+                //add a sample tag
+                Chip chip = (Chip) LayoutInflater.from(itemView.getContext()).inflate(R.layout.tag_chip, null, false);
+                chip.setText(tagName);
+
+                chipGroup.addView(chip);
             }
         }
 

@@ -70,6 +70,7 @@ public class SlaRepository {
     public LiveData<List<Ingredient>> getIngredientsByRecipeId(int id){
         return ingredientDao.getIngredientsByRecipeId(id);
     }
+
     public Future<List<Ingredient>> getIngredientsByRecipeIdNonLive(int id){
         Callable<List<Ingredient>> insertCallable = () -> ingredientDao.getIngredientsByRecipeIdNonLive(id);
 

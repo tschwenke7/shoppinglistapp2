@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class RecipesViewModel extends AndroidViewModel {
 
@@ -237,7 +238,13 @@ public class RecipesViewModel extends AndroidViewModel {
 
     private Recipe populateIngredientsAndTags(Recipe recipe) {
         //combine ingredients
-        recipe.setIngredients(getRecipeIngredientsById(recipe.getId()).getValue());
+        try {
+            recipe.setIngredients(slaRepository.getIngredientsByRecipeIdNonLive(recipe.getId()).get());
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         //combine tags
         recipe.setTags(getTagsByRecipe(recipe.getId()));
