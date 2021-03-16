@@ -14,11 +14,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.MainActivity;
 
 public class ShoppingListFragment extends Fragment implements ShoppingListAdapter.SlItemClickListener {
     private ShoppingListViewModel shoppingListViewModel;
@@ -72,6 +75,8 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu,inflater);
+        menu.clear();
         inflater.inflate(R.menu.shopping_list_action_bar, menu);
     }
 
@@ -98,6 +103,18 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                 return super.onOptionsItemSelected(item);
         }
         return false;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        //hide back button
+        MainActivity mainActivity = (MainActivity) requireActivity();
+        mainActivity.hideUpButton();
+
+        //set title
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_shopping_list);
     }
 
     @Override

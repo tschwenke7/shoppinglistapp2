@@ -2,9 +2,12 @@ package com.example.shoppinglistapp2.activities.ui.recipes.creator;
 
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -51,11 +54,15 @@ public class CreateRecipeFragment extends Fragment {
         //setup action bar to allow back button
         this.setHasOptionsMenu(true);
 
-        //setup "create recipe from website" button
+        setupUi(root);
+
+        return root;
+    }
+
+    private void setupUi(View root){
+                //setup "create recipe from website" button
         Button websiteButton = root.findViewById(R.id.create_recipe_from_website_button);
-        websiteButton.setOnClickListener(view -> {
-            onWebsiteButtonClicked(view);
-        });
+        websiteButton.setOnClickListener(this::onWebsiteButtonClicked);
 
         //setup manual recipe creation button to get a new recipe id for an empty recipe and navigate
         //to editor
@@ -68,7 +75,16 @@ public class CreateRecipeFragment extends Fragment {
             Navigation.findNavController(root).navigate(action);
         });
 
-        return root;
+        //configure back button to work within parent fragment
+        Fragment f1 = this;
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                NavHostFragment.findNavController(f1).navigateUp();
+            }
+        };
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
     }
 
     private void onWebsiteButtonClicked(View view){
@@ -126,10 +142,25 @@ public class CreateRecipeFragment extends Fragment {
         switch (item.getItemId()) {
             //back button pressed
             case android.R.id.home:
-                ((MainActivity) getActivity()).onBackPressed();
+                ((MainActivity) getParentFragment().getActivity()).onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    //show back button in action bar for this fragment
+    @Override
+    public void onResume() {
+        super.onResume();
+        //show back button
+        MainActivity activity = (MainActivity) getParentFragment().getActivity();
+        if (activity != null) {
+            activity.showUpButton();
+        }
+
+        //set title of page
+        ((AppCompatActivity) getParentFragment().getActivity()).getSupportActionBar().setTitle(R.string.create_recipe_title);
+
     }
 }

@@ -143,10 +143,15 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     @Override
     public void onResume() {
         super.onResume();
-        MainActivity activity = (MainActivity)getActivity();
+        //hide back button
+        MainActivity activity = (MainActivity) getParentFragment().getActivity();
         if (activity != null) {
             activity.hideUpButton();
         }
+
+        //set title of page
+        ((AppCompatActivity) getParentFragment().getActivity()).getSupportActionBar().setTitle(R.string.title_recipes);
+
     }
 
     /** Merges extra menu items into the default activity action bar, according to provided menu xml */

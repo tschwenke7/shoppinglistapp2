@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_shopping_list">
+    app:startDestination="@+id/nav_recipe_list">
 
     <fragment
         android:id="@+id/nav_recipe_list"
@@ -32,12 +32,6 @@
             app:popEnterAnim="@anim/slide_in_right_delayed"
             app:popExitAnim="@anim/slide_out_left_delayed" />
     </fragment>
-
-    <fragment
-        android:id="@+id/nav_shopping_list"
-        android:name="com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListFragment"
-        android:label="@string/title_shopping_list"
-        tools:layout="@layout/fragment_shopping_list" />
 
     <fragment
         android:id="@+id/viewRecipeFragment"

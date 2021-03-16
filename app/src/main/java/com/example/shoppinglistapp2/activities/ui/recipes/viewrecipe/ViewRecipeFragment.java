@@ -18,6 +18,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +26,7 @@ import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -53,6 +55,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     private ActionMode.Callback actionModeCallback = new ViewRecipeFragment.ActionModeCallback();
     private IngredientListAdapter adapter;
     private RecyclerView ingredientRecyclerView;
+    private String pageTitle;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -76,8 +79,6 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         this.setHasOptionsMenu(true);
 
         setupViews(root);
-
-
 
         saved = false;
 
@@ -136,11 +137,23 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         else{
             enterViewMode(root);
         }
+
+        //make back button work within these nested fragments
+        Fragment f1 = this;
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                NavHostFragment.findNavController(f1).navigateUp();
+            }
+        };
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
     }
 
     private void populateViews(View root, Recipe recipe){
         //set name as action bar title
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(recipe.getName());
+        pageTitle = recipe.getName();
+        ((AppCompatActivity) getParentFragment().getActivity()).getSupportActionBar().setTitle(pageTitle);
 
         //prefill recipe name field
         ((TextView) root.findViewById(R.id.edit_text_recipe_name)).setText(recipe.getName());
@@ -436,10 +449,13 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     @Override
     public void onResume() {
         super.onResume();
-        MainActivity activity = (MainActivity)getActivity();
+        MainActivity activity = (MainActivity) getParentFragment().getActivity();
         if (activity != null) {
             activity.showUpButton();
         }
+
+        //set name as action bar title
+        ((AppCompatActivity) getParentFragment().getActivity()).getSupportActionBar().setTitle(pageTitle);
     }
 
     /** Merges extra menu items into the default activity action bar, according to provided menu xml */

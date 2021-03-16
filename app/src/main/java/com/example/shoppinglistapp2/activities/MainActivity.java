@@ -4,54 +4,40 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.shoppinglistapp2.R;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.example.shoppinglistapp2.activities.ui.recipes.RecipesParentFragment;
+import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListFragment;
+import com.google.android.material.tabs.TabLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.navigation.NavController;
-import androidx.navigation.NavOptions;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 
 public class MainActivity extends AppCompatActivity {
+
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private SectionsPagerAdapter sectionsPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        BottomNavigationView navView = findViewById(R.id.nav_view);
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_recipe_list, R.id.nav_shopping_list)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);
+        sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
+        viewPager = findViewById(R.id.view_pager);
+        viewPager.setAdapter(sectionsPagerAdapter);
 
-//        //add animations to bottom navigation bar
-//        NavOptions options = new NavOptions.Builder()
-//                .setLaunchSingleTop(true)
-//
-//                .setEnterAnim(R.anim.slide_in_right)
-//                .setExitAnim(R.anim.wait_anim)
-//                .build();
-//
-//        navView.setOnNavigationItemSelectedListener((item -> {
-//            switch(item.getItemId()){
-//                case R.id.nav_shopping_list:
-//                    navController.navigate(R.id.nav_shopping_list, null, options);
-//                    break;
-//                case R.id.nav_recipe_list:
-//                    navController.navigate(R.id.nav_recipe_list, null, options);
-//            }
-//            return true;
-//        }));
+        tabLayout = findViewById(R.id.tab_layout);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_baseline_menu_book_24);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_baseline_format_list_bulleted_24);
 
-
+        //start on shopping list tab
+//        viewPager.setCurrentItem(1, false);
     }
 
     //enable the back button in action bar to go to previous fragment
@@ -74,4 +60,40 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
     }
 
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+        public SectionsPagerAdapter(FragmentManager fm, int behaviour) {
+            super(fm, behaviour);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            Fragment fragment = null;
+            switch (position) {
+                case 0:
+                    fragment = RecipesParentFragment.newInstance();
+                    break;
+                case 1:
+                    fragment = new ShoppingListFragment();
+                    break;
+            }
+            return fragment;
+        }
+        @Override
+        public int getCount() {
+            // Show 2 total pages.
+            return 2;
+        }
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return getResources().getString(R.string.title_recipes);
+                case 1:
+                    return getResources().getString(R.string.title_shopping_list);
+            }
+            return null;
+        }
+
+
+    }
 }

@@ -54,7 +54,6 @@
     <string name="recipe_url_timeout_error">Error - website too long to respond. Check your internet connection and try again.</string>
 
 
-
     <!-- View recipe page -->
     <string name="edit_recipe_action_title">Edit</string>
     <string name="view_recipe_website_button">View recipe online</string>
@@ -99,5 +98,7 @@
     <string name="clear_list_positive_button">Clear list</string>
     <string name="clear_list_negative_button">Cancel</string>
     <string name="serves_heading">Serves:</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
