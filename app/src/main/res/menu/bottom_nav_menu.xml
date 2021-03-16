@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/recipe_list"
+        android:id="@+id/nav_recipe_list"
         android:icon="@drawable/ic_baseline_menu_book_24"
         android:title="@string/title_recipes" />
 
     <item
-        android:id="@+id/shopping_list"
+        android:id="@+id/nav_shopping_list"
         android:icon="@drawable/ic_baseline_format_list_bulleted_24"
         android:title="@string/title_shopping_list" />
 
