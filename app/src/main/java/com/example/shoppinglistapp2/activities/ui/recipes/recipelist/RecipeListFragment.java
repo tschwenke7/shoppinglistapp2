@@ -50,12 +50,18 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         root = inflater.inflate(R.layout.fragment_recipe_list, container, false);
 
-        setupViews(root);
+
 
         //this will delete ALL recipes and load recipetineats websites from the spreadsheet in res/raw/<name>.csv
 //        recipesViewModel.loadFromBackup(this);
 
         return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setupViews(root);
     }
 
     private void setupViews(View root){

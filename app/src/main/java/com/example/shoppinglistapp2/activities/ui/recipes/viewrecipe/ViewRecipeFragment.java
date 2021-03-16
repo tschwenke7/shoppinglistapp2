@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
@@ -75,17 +76,23 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
         View root = inflater.inflate(R.layout.fragment_view_recipe, container, false);
 
-        //setup action bar
-        this.setHasOptionsMenu(true);
 
-        setupViews(root);
 
         saved = false;
 
         return root;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setupViews(view);
+    }
+
     private void setupViews(View root){
+        //setup action bar
+        this.setHasOptionsMenu(true);
+
         /* fill in textViews with saved recipe data where available */
         populateViews(root, currentRecipe);
 

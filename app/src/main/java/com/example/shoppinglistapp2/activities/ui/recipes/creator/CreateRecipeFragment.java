@@ -3,6 +3,8 @@ package com.example.shoppinglistapp2.activities.ui.recipes.creator;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -51,16 +53,20 @@ public class CreateRecipeFragment extends Fragment {
         recipesViewModel =
                 new ViewModelProvider(getActivity()).get(RecipesViewModel.class);
 
-        //setup action bar to allow back button
-        this.setHasOptionsMenu(true);
-
-        setupUi(root);
-
         return root;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setupUi(root);
+    }
+
     private void setupUi(View root){
-                //setup "create recipe from website" button
+        //setup action bar to allow back button
+        this.setHasOptionsMenu(true);
+
+        //setup "create recipe from website" button
         Button websiteButton = root.findViewById(R.id.create_recipe_from_website_button);
         websiteButton.setOnClickListener(this::onWebsiteButtonClicked);
 

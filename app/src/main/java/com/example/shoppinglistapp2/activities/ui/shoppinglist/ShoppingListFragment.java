@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -35,6 +36,12 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
         //inflate fragment
         View root = inflater.inflate(R.layout.fragment_shopping_list, container, false);
 
+        return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View root, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(root, savedInstanceState);
         //setup action bar
         this.setHasOptionsMenu(true);
 
@@ -53,9 +60,6 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
         ((Button) root.findViewById(R.id.button_new_list_item)).setOnClickListener(view -> {
             addItems(view);
         });
-
-
-        return root;
     }
 
     private void addItems(View view){
