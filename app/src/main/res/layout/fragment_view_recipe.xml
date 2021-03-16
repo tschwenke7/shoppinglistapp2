@@ -79,7 +79,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_text_ingredient"
-            tools:listitem="@layout/ingredient_list_item_editor" >
+            tools:listitem="@layout/ingredient_list_item" >
 
         </androidx.recyclerview.widget.RecyclerView>
 

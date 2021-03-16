@@ -8,6 +8,8 @@ import androidx.room.Fts4;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.util.Objects;
+
 @Entity(tableName = "ingredients",
         foreignKeys = @ForeignKey(
                 entity = Recipe.class,
@@ -31,7 +33,7 @@ public class Ingredient {
 
     private String unit;
 
-    public Ingredient(@NonNull String name, @NonNull int recipeId){
+    public Ingredient(@NonNull String name, @NonNull int recipeId) {
         this.name = name;
         this.recipeId = recipeId;
     }
@@ -52,7 +54,7 @@ public class Ingredient {
     }
 
     @Ignore
-    public Ingredient(@NonNull String name){
+    public Ingredient(@NonNull String name) {
         this.name = name;
     }
 
@@ -98,16 +100,26 @@ public class Ingredient {
     }
 
     @Ignore
-    public String toString(){
+    public String toString() {
         String str = "";
         //prepend qty and unit if present to the ingredient's name
-        if (null != qty){
+        if (null != qty) {
             str += qty + " ";
         }
-        if(null != unit){
+        if (null != unit) {
             str += unit + " ";
         }
 
         return str + name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Ingredient that = (Ingredient) o;
+        return name.equals(that.name) &&
+                Objects.equals(qty, that.qty) &&
+                Objects.equals(unit, that.unit);
     }
 }

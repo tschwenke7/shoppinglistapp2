@@ -90,17 +90,12 @@ public class ShoppingListViewModel extends AndroidViewModel {
         }
     }
 
-    public void addItemsFromRecipe(List<Ingredient> ingredients){
-        //record list of items to update in db afterwards, if their qtys are edited during the merge
-        List<SlItem> itemsToUpdate = new ArrayList<>();
+    public void addIngredientsToShoppingList(List<Ingredient> ingredients){
         //for each ingredient, convert it to an SLItem
-        //either add that item if it's new,
+        //either add that item if it's new, or merge qtys if it already existed
         for (Ingredient ingredient : ingredients){
             SlItem item = SlItemUtils.toSlItem(ingredient);
             insertOrMergeItem(item);
         }
-
-        //update all items with modified qtys in db
-        slaRepository.updateSlItems(itemsToUpdate.toArray(new SlItem[itemsToUpdate.size()]));
     }
 }

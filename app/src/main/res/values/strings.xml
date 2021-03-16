@@ -63,9 +63,9 @@
     <string name="cook_time_heading_short">Cook:</string>
     <string name="abbreviated_time_unit">mins</string>
     <string name="default_notes_text">You\'ve not written any notes for this recipe.</string>
-    <string name="add_all_ingredients_toast">All ingredients added to shopping list.</string>
+    <string name="add_all_ingredients_toast">All selected ingredients added to shopping list.</string>
     <string name="add_all_ingredients_dialog_title">Confirm</string>
-    <string name="add_all_ingredients_dialog">Add all ingredients from this recipe to your shopping list?</string>
+    <string name="add_all_ingredients_dialog">Add all selected ingredients from this recipe to your shopping list?</string>
     <string name="add_all_ingredients_dialog_positive_button">Yes</string>
     <string name="add_all_ingredients_dialog_negative_button">Cancel</string>
 

@@ -1,83 +1,187 @@
 package com.example.shoppinglistapp2.activities.ui.recipes.viewrecipe;
 
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.CheckBox;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 
-public class IngredientListAdapter extends ListAdapter<Ingredient, IngredientListAdapter.ViewHolder> {
-    private IngredientListAdapter.ItemClickListener itemClickListener;
-    private boolean editMode = false;
+import java.util.ArrayList;
+import java.util.List;
 
-    public IngredientListAdapter(@NonNull DiffUtil.ItemCallback<Ingredient> diffCallback, IngredientListAdapter.ItemClickListener itemClickListener) {
-        super(diffCallback);
-        this.itemClickListener = itemClickListener;
+public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAdapter.ViewHolder> {
+
+    private List<Ingredient> ingredients;
+    private IngredientClickListener ingredientClickListener;
+    private boolean editMode = false;
+    private List<Integer> deselectedPositions;
+
+    public IngredientListAdapter(IngredientClickListener ingredientClickListener){
+        this.ingredientClickListener = ingredientClickListener;
+        deselectedPositions = new ArrayList<>();
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.ingredient_list_item_editor, parent, false);
-        return new ViewHolder(view, itemClickListener);
+                .inflate(R.layout.ingredient_list_item, parent, false);
+        return new IngredientListAdapter.ViewHolder(view, ingredientClickListener);
     }
+
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Ingredient current = getItem(position);
-        holder.bind(current);
+        holder.bind(ingredients.get(position));
     }
 
-    public void setEditMode(boolean isEditMode){
-        this.editMode = isEditMode;
+    @Override
+    public int getItemCount() {
+        if(null == ingredients){
+            return 0;
+        }
+        return ingredients.size();
     }
 
-    public static class IngredientDiff extends DiffUtil.ItemCallback<Ingredient> {
+    public void setList(List<Ingredient> newList){
+        //clear any selection/deselection info, as the list may have changed
+        // and invalidated the recorded positions
+        resetSelections();
 
-        @Override
-        public boolean areItemsTheSame(@NonNull Ingredient oldItem, @NonNull Ingredient newItem) {
-            return oldItem.getId() == newItem.getId();
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new IngredientDiff(newList, ingredients));
+        diffResult.dispatchUpdatesTo(this);
+        ingredients = newList;
+    }
+
+    public void setEditMode(boolean editMode) {
+        this.editMode = editMode;
+    }
+
+    public void resetSelections(){
+        if(null != ingredients)
+            deselectedPositions.clear();
+    }
+
+    /**
+     * Compiles and returns a list of all Ingredients which haven't been manually checked off the
+     * recipe's ingredients list by the user.
+     * @return all Ingredients which remain selected within this adapter
+     */
+    public List<Ingredient> getSelectedIngredients(){
+        List<Ingredient> selected = new ArrayList<>();
+
+        //add all ingredients which haven't been deselected by the user
+        for (int i = 0; i < ingredients.size(); i++){
+            if(!deselectedPositions.contains(i)){
+                selected.add(ingredients.get(i));
+            }
         }
 
-        @Override
-        public boolean areContentsTheSame(@NonNull Ingredient oldItem, @NonNull Ingredient newItem) {
-            return oldItem.getId() == newItem.getId();
-        }
+        return selected;
     }
 
-    public interface ItemClickListener {
-        void onDeleteClicked(int position);
-    }
+    public class ViewHolder extends RecyclerView.ViewHolder{
+        private IngredientClickListener ingredientClickListener;
+        private View itemView;
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private final TextView ingredientNameView;
-
-        public ViewHolder(@NonNull View itemView, ItemClickListener itemClickListener) {
+        public ViewHolder(@NonNull View itemView, IngredientClickListener ingredientClickListener) {
             super(itemView);
-            ingredientNameView = itemView.findViewById(R.id.ingredient_name);
+            this.itemView = itemView;
+            this.ingredientClickListener = ingredientClickListener;
+        }
 
-            //hide delete button if edit mode is disabled
-            if(!editMode){
-                itemView.findViewById(R.id.delete_icon).setVisibility(View.INVISIBLE);
+        public void bind(Ingredient ingredient){
+            //fill ingredient name
+            CheckBox checkBoxView = itemView.findViewById(R.id.ingredient_name);
+            checkBoxView.setText(ingredient.toString());
+            checkBoxView.setChecked(true);
+
+            //show or hide delete icon depending on whether edit mode is active
+            View deleteIcon = itemView.findViewById(R.id.delete_icon);
+            if(editMode){
+                deleteIcon.setVisibility(View.VISIBLE);
+                //set listener for when delete icon clicked
+                deleteIcon.setOnClickListener((view) -> {
+                    ingredientClickListener.onDeleteClicked(getAdapterPosition());
+                });
+
+                //hide checkbox
+                Drawable transparentDrawable = new ColorDrawable(Color.TRANSPARENT);
+                checkBoxView.setButtonDrawable(transparentDrawable);
             }
             else{
-                itemView.findViewById(R.id.delete_icon).setVisibility(View.VISIBLE);
-                //attach click listener to delete icon
-                itemView.findViewById(R.id.delete_icon).setOnClickListener(view ->
-                        itemClickListener.onDeleteClicked(getAdapterPosition()));
+                deleteIcon.setVisibility(View.GONE);
+
+                //listen for select/deselect clicks
+                checkBoxView.setOnClickListener((view -> {
+                    //if deselected, reselect and remove from deselected list
+                    if(deselectedPositions.contains(getAdapterPosition())){
+                        deselectedPositions.remove(Integer.valueOf(getAdapterPosition()));
+
+                        //remove strikethrough and restore text colour
+                        checkBoxView.setPaintFlags(checkBoxView.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
+                        checkBoxView.setTextColor(itemView.getContext().getResources().getColor(R.color.primary_text_default));
+                    }
+                    //if selected, reselect and add to deselected list
+                    else{
+                        deselectedPositions.add(getAdapterPosition());
+
+                        //add strikethrough and fade text
+                        checkBoxView.setPaintFlags(checkBoxView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                        checkBoxView.setTextColor(0xffd3d3d3);
+                    }
+                }));
             }
         }
+    }
 
-        public void bind (Ingredient ingredient){
-            ingredientNameView.setText(ingredient.toString());
+    private class IngredientDiff extends DiffUtil.Callback {
+        List<Ingredient> newList;
+        List<Ingredient> oldList;
+
+        public IngredientDiff(List<Ingredient> newList, List<Ingredient> oldList) {
+            this.newList = newList;
+            this.oldList = oldList;
         }
+
+        @Override
+        public int getOldListSize() {
+            if(oldList == null){
+                return 0;
+            }
+            return oldList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            if(newList == null){
+                return 0;
+            }
+            return newList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).getId() == newList.get(newItemPosition).getId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
+        }
+    }
+
+    public interface IngredientClickListener{
+        void onDeleteClicked(int position);
     }
 }

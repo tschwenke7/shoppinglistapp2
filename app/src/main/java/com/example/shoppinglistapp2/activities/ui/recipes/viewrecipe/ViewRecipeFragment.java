@@ -40,7 +40,7 @@ import com.google.android.material.chip.ChipGroup;
 
 import java.util.List;
 
-public class ViewRecipeFragment extends Fragment implements IngredientListAdapter.ItemClickListener {
+public class ViewRecipeFragment extends Fragment implements IngredientListAdapter.IngredientClickListener {
     private RecipesViewModel recipesViewModel;
     private ShoppingListViewModel shoppingListViewModel;
     private int recipeId;
@@ -90,12 +90,13 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
         //setup ingredient list recyclerview
         ingredientRecyclerView = root.findViewById(R.id.recipe_ingredients_list);
-        adapter = new IngredientListAdapter(new IngredientListAdapter.IngredientDiff(), this);
-        ingredientRecyclerView.setAdapter(adapter);
-        ingredientRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         //set observer to update ingredient list if it changes
         ingredients = recipesViewModel.getRecipeIngredientsById(recipeId);
-        ingredients.observe(getViewLifecycleOwner(), adapter::submitList);
+        adapter = new IngredientListAdapter(this);
+        ingredientRecyclerView.setAdapter(adapter);
+        ingredientRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+
+        ingredients.observe(getViewLifecycleOwner(), (list) -> adapter.setList(list));
 
         //handle ingredient being added
         Button addIngredientButton = root.findViewById(R.id.recipe_add_ingredient_button);
@@ -338,9 +339,9 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         TextView notesTextView = root.findViewById(R.id.recipe_notes);
         notesTextView.setVisibility(View.VISIBLE);
 
-
-        //hide per-ingredient delete icons
+        //hide per-ingredient delete icons and reset selections
         adapter.setEditMode(false);
+        adapter.resetSelections();
         ingredientRecyclerView.setAdapter(adapter);
     }
 
@@ -469,7 +470,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
                         .setTitle(R.string.add_all_ingredients_dialog_title)
                         .setMessage(R.string.add_all_ingredients_dialog)
                         .setPositiveButton(R.string.add_all_ingredients_dialog_positive_button, (dialogInterface, i) -> {
-                            shoppingListViewModel.addItemsFromRecipe(ingredients.getValue());
+                            shoppingListViewModel.addIngredientsToShoppingList(adapter.getSelectedIngredients());
                             Toast.makeText(getContext(),R.string.add_all_ingredients_toast,Toast.LENGTH_LONG).show();
                         })
                         //otherwise don't do anything
