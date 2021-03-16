@@ -110,6 +110,11 @@ public class Ingredient {
             str += unit + " ";
         }
 
+        //if there was only default qty and no unit, hide the "1 " for readability
+        if(str.equals("1 ")){
+            return name;
+        }
+
         return str + name;
     }
 

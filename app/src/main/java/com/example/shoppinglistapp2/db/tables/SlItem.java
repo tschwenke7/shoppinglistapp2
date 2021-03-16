@@ -129,6 +129,12 @@ public class SlItem {
                 str += " " + unit2;
             }
         }
+
+        //if there was only default qty and no unit, hide the "1 " for readability
+        if(str.equals("1")){
+            return name;
+        }
+
         str += " " + name;
         return str;
     }
