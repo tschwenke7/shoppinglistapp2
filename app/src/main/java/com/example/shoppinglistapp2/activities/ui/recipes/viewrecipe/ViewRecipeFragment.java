@@ -76,8 +76,6 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
         View root = inflater.inflate(R.layout.fragment_view_recipe, container, false);
 
-
-
         saved = false;
 
         return root;
@@ -298,7 +296,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         ((RatingBar) root.findViewById(R.id.tom_rating_bar)).setIsIndicator(false);
 
         //swap url button for field/title
-        root.findViewById(R.id.url_editor).setVisibility(View.VISIBLE);
+        root.findViewById(R.id.url_editor_container).setVisibility(View.VISIBLE);
         root.findViewById(R.id.recipe_url_button).setVisibility(View.GONE);
 
         //swap notes textView for editText
@@ -350,7 +348,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         ((RatingBar) root.findViewById(R.id.tom_rating_bar)).setIsIndicator(true);
 
         //swap url field/title for button
-        root.findViewById(R.id.url_editor).setVisibility(View.GONE);
+        root.findViewById(R.id.url_editor_container).setVisibility(View.GONE);
         root.findViewById(R.id.recipe_url_button).setVisibility(View.VISIBLE);
 
         //swap notes editText for textView
