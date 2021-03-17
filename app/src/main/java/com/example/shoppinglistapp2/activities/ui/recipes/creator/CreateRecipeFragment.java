@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.shoppinglistapp2.R;
@@ -94,7 +95,13 @@ public class CreateRecipeFragment extends Fragment {
     }
 
     private void onWebsiteButtonClicked(View view){
-        String url = ((EditText) root.findViewById(R.id.edit_text_recipe_website)).getText().toString();
+        //show progress bar and fade everything else
+        ProgressBar progressBar = root.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+        View mainContent = root.findViewById(R.id.main_content_container);
+        mainContent.setAlpha(0.2f);
+
+        String url = ((EditText) root.findViewById(R.id.edit_text_recipe_website)).getText().toString().trim();
 
         //check that something was entered
         if(url.isEmpty()){
@@ -113,6 +120,7 @@ public class CreateRecipeFragment extends Fragment {
 
         //attempt to create a Recipe from the website
         else{
+            //attempt to load the website
             Callable<Integer> generateRecipe = () -> recipesViewModel.generateRecipeIdFromUrl(url);
             Future<Integer> recipeId = websiteExecutor.submit(generateRecipe);
 
@@ -140,6 +148,9 @@ public class CreateRecipeFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+        //hide progress bar and reset opacity of everything else
+        progressBar.setVisibility(View.GONE);
+        mainContent.setAlpha(1.0f);
     }
 
     @Override
