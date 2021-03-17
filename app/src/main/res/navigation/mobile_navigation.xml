@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_recipe_list">
+
+    <fragment
+        android:id="@+id/nav_recipe_list"
+        android:name="com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment"
+        android:label="@string/title_recipes"
+        tools:layout="@layout/fragment_recipe_list" >
+        <action
+            android:id="@+id/action_recipe_list_to_view_recipe"
+            app:destination="@id/viewRecipeFragment"
+            app:enterAnim="@anim/slide_in_left_delayed"
+            app:exitAnim="@anim/slide_out_right_delayed"
+            app:popEnterAnim="@anim/slide_in_right_delayed"
+            app:popExitAnim="@anim/slide_out_left_delayed">
+            <argument
+                android:name="newRecipeFlag"
+                android:defaultValue="false" />
+            <argument
+                android:name="editingFlag"
+                android:defaultValue="false" />
+        </action>
+        <action
+            android:id="@+id/action_recipe_list_to_create_recipe"
+            app:destination="@id/createRecipe"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_right"
+            app:popEnterAnim="@anim/slide_in_right_delayed"
+            app:popExitAnim="@anim/slide_out_left_delayed" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/viewRecipeFragment"
+        android:name="com.example.shoppinglistapp2.activities.ui.recipes.viewrecipe.ViewRecipeFragment"
+        android:label="View Recipe"
+        tools:layout="@layout/fragment_view_recipe">
+        <argument android:name="recipeId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <argument
+            android:name="newRecipeFlag"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="editingFlag"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/createRecipe"
+        android:name="com.example.shoppinglistapp2.activities.ui.recipes.creator.CreateRecipeFragment"
+        android:label="@string/create_recipe_title"
+        tools:layout="@layout/fragment_create_recipe">
+        <action
+            android:id="@+id/action_create_recipe_to_view_recipe"
+            app:destination="@id/viewRecipeFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_right"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_left">
+            <argument
+                android:name="editingFlag"
+                android:defaultValue="true" />
+            <argument
+                android:name="newRecipeFlag"
+                android:defaultValue="true" />
+        </action>
+    </fragment>
+
+</navigation>
