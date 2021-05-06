@@ -101,4 +101,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!-- Meal Plan Fragment -->
+    <string name="plans_heading">Meal Plans</string>
+    <string name="plan_ingredients_heading">Ingredients needed</string>
+    <string name="suggestions_heading">Suggested Recipes</string>
+    <string name="meal_plan_notes_placeholder">Add notes…</string>
 </resources>
