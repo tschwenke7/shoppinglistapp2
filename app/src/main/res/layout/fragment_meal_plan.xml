@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".activities.ui.mealplan.MealPlan"
+    tools:context=".activities.ui.mealplan.MealPlanFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -42,11 +42,20 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/plan_recipes_recyclerview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="16dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            tools:listitem="@layout/meal_plan_recyclerview_item"
-            tools:itemCount="7"/>
+            android:layout_marginBottom="16dp"
+            android:nestedScrollingEnabled="false"
+            tools:itemCount="7"
+            tools:listitem="@layout/meal_plan_recyclerview_item" />
+
+        <Button
+            android:id="@+id/add_day_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_day_button_text"
+            android:textAlignment="center"
+            app:icon="@drawable/add_icon_white_24" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -74,7 +83,9 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/plan_ingredients_recyclerview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:scrollbars="vertical"
             tools:listitem="@layout/meal_plan_ingredient_recyclerview_item"
             />
 
@@ -105,10 +116,11 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/suggested_recipes_recyclerview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"
             tools:itemCount="5"
             tools:listitem="@layout/meal_plan_suggestion_recyclerview_item"/>
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>
 
 

@@ -5,10 +5,12 @@ import android.content.Context;
 import androidx.lifecycle.LiveData;
 
 import com.example.shoppinglistapp2.db.dao.IngredientDao;
+import com.example.shoppinglistapp2.db.dao.MealPlanDao;
 import com.example.shoppinglistapp2.db.dao.RecipeDao;
 import com.example.shoppinglistapp2.db.dao.SlItemDao;
 import com.example.shoppinglistapp2.db.dao.TagDao;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
+import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.SlItem;
 import com.example.shoppinglistapp2.db.tables.Tag;
@@ -23,6 +25,7 @@ public class SlaRepository {
     private RecipeDao recipeDao;
     private SlItemDao slItemDao;
     private TagDao tagDao;
+    private MealPlanDao mealPlanDao;
 
     private LiveData<List<Recipe>> allRecipes;
     private LiveData<List<SlItem>> allSlItems;
@@ -33,8 +36,9 @@ public class SlaRepository {
         recipeDao = db.recipeDao();
         slItemDao = db.slItemDao();
         tagDao = db.tagDao();
+        mealPlanDao = db.mealPlanDao();
         allRecipes = recipeDao.getAllAlphabetical();
-        allSlItems = slItemDao.getAll();
+        allSlItems = slItemDao.getAll(2);
     }
 
     public LiveData<List<Recipe>> getAllRecipes(){
@@ -134,8 +138,8 @@ public class SlaRepository {
         return allSlItems;
     }
 
-    public SlItem getSlItemByName(String name){
-        Callable<SlItem> queryCallable = () -> slItemDao.getByName(name);
+    public SlItem getSlItemByName(int listId, String name){
+        Callable<SlItem> queryCallable = () -> slItemDao.getByName(listId, name);
 
         Future<SlItem> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
         try {
@@ -162,12 +166,12 @@ public class SlaRepository {
         SlaDatabase.databaseWriteExecutor.execute(() -> slItemDao.update(slItems));
     }
 
-    public void deleteCheckedSlItems(){
-        SlaDatabase.databaseWriteExecutor.execute(() -> slItemDao.clearAllChecked());
+    public void deleteCheckedSlItems(int listId){
+        SlaDatabase.databaseWriteExecutor.execute(() -> slItemDao.clearAllChecked(listId));
     }
 
-    public void deleteAllSlItems(){
-        SlaDatabase.databaseWriteExecutor.execute(() -> slItemDao.clearAll());
+    public void deleteAllSlItems(int listId){
+        SlaDatabase.databaseWriteExecutor.execute(() -> slItemDao.clearAll(listId));
     }
 
     /* "Tag" functions */
@@ -217,5 +221,14 @@ public class SlaRepository {
 
     public void deleteAllRecipes() {
         SlaDatabase.databaseWriteExecutor.execute(()-> recipeDao.deleteEverything());
+    }
+
+    /* Meal plans */
+    public LiveData<List<MealPlan>> getAllMealPlans(int planId){
+        return mealPlanDao.getAll(planId);
+    }
+
+    public void insertMealPlan(MealPlan mealPlan){
+        SlaDatabase.databaseWriteExecutor.execute(()-> mealPlanDao.insert(mealPlan));
     }
 }

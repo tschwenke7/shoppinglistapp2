@@ -16,14 +16,14 @@ public interface SlItemDao {
     @Insert
     long insert(SlItem slItem);
 
-    @Query("SELECT * FROM slitems ORDER BY checked")
-    LiveData<List<SlItem>> getAll();
+    @Query("SELECT * FROM slitems WHERE list_id = :listId ORDER BY checked")
+    LiveData<List<SlItem>> getAll(int listId);
 
-    @Query("SELECT * FROM slitems WHERE checked = 0")
-    List<SlItem> getAllUncheckedNonLive();
+    @Query("SELECT * FROM slitems WHERE list_id = :listId AND checked = 0")
+    List<SlItem> getAllUncheckedNonLive(int listId);
 
-    @Query("SELECT * FROM slitems WHERE name = :name AND checked = 0")
-    SlItem getByName(String name);
+    @Query("SELECT * FROM slitems WHERE list_id = :listId AND name = :name AND checked = 0")
+    SlItem getByName(int listId, String name);
 
     @Delete
     void deleteAll(SlItem... slItems);
@@ -31,9 +31,9 @@ public interface SlItemDao {
     @Update
     void update(SlItem... slItems);
 
-    @Query("DELETE FROM slitems WHERE checked = 1")
-    void clearAllChecked();
+    @Query("DELETE FROM slitems WHERE list_id = :listId AND checked = 1")
+    void clearAllChecked(int listId);
 
-    @Query("DELETE FROM slitems")
-    void clearAll();
+    @Query("DELETE FROM slitems WHERE list_id = :listId")
+    void clearAll(int listId);
 }

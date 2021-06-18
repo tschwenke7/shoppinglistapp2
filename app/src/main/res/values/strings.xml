@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">SLA2</string>
     <string name="title_activity_main2">MainActivity</string>
+    <string name="title_meal_plan">Meal Plan</string>
     <string name="title_recipes">Recipes</string>
     <string name="title_shopping_list">Shopping List</string>
     <string name="title_recipe_editor">Edit Recipe</string>
@@ -102,8 +103,14 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- Meal Plan Fragment -->
-    <string name="plans_heading">Meal Plans</string>
+    <string name="plans_heading">Meals</string>
     <string name="plan_ingredients_heading">Ingredients needed</string>
     <string name="suggestions_heading">Suggested Recipes</string>
     <string name="meal_plan_notes_placeholder">Add notes…</string>
+    <string name="add_day_button_text">Add day…</string>
+    <string name="choose_recipe_button">Choose recipe…</string>
+
+
+    <string name="add_ingredients_to_list_option">Add all ingredients to shopping list</string>
+    <string name="clear_meal_plan_option">Clear meal plan</string>
 </resources>

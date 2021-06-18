@@ -16,6 +16,13 @@ public class SlItem {
     @PrimaryKey(autoGenerate = true)
     private int id;
 
+    /**
+     * 1 - Meal planning ingredient list
+     * 2 - Shopping list
+     */
+    @ColumnInfo(defaultValue = "2", name = "list_id")
+    private int listId;
+
     @NonNull
     private String name;
 
@@ -43,9 +50,10 @@ public class SlItem {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SlItem SLItem = (SlItem) o;
-        return checked == SLItem.checked &&
-                name.equals(SLItem.name);
+        SlItem slItem = (SlItem) o;
+        return checked == slItem.isChecked() &&
+                name.equals(slItem.getName()); //&&
+//                listId == slItem.getListId();
     }
 
     /**
@@ -114,6 +122,14 @@ public class SlItem {
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    public int getListId() {
+        return listId;
+    }
+
+    public void setListId(int listId) {
+        this.listId = listId;
     }
 
     @Ignore
