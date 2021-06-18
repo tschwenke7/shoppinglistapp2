@@ -21,10 +21,11 @@ import android.widget.Button;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListViewModel;
+import com.example.shoppinglistapp2.helpers.KeyboardHider;
 
 import org.jetbrains.annotations.NotNull;
 
-public class MealPlanFragment extends Fragment {
+public class MealPlanFragment extends Fragment implements MealPlanListAdapter.MealPlanClickListener {
 
     private MealPlanViewModel mealPlanViewModel;
 
@@ -50,7 +51,7 @@ public class MealPlanFragment extends Fragment {
 
         //setup meal plan recyclerview
         RecyclerView mealPlanRecyclerView = getView().findViewById(R.id.plan_recipes_recyclerview);
-        final MealPlanListAdapter mealPlanListAdapter = new MealPlanListAdapter();
+        final MealPlanListAdapter mealPlanListAdapter = new MealPlanListAdapter(this);
         mealPlanRecyclerView.setAdapter(mealPlanListAdapter);
         mealPlanRecyclerView.setLayoutManager(new LinearLayoutManager((this.getContext())));
 
@@ -85,5 +86,23 @@ public class MealPlanFragment extends Fragment {
 
         //set title
         ((AppCompatActivity) mainActivity).getSupportActionBar().setTitle(R.string.title_meal_plan);
+    }
+
+    @Override
+    public void onTitleConfirmClicked(int position, String newTitle) {
+        KeyboardHider.hideKeyboard(getActivity());
+
+        //update title in database
+        mealPlanViewModel.updateDayTitle(position, newTitle);
+    }
+
+    @Override
+    public void onChooseRecipeClicked(int position) {
+
+    }
+
+    @Override
+    public void onRecipeClicked(int position) {
+
     }
 }

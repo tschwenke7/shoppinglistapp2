@@ -231,4 +231,8 @@ public class SlaRepository {
     public void insertMealPlan(MealPlan mealPlan){
         SlaDatabase.databaseWriteExecutor.execute(()-> mealPlanDao.insert(mealPlan));
     }
+
+    public void updateMealPlan(MealPlan mealPlan) {
+        SlaDatabase.databaseWriteExecutor.execute(()-> mealPlanDao.update(mealPlan));
+    }
 }

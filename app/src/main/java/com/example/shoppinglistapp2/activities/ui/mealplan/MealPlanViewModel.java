@@ -33,6 +33,13 @@ public class MealPlanViewModel extends AndroidViewModel {
         MealPlan mealPlan = new MealPlan();
         mealPlan.setDayId(allMealPlans.getValue().size());
         mealPlan.setDayTitle("Title");
+        mealPlan.setPlanId(1);
         slaRepository.insertMealPlan(mealPlan);
+    }
+
+    public void updateDayTitle(int pos, String newTitle){
+        MealPlan mp = allMealPlans.getValue().get(pos);
+        mp.setDayTitle(newTitle);
+        slaRepository.updateMealPlan(mp);
     }
 }
