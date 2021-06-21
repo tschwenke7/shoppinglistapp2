@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
@@ -53,9 +54,48 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
     }
 
     public void setList(List<MealPlan> newList){
-        mealPlans = newList;
-        notifyDataSetChanged();
-        //TODO - implement diffUtil if necessary
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new MealPlanDiff(newList, mealPlans));
+        diffResult.dispatchUpdatesTo(this);
+        this.mealPlans = newList;
+
+//        mealPlans = newList;
+//        notifyDataSetChanged();
+    }
+
+    public static class MealPlanDiff extends DiffUtil.Callback {
+        List<MealPlan> newList;
+        List<MealPlan> oldList;
+
+        public MealPlanDiff(List<MealPlan> newList, List<MealPlan> oldList) {
+            this.newList = newList;
+            this.oldList = oldList;
+        }
+
+        @Override
+        public int getOldListSize() {
+            if(oldList == null){
+                return 0;
+            }
+            return oldList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            if(newList == null){
+                return 0;
+            }
+            return newList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).getId() == newList.get(newItemPosition).getId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

@@ -160,14 +160,14 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         ((AppCompatActivity) getParentFragment().getActivity()).getSupportActionBar().setTitle(R.string.title_recipes);
 
         //if we've arrived at this page to select a recipe for a meal plan,
-        //activate the appropriate action mode
-        actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(chooseMealPlanItemActionModeCallback);
+        if(recipesViewModel.getSelectingForMeal() != null){
+            //activate the appropriate action mode
+            actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(chooseMealPlanItemActionModeCallback);
 
-        //change title accordingly
-        actionMode.setTitle(String.format("Choose a recipe for %s", recipesViewModel.getSelectingForMeal().getDayTitle()));
-        actionMode.invalidate();
-
-
+            //change title accordingly
+            actionMode.setTitle(String.format("Choose a recipe for %s", recipesViewModel.getSelectingForMeal().getDayTitle()));
+            actionMode.invalidate();
+        }
     }
 
     /** Merges extra menu items into the default activity action bar, according to provided menu xml */

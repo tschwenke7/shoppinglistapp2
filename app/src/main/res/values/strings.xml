@@ -107,7 +107,7 @@
     <string name="plan_ingredients_heading">Ingredients needed</string>
     <string name="suggestions_heading">Suggested Recipes</string>
     <string name="meal_plan_notes_placeholder">Add notes…</string>
-    <string name="add_day_button_text">Add day…</string>
+    <string name="add_day_button_text">Add meal…</string>
     <string name="choose_recipe_button">Choose recipe…</string>
 
 

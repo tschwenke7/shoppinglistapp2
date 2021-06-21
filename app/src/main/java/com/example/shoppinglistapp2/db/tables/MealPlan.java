@@ -6,6 +6,8 @@ import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.util.Objects;
+
 @Entity(
         tableName = "meal_plans",
         foreignKeys = @ForeignKey(
@@ -90,5 +92,24 @@ public class MealPlan {
 
     public void setRecipe(Recipe recipe) {
         this.recipe = recipe;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MealPlan mealPlan = (MealPlan) o;
+        return id == mealPlan.id &&
+                planId == mealPlan.planId &&
+                dayId == mealPlan.dayId &&
+                Objects.equals(dayTitle, mealPlan.dayTitle) &&
+                Objects.equals(recipeId, mealPlan.recipeId) &&
+                Objects.equals(notes, mealPlan.notes) &&
+                Objects.equals(recipe, mealPlan.recipe);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, planId, dayId, dayTitle, recipeId, notes, recipe);
     }
 }
