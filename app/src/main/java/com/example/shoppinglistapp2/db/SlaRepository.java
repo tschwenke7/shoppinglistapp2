@@ -72,10 +72,18 @@ public class SlaRepository {
         return ingredientDao.getIngredientsByRecipeId(id);
     }
 
-    public Future<List<Ingredient>> getIngredientsByRecipeIdNonLive(int id){
+    public List<Ingredient> getIngredientsByRecipeIdNonLive(int id){
         Callable<List<Ingredient>> insertCallable = () -> ingredientDao.getIngredientsByRecipeIdNonLive(id);
 
-       return SlaDatabase.databaseWriteExecutor.submit(insertCallable);
+        Future<List<Ingredient>> future = SlaDatabase.databaseWriteExecutor.submit(insertCallable);
+
+        try{
+            return future.get();
+        }
+        catch (InterruptedException | ExecutionException e1) {
+            e1.printStackTrace();
+            return null;
+        }
     }
 
     public void deleteRecipe(Recipe... recipes){
@@ -234,5 +242,20 @@ public class SlaRepository {
 
     public void updateMealPlan(MealPlan mealPlan) {
         SlaDatabase.databaseWriteExecutor.execute(()-> mealPlanDao.update(mealPlan));
+    }
+
+    public MealPlan getMealPlanById(int id){
+        Callable<MealPlan> queryCallable = () -> mealPlanDao.getById(id);
+
+        Future<MealPlan> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
+        try {
+            return future.get();
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+            return null;
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

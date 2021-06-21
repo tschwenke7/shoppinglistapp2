@@ -30,6 +30,9 @@ public interface MealPlanDao {
     @Query("SELECT * FROM meal_plans WHERE day_id = :dayId AND plan_id = :planId")
     MealPlan getByDayId(int planId, int dayId);
 
+    @Query("SELECT * FROM meal_plans WHERE id = :id")
+    MealPlan getById(int id);
+
     @Insert
     long insert(MealPlan mealPlan);
 

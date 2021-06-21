@@ -13,6 +13,7 @@ import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment;
 import com.example.shoppinglistapp2.db.SlaRepository;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
+import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.helpers.IngredientUtils;
 import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
@@ -31,6 +32,8 @@ public class RecipesViewModel extends AndroidViewModel {
     private final LiveData<List<Recipe>> allRecipesBase;
     /** Contains the Recipes with their ingredients and tags combined in */
     private final MutableLiveData<List<Recipe>> allRecipes = new MutableLiveData<>();
+
+    private MealPlan selectingForMeal = null;
 
     private Observer<List<Recipe>> recipeObserver = recipes -> {
         //when db changes, retrieve ingredients and tags for recipes returned
@@ -238,13 +241,7 @@ public class RecipesViewModel extends AndroidViewModel {
 
     private Recipe populateIngredientsAndTags(Recipe recipe) {
         //combine ingredients
-        try {
-            recipe.setIngredients(slaRepository.getIngredientsByRecipeIdNonLive(recipe.getId()).get());
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        recipe.setIngredients(slaRepository.getIngredientsByRecipeIdNonLive(recipe.getId()));
 
         //combine tags
         recipe.setTags(getTagsByRecipe(recipe.getId()));
@@ -257,5 +254,28 @@ public class RecipesViewModel extends AndroidViewModel {
     protected void onCleared() {
         allRecipesBase.removeObserver(recipeObserver);
         super.onCleared();
+    }
+
+    public void setSelectingForMeal(MealPlan mealPlan) {
+        selectingForMeal = mealPlan;
+    }
+
+    public void clearSelectingForMeal(){
+        selectingForMeal = null;
+    }
+
+    public void saveToMealPlan(int position) {
+        //get id of recipe
+        int recipeId = getRecipeIdAtPosition(position);
+
+        //retrieve mealplan object and update its recipe id
+        selectingForMeal.setRecipeId(recipeId);
+
+        //update in db
+        slaRepository.updateMealPlan(selectingForMeal);
+    }
+
+    public MealPlan getSelectingForMeal() {
+        return selectingForMeal;
     }
 }

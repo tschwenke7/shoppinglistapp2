@@ -6,6 +6,7 @@ import android.util.Log;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.mealplan.MealPlanFragment;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesParentFragment;
+import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListFragment;
 import com.google.android.material.tabs.TabLayout;
 
@@ -16,7 +17,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MealPlanFragment.Callback, RecipeListFragment.Callback {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -100,5 +101,10 @@ public class MainActivity extends AppCompatActivity {
             }
             return null;
         }
+    }
+
+    @Override
+    public void setViewpagerTo(int page) {
+        viewPager.setCurrentItem(page);
     }
 }

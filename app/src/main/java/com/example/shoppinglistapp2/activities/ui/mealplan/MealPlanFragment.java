@@ -20,7 +20,7 @@ import android.widget.Button;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
-import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListViewModel;
+import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 public class MealPlanFragment extends Fragment implements MealPlanListAdapter.MealPlanClickListener {
 
     private MealPlanViewModel mealPlanViewModel;
+    private RecipesViewModel recipesViewModel;
+    private Callback callback;
 
     public static MealPlanFragment newInstance() {
         return new MealPlanFragment();
@@ -36,6 +38,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        callback = (Callback) getActivity();//enables navigation of viewpager from within fragment
         return inflater.inflate(R.layout.fragment_meal_plan, container, false);
     }
 
@@ -43,9 +46,11 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //get viewModel
+        //get viewModels
         mealPlanViewModel =
                 new ViewModelProvider(getActivity()).get(MealPlanViewModel.class);
+        recipesViewModel =
+                new ViewModelProvider(getActivity()).get(RecipesViewModel.class);
 
         this.setHasOptionsMenu(true);
 
@@ -62,11 +67,6 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
         ((Button) getView().findViewById(R.id.add_day_button)).setOnClickListener(
                 button -> mealPlanViewModel.addDay()
         );
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -98,11 +98,20 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     @Override
     public void onChooseRecipeClicked(int position) {
+        //notify the viewmodel we are wanting to find a recipe for the specified mealplan
+        recipesViewModel.setSelectingForMeal(mealPlanViewModel.getMealPlans().getValue().get(position));
 
+        //navigate to recipes tab
+        callback.setViewpagerTo(1);
     }
 
     @Override
     public void onRecipeClicked(int position) {
 
+    }
+
+    /** Navigation between viewpager fragments via activity */
+    public interface Callback {
+        void setViewpagerTo(int page);
     }
 }

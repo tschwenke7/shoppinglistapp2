@@ -1,5 +1,6 @@
 package com.example.shoppinglistapp2.activities.ui.mealplan;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -68,6 +69,7 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
             this.mealPlanClickListener = mealPlanClickListener;
         }
 
+        @SuppressLint("ClickableViewAccessibility")
         public void bind(MealPlan mealPlan) {
             this.mealPlan = mealPlan;
 
@@ -77,14 +79,11 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
 
             /* Listen for click on day name for editing */
             View confirmDayTitle = itemView.findViewById(R.id.edit_day_title_confirm);
-            dayTitle.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if(MotionEvent.ACTION_UP == event.getAction()){
-                        confirmDayTitle.setVisibility(View.VISIBLE);
-                    }
-                    return false;
+            dayTitle.setOnTouchListener((v, event) -> {
+                if(MotionEvent.ACTION_UP == event.getAction()){
+                    confirmDayTitle.setVisibility(View.VISIBLE);
                 }
+                return false;
             });
 
             /* Listen for title change confirm "tick icon" clicked, and tell fragment to update */
@@ -105,10 +104,22 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
                 //recipe name
                 ((TextView) cardView.findViewById(R.id.recipe_title)).setText(recipe.getName());
 
-                //prep time
-                ((TextView) cardView.findViewById(R.id.edit_text_prep_time)).setText(recipe.getPrepTime());
-                //cook time
-                ((TextView) cardView.findViewById(R.id.edit_text_cook_time)).setText(recipe.getCookTime());
+                //set prep and cook times
+                String timeUnit = itemView.getContext().getString(R.string.abbreviated_time_unit);
+                TextView prepTimeView = itemView.findViewById(R.id.edit_text_prep_time);
+                if(0 != recipe.getPrepTime()){
+                    prepTimeView.setText(String.format("%d %s",recipe.getPrepTime(), timeUnit));
+                }
+                else{
+                    prepTimeView.setText("-");
+                }
+                TextView cookTimeView = itemView.findViewById(R.id.cook_time);
+                if(0 != recipe.getCookTime()){
+                    cookTimeView.setText(String.format("%d %s",recipe.getCookTime(),timeUnit));
+                }
+                else{
+                    cookTimeView.setText("-");
+                }
             }
             else{
                 cardView.setVisibility(View.GONE);
