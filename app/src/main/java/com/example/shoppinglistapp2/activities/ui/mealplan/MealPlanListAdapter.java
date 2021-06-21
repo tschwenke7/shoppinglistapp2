@@ -127,10 +127,13 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
             }
 
             // set click listener for recipe
-            cardView.setOnClickListener(view -> mealPlanClickListener.onRecipeClicked(getAdapterPosition()));
+            cardView.setOnClickListener(v -> mealPlanClickListener.onRecipeClicked(getAdapterPosition()));
             // set click listener for choose recipe button
             itemView.findViewById(R.id.choose_recipe_button)
-                    .setOnClickListener(view -> mealPlanClickListener.onChooseRecipeClicked(getAdapterPosition()));
+                    .setOnClickListener(v -> mealPlanClickListener.onChooseRecipeClicked(getAdapterPosition()));
+            //set click listener for delete recipe icon
+            itemView.findViewById(R.id.delete_icon)
+                    .setOnClickListener(v -> mealPlanClickListener.onRemoveRecipeClicked(getAdapterPosition()));
 
             /* set notes */
         }
@@ -140,5 +143,6 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
         void onTitleConfirmClicked(int position, String newTitle);
         void onChooseRecipeClicked(int position);
         void onRecipeClicked(int position);
+        void onRemoveRecipeClicked(int position);
     }
 }

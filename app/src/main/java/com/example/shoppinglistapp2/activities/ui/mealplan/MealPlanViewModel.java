@@ -75,4 +75,10 @@ public class MealPlanViewModel extends AndroidViewModel {
         mp.setDayTitle(newTitle);
         slaRepository.updateMealPlan(mp);
     }
+
+    public void removeRecipe(int position) {
+        MealPlan mealPlan = allMealPlans.getValue().get(position);
+        mealPlan.setRecipeId(null);
+        slaRepository.updateMealPlan(mealPlan);
+    }
 }

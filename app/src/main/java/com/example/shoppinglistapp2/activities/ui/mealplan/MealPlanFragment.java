@@ -110,6 +110,11 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     }
 
+    @Override
+    public void onRemoveRecipeClicked(int position) {
+        mealPlanViewModel.removeRecipe(position);
+    }
+
     /** Navigation between viewpager fragments via activity */
     public interface Callback {
         void setViewpagerTo(int page);
