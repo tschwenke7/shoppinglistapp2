@@ -136,7 +136,7 @@ public class SlItem {
     @Ignore
     @Override
     public String toString(){
-        String str = qty1;
+        String str = "" + qty1;
         if(null != unit1 && !"na".equals(unit1)){
             str += " " + unit1;
         }

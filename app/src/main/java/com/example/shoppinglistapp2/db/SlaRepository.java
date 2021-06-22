@@ -14,6 +14,7 @@ import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.SlItem;
 import com.example.shoppinglistapp2.db.tables.Tag;
+import com.example.shoppinglistapp2.helpers.SlItemUtils;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -39,8 +40,8 @@ public class SlaRepository {
         tagDao = db.tagDao();
         mealPlanDao = db.mealPlanDao();
         allRecipes = recipeDao.getAllAlphabetical();
-        allMealPlanSlItems = slItemDao.getAll(1);
-        allSlItems = slItemDao.getAll(2);
+        allMealPlanSlItems = slItemDao.getAll(SlItemUtils.MEALPLAN_LIST_ID);
+        allSlItems = slItemDao.getAll(SlItemUtils.SHOPPING_LIST_ID);
     }
 
     public LiveData<List<Recipe>> getAllRecipes(){
@@ -148,17 +149,14 @@ public class SlaRepository {
         return allSlItems;
     }
 
-    public SlItem getSlItemByName(int listId, String name){
-        Callable<SlItem> queryCallable = () -> slItemDao.getByName(listId, name);
+    public SlItem getSlItemByName(int listId, String name, boolean checked){
+        Callable<SlItem> queryCallable = () -> slItemDao.getByName(listId, name, checked);
 
         Future<SlItem> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
         try {
             return future.get();
-        } catch (InterruptedException e1) {
+        } catch (InterruptedException | ExecutionException e1) {
             e1.printStackTrace();
-            return null;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
             return null;
         }
     }

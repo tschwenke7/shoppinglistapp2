@@ -22,8 +22,8 @@ public interface SlItemDao {
     @Query("SELECT * FROM slitems WHERE list_id = :listId AND checked = 0")
     List<SlItem> getAllUncheckedNonLive(int listId);
 
-    @Query("SELECT * FROM slitems WHERE list_id = :listId AND name = :name AND checked = 0")
-    SlItem getByName(int listId, String name);
+    @Query("SELECT * FROM slitems WHERE list_id = :listId AND name = :name AND checked = :checked")
+    SlItem getByName(int listId, String name, boolean checked);
 
     @Delete
     void deleteAll(SlItem... slItems);

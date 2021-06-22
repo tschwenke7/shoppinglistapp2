@@ -35,7 +35,7 @@ public class ShoppingListViewModel extends AndroidViewModel {
 
     private void insertOrMergeItem(int listId, SlItem newItem){
         //attempt to find an existing item with the same name
-        SlItem existingItemWithSameName = slaRepository.getSlItemByName(listId, newItem.getName());
+        SlItem existingItemWithSameName = slaRepository.getSlItemByName(listId, newItem.getName(), newItem.isChecked());
 
         //if none found, just insert
         if(null == existingItemWithSameName){
@@ -44,9 +44,7 @@ public class ShoppingListViewModel extends AndroidViewModel {
                 //is already on the list
                 newItem.setListId(listId);
                 slaRepository.insertSlItem(newItem).get();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
 
@@ -75,9 +73,10 @@ public class ShoppingListViewModel extends AndroidViewModel {
      * @param position - the position of the item to toggle
      */
     public void toggleChecked(int position) {
-        SlItem slItem = allItems.getValue().get(position);
-        slItem.setChecked(!slItem.isChecked());
-        updateSlItem(slItem);
+        SlItem item = allItems.getValue().get(position);
+        item.setChecked(!item.isChecked());
+        slaRepository.deleteSlItems(item);
+        insertOrMergeItem(item.getListId(), item);
     }
 
     public void addItems(String inputText) {

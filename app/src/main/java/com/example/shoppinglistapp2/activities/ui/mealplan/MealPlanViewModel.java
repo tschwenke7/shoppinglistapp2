@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import com.example.shoppinglistapp2.db.SlaRepository;
+import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.SlItem;
@@ -52,12 +53,6 @@ public class MealPlanViewModel extends AndroidViewModel {
         return allMealPlanSlItems;
     }
 
-    public void toggleChecked(int position) {
-        SlItem slItem = allMealPlanSlItems.getValue().get(position);
-        slItem.setChecked(!slItem.isChecked());
-        slaRepository.updateSlItems(slItem);
-    }
-
     /** If a recipe id is associated with this meal plan, populates the MealPlan object with a recipe,
      * which is in turn populated with its ingredients.
      * @param mealPlan - a MealPlan
@@ -88,8 +83,8 @@ public class MealPlanViewModel extends AndroidViewModel {
         slaRepository.updateMealPlan(mp);
     }
 
-    public void removeRecipe(int position) {
-        MealPlan mealPlan = allMealPlans.getValue().get(position);
+    public void removeRecipe(MealPlan mealPlan) {
+        //remove the recipe from this meal
         mealPlan.setRecipeId(null);
         slaRepository.updateMealPlan(mealPlan);
     }

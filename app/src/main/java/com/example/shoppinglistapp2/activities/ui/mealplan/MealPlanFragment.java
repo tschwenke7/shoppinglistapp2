@@ -25,6 +25,7 @@ import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListAdapter;
+import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 
 import org.jetbrains.annotations.NotNull;
@@ -225,12 +226,16 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     @Override
     public void onRemoveRecipeClicked(int position) {
-        mealPlanViewModel.removeRecipe(position);
+        MealPlan mealPlan = mealPlanViewModel.getMealPlans().getValue().get(position);
+        //remove the recipe from the meal plan slot
+        mealPlanViewModel.removeRecipe(mealPlan);
+        //remove all ingredients from this recipe from the "ingredients needed" list
+        recipesViewModel.removeIngredientsFromList(mealPlan.getRecipe().getIngredients());
     }
 
     @Override
     public void onSlItemClick(int position) {
-        mealPlanViewModel.toggleChecked(position);
+        recipesViewModel.toggleChecked(mealPlanViewModel.getAllMealPlanSlItems().getValue().get(position));
     }
 
     /** Navigation between viewpager fragments via activity */

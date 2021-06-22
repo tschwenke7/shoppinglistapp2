@@ -284,28 +284,123 @@ public class RecipesViewModel extends AndroidViewModel {
     }
 
     private void insertOrMergeItem(int listId, SlItem newItem){
-        //attempt to find an existing item with the same name
-        SlItem existingItemWithSameName = slaRepository.getSlItemByName(listId, newItem.getName());
+        //attempt to find an existing item with the same name/checked status
+        SlItem existingItem = slaRepository.getSlItemByName(listId, newItem.getName(), newItem.isChecked());
 
         //if none found, just insert
-        if(null == existingItemWithSameName){
-            try {
-                //calling "get()" forces the insert to have completed before checking if the next item
-                //is already on the list
-                newItem.setListId(listId);
-                slaRepository.insertSlItem(newItem).get();
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
+        if(null == existingItem){
+            //if the new item has negative qty (i.e. we're removing), check if there's a crossed off
+            //entry we can still merge with/subtract from instead
+            if (newItem.getQty1().charAt(0) == '-') {
+                if(!newItem.isChecked()) {
+                    newItem.setChecked(true);
+                    insertOrMergeItem(listId, newItem);
+                }
+            }
+            //if no match and not negative, simply insert it to the db
+            else {
+                try {
+                    //calling "get()" forces the insert to have completed before checking if the next item
+                    //is already on the list
+                    newItem.setListId(listId);
+                    slaRepository.insertSlItem(newItem).get();
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
-        //if one was found, merge their quantities then persist the change
+        //if a match was found, merge their quantities then persist the change
         else{
-            SlItemUtils.mergeQuantities(existingItemWithSameName, newItem);
-            slaRepository.updateSlItems(existingItemWithSameName);
+            //perform the merge
+            SlItemUtils.mergeQuantities(existingItem, newItem);
+
+            /* Check for and nullify 0 or negative qtys, splitting and re-merging if negatives */
+            //if qty1 is 0, set it to null
+            if(existingItem.getQty1().equals("0")){
+                existingItem.setQty1(null);
+                existingItem.setUnit1(null);
+            }
+            //if qty1 is negative, set it to null...
+            else if (existingItem.getQty1().charAt(0) == '-'){
+                //if it isn't crossed off, create a new item which IS with the negative qty and merge it
+                //else if it's already crossed off, we can ignore the excess negative
+                if(!existingItem.isChecked()){
+                    SlItem negativeSplit = new SlItem();
+                    negativeSplit.setQty1(existingItem.getQty1());
+                    negativeSplit.setUnit1(existingItem.getUnit1());
+                    negativeSplit.setName(existingItem.getName());
+                    negativeSplit.setChecked(true);
+                    insertOrMergeItem(listId, negativeSplit);
+                }
+
+                existingItem.setQty1(null);
+                existingItem.setUnit1(null);
+            }
+
+            //if qty2 is 0, set it to null
+            if(null != existingItem.getQty2()){
+                if(existingItem.getQty2().equals("0")){
+                    existingItem.setQty2(null);
+                    existingItem.setUnit2(null);
+                }
+
+                //if qty2 is negative, set it to null
+                else if (existingItem.getQty2().charAt(0) == '-'){
+                    //if it isn't crossed off, create a new item which IS with the negative qty and merge it
+                    //else if it's already crossed off, we can ignore the excess negative
+                    if(!existingItem.isChecked()){
+                        SlItem negativeSplit = new SlItem();
+                        negativeSplit.setQty2(existingItem.getQty2());
+                        negativeSplit.setUnit2(existingItem.getUnit2());
+                        negativeSplit.setName(existingItem.getName());
+                        negativeSplit.setChecked(true);
+                        insertOrMergeItem(listId, negativeSplit);
+                    }
+
+                    existingItem.setQty2(null);
+                    existingItem.setUnit2(null);
+                }
+            }
+
+            //if qty1 is null but qty2 isn't, move qty 2 to qty 1
+            if (existingItem.getQty1() == null && existingItem.getQty2() != null){
+                existingItem.setUnit1(existingItem.getUnit2());
+                existingItem.setQty1(existingItem.getQty2());
+                existingItem.setUnit2(null);
+                existingItem.setQty2(null);
+            }
+
+            /* Now that all possible nullifying has happened... */
+            //if qty1 is still null, delete the db entry
+            if (existingItem.getQty1() == null){
+                slaRepository.deleteSlItems(existingItem);
+            }
+
+            //else update it
+            else{
+                slaRepository.updateSlItems(existingItem);
+            }
         }
+    }
+
+    public void toggleChecked(SlItem item) {
+        item.setChecked(!item.isChecked());
+        slaRepository.deleteSlItems(item);
+        insertOrMergeItem(item.getListId(), item);
     }
 
     public MealPlan getSelectingForMeal() {
         return selectingForMeal;
+    }
+
+    public void removeIngredientsFromList(List<Ingredient> ingredients) {
+        //remove the recipe's ingredients from the "ingredients needed" list
+        for(Ingredient ingredient : ingredients){
+            //remove the right amount of the ingredient
+            //by negating the quantity and then "adding" it to the list
+            SlItem item = SlItemUtils.toSlItem(ingredient);
+            item.setQty1("-" + item.getQty1());
+            insertOrMergeItem(SlItemUtils.MEALPLAN_LIST_ID, item);
+        }
     }
 }
