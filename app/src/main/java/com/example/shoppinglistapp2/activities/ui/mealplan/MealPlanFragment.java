@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
@@ -52,21 +53,84 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
         recipesViewModel =
                 new ViewModelProvider(getActivity()).get(RecipesViewModel.class);
 
+        setupViews(view);
+
+    }
+
+    private void setupViews(View root){
         this.setHasOptionsMenu(true);
 
         //setup meal plan recyclerview
-        RecyclerView mealPlanRecyclerView = getView().findViewById(R.id.plan_recipes_recyclerview);
+        RecyclerView mealPlanRecyclerView = root.findViewById(R.id.plan_recipes_recyclerview);
         final MealPlanListAdapter mealPlanListAdapter = new MealPlanListAdapter(this);
         mealPlanRecyclerView.setAdapter(mealPlanListAdapter);
         mealPlanRecyclerView.setLayoutManager(new LinearLayoutManager((this.getContext())));
 
+        //loading spinner which shows while mealPlan recyclerview is loading
+        View loadingSpinner = root.findViewById(R.id.meals_loading_spinner);
+
         //listen to meal plan list
-        mealPlanViewModel.getMealPlans().observe(getViewLifecycleOwner(), mealPlanListAdapter::setList);
+        mealPlanViewModel.getMealPlans().observe(getViewLifecycleOwner(), (newList) -> {
+            mealPlanListAdapter.setList(newList);
+
+            //swap loading spinner for recyclerview once loaded
+            mealPlanRecyclerView.setVisibility(View.VISIBLE);
+            loadingSpinner.setVisibility(View.GONE);
+        });
 
         //listen to add day button
-        ((Button) getView().findViewById(R.id.add_day_button)).setOnClickListener(
+        ((Button) root.findViewById(R.id.add_day_button)).setOnClickListener(
                 button -> mealPlanViewModel.addDay()
         );
+
+        /* listen to expand/hide section arrows */
+        //'meals' clicked
+        root.findViewById(R.id.layout_meals_title).setOnClickListener((view) -> {
+            ImageView arrow = (ImageView) view.findViewById(R.id.plan_expand_arrow);
+            View content = root.findViewById(R.id.layout_meals_content);
+            //if visible, hide
+            if(content.getVisibility() == View.VISIBLE){
+                arrow.setImageResource(R.drawable.ic_hidden_arrow);
+                content.setVisibility(View.GONE);
+            }
+            //if hidden, make visible
+            else{
+                arrow.setImageResource(R.drawable.ic_expanded_arrow);
+                content.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //'ingredients needed' clicked
+        root.findViewById(R.id.layout_ingredients_title).setOnClickListener((view) -> {
+            ImageView arrow = (ImageView) view.findViewById(R.id.plan_ingredients_expand_arrow);
+            View content = root.findViewById(R.id.plan_ingredients_recyclerview);
+            //if visible, hide
+            if(content.getVisibility() == View.VISIBLE){
+                arrow.setImageResource(R.drawable.ic_hidden_arrow);
+                content.setVisibility(View.GONE);
+            }
+            //if hidden, make visible
+            else{
+                arrow.setImageResource(R.drawable.ic_expanded_arrow);
+                content.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //'ingredients needed' clicked
+        root.findViewById(R.id.layout_suggestions_title).setOnClickListener((view) -> {
+            ImageView arrow = (ImageView) view.findViewById(R.id.plan_suggestions_expand_arrow);
+            View content = root.findViewById(R.id.suggested_recipes_recyclerview);
+            //if visible, hide
+            if(content.getVisibility() == View.VISIBLE){
+                arrow.setImageResource(R.drawable.ic_hidden_arrow);
+                content.setVisibility(View.GONE);
+            }
+            //if hidden, make visible
+            else{
+                arrow.setImageResource(R.drawable.ic_expanded_arrow);
+                content.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     @Override

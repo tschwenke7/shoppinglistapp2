@@ -18,7 +18,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="24sp"
+            android:textSize="20sp"
             tools:text="Monday"
             android:background="@null"
             android:textColor="@color/day_title_edittext_font_color"
@@ -38,7 +38,6 @@
         android:id="@+id/recipe_cardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         app:cardBackgroundColor="@color/recipe_item_background"
         app:cardCornerRadius="4dp"
         app:cardElevation="2dp">
@@ -60,7 +59,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/recipe_item_text_primary"
-                    android:textSize="20sp"
+                    android:textSize="16sp"
                     tools:text="Curried Sausages" />
 
                 <LinearLayout
