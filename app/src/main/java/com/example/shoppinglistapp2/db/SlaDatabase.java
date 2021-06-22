@@ -23,7 +23,7 @@ import com.example.shoppinglistapp2.db.tables.Tag;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Recipe.class, Ingredient.class, SlItem.class, Tag.class, MealPlan.class}, version = 11, exportSchema = false)
+@Database(entities = {Recipe.class, Ingredient.class, SlItem.class, Tag.class, MealPlan.class}, version = 12, exportSchema = false)
 public abstract class SlaDatabase extends RoomDatabase {
     public abstract RecipeDao recipeDao();
     public abstract IngredientDao ingredientDao();
@@ -43,7 +43,7 @@ public abstract class SlaDatabase extends RoomDatabase {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             SlaDatabase.class, "sla_database")
                             .addCallback(sRoomDatabaseCallback)
-                            .addMigrations(MIGRATION_10_11)
+                            .addMigrations(MIGRATION_10_11, MIGRATION_11_12)
 //                            .fallbackToDestructiveMigration()
                             .build();
                 }
@@ -131,6 +131,50 @@ public abstract class SlaDatabase extends RoomDatabase {
             database.execSQL(new StringBuilder()
                     .append("INSERT INTO meal_plans(id, plan_id, day_id, day_title, recipe_id, notes)\n")
                     .append("SELECT * FROM temp_table;\n")
+                    .toString());
+
+            database.execSQL(new StringBuilder()
+                    .append("COMMIT;")
+                    .toString());
+        }
+    };
+
+    private static final Migration MIGRATION_11_12 = new Migration(11,12){
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL(new StringBuilder()
+                    .append("BEGIN TRANSACTION;\n")
+                    .toString());
+
+            database.execSQL(new StringBuilder()
+                    .append("DROP TABLE IF EXISTS temp_table;\n")
+                    .toString());
+
+            database.execSQL(new StringBuilder()
+                    .append("ALTER TABLE slitems RENAME TO temp_table; \n")
+                    .toString());
+
+            database.execSQL(new StringBuilder()
+                    .append("CREATE TABLE slitems\n")
+                    .append("(\n")
+                    .append("id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\n")
+                    .append("list_id INTEGER DEFAULT 0 NOT NULL,\n")
+                    .append("name VARCHAR NOT NULL,\n")
+                    .append("qty1 VARCHAR,\n")
+                    .append("unit1 VARCHAR,\n")
+                    .append("qty2 VARCHAR,\n")
+                    .append("unit2 VARCHAR,\n")
+                    .append("checked INTEGER DEFAULT 0 NOT NULL\n")
+                    .append(");\n")
+                    .toString());
+
+            database.execSQL(new StringBuilder()
+                    .append("INSERT INTO slitems(id, list_id, name, qty1, unit1, qty2, unit2, checked)\n")
+                    .append("SELECT * FROM temp_table;\n")
+                    .toString());
+
+            database.execSQL(new StringBuilder()
+                    .append("DROP TABLE IF EXISTS temp_table;\n")
                     .toString());
 
             database.execSQL(new StringBuilder()

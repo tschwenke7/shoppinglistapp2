@@ -15,8 +15,10 @@ import com.example.shoppinglistapp2.db.SlaRepository;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
+import com.example.shoppinglistapp2.db.tables.SlItem;
 import com.example.shoppinglistapp2.helpers.IngredientUtils;
 import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
+import com.example.shoppinglistapp2.helpers.SlItemUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -271,8 +273,36 @@ public class RecipesViewModel extends AndroidViewModel {
         //retrieve mealplan object and update its recipe id
         selectingForMeal.setRecipeId(recipeId);
 
-        //update in db
+        //update meal plan in db
         slaRepository.updateMealPlan(selectingForMeal);
+
+        //update meal plan ingredients needed accordingly
+        List<Ingredient> newIngredients = slaRepository.getIngredientsByRecipeIdNonLive(recipeId);
+        for(Ingredient ingredient : newIngredients){
+            insertOrMergeItem(SlItemUtils.MEALPLAN_LIST_ID, SlItemUtils.toSlItem(ingredient));
+        }
+    }
+
+    private void insertOrMergeItem(int listId, SlItem newItem){
+        //attempt to find an existing item with the same name
+        SlItem existingItemWithSameName = slaRepository.getSlItemByName(listId, newItem.getName());
+
+        //if none found, just insert
+        if(null == existingItemWithSameName){
+            try {
+                //calling "get()" forces the insert to have completed before checking if the next item
+                //is already on the list
+                newItem.setListId(listId);
+                slaRepository.insertSlItem(newItem).get();
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        //if one was found, merge their quantities then persist the change
+        else{
+            SlItemUtils.mergeQuantities(existingItemWithSameName, newItem);
+            slaRepository.updateSlItems(existingItemWithSameName);
+        }
     }
 
     public MealPlan getSelectingForMeal() {

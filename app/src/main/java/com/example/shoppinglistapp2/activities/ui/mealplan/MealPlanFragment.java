@@ -1,5 +1,6 @@
 package com.example.shoppinglistapp2.activities.ui.mealplan;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -22,11 +24,12 @@ import android.widget.ImageView;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
+import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListAdapter;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 
 import org.jetbrains.annotations.NotNull;
 
-public class MealPlanFragment extends Fragment implements MealPlanListAdapter.MealPlanClickListener {
+public class MealPlanFragment extends Fragment implements MealPlanListAdapter.MealPlanClickListener, ShoppingListAdapter.SlItemClickListener {
 
     private MealPlanViewModel mealPlanViewModel;
     private RecipesViewModel recipesViewModel;
@@ -83,6 +86,18 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                 button -> mealPlanViewModel.addDay()
         );
 
+        //setup ingredients recyclerview
+        //setup meal plan recyclerview
+        RecyclerView planIngredientsRecyclerView = root.findViewById(R.id.plan_ingredients_recyclerview);
+        final ShoppingListAdapter planIngredientAdapter = new ShoppingListAdapter(this);
+        planIngredientsRecyclerView.setAdapter(planIngredientAdapter);
+        planIngredientsRecyclerView.setLayoutManager(new LinearLayoutManager((this.getContext())));
+
+        //listen to meal plan ingredient list
+        mealPlanViewModel.getAllMealPlanSlItems().observe(getViewLifecycleOwner(), (newList) -> {
+            planIngredientAdapter.setItems(newList);
+        });
+
         /* listen to expand/hide section arrows */
         //'meals' clicked
         root.findViewById(R.id.layout_meals_title).setOnClickListener((view) -> {
@@ -103,7 +118,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
         //'ingredients needed' clicked
         root.findViewById(R.id.layout_ingredients_title).setOnClickListener((view) -> {
             ImageView arrow = (ImageView) view.findViewById(R.id.plan_ingredients_expand_arrow);
-            View content = root.findViewById(R.id.plan_ingredients_recyclerview);
+            View content = planIngredientsRecyclerView;
             //if visible, hide
             if(content.getVisibility() == View.VISIBLE){
                 arrow.setImageResource(R.drawable.ic_hidden_arrow);
@@ -116,7 +131,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
             }
         });
 
-        //'ingredients needed' clicked
+        //'suggested recipes' clicked
         root.findViewById(R.id.layout_suggestions_title).setOnClickListener((view) -> {
             ImageView arrow = (ImageView) view.findViewById(R.id.plan_suggestions_expand_arrow);
             View content = root.findViewById(R.id.suggested_recipes_recyclerview);
@@ -138,6 +153,40 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
         super.onCreateOptionsMenu(menu,inflater);
         menu.clear();
         inflater.inflate(R.menu.meal_plan_action_bar, menu);
+    }
+
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.remove_all_recipes:
+                //prompt for confirmation first
+                new AlertDialog.Builder(getContext())
+                        .setTitle(R.string.remove_recipes_option)
+                        .setMessage(R.string.remove_recipes_warning)
+                        .setPositiveButton(R.string.remove_recipes_positive_button, (dialogInterface, i) -> {
+                            //delete all recipes and ingredients
+                            mealPlanViewModel.removeAllRecipes();
+                        })
+                        //otherwise don't do anything
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
+                break;
+            case R.id.clear_meal_plans:
+                //prompt for confirmation first
+                new AlertDialog.Builder(getContext())
+                        .setTitle(R.string.clear_meal_plans_option)
+                        .setMessage(R.string.clear_meal_plans_warning)
+                        .setPositiveButton(R.string.clear_meal_plans_positive_button, (dialogInterface, i) -> {
+                            //delete everything
+                            mealPlanViewModel.resetMealPlan();
+                        })
+                        //otherwise don't do anything
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return false;
     }
 
     @Override
@@ -177,6 +226,11 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     @Override
     public void onRemoveRecipeClicked(int position) {
         mealPlanViewModel.removeRecipe(position);
+    }
+
+    @Override
+    public void onSlItemClick(int position) {
+        mealPlanViewModel.toggleChecked(position);
     }
 
     /** Navigation between viewpager fragments via activity */

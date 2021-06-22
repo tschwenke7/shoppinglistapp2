@@ -46,7 +46,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:visibility="gone"
             tools:visibility="gone">
 
             <ProgressBar
@@ -98,6 +97,14 @@
                 android:text="@string/plan_ingredients_heading"
                 android:textSize="22sp"
                 android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/export_ingredients_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/add_to_list_drawable_ic"
+                android:layout_marginEnd="4dp"/>
 
         </LinearLayout>
 

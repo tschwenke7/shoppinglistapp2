@@ -17,10 +17,11 @@ public class SlItem {
     private int id;
 
     /**
-     * 1 - Meal planning ingredient list
-     * 2 - Shopping list
+     * 0 - Shopping list
+     * 1+ - Meal plan ingredient list (corresponds to meal_plans.plan_id)
+     * NOTE: only 1 meal plan can exist in the current implementation
      */
-    @ColumnInfo(defaultValue = "2", name = "list_id")
+    @ColumnInfo(defaultValue = "0", name = "list_id")
     private int listId;
 
     @NonNull

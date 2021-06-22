@@ -9,6 +9,8 @@ import java.util.List;
 
 public class SlItemUtils {
     private static DecimalFormat df = new DecimalFormat("#.##");
+    public static final int MEALPLAN_LIST_ID = 1;
+    public static final int SHOPPING_LIST_ID = 0;
 
     public static SlItem toSlItem(String text){
         //delegate to IngredientUtils to interpret the user input as an ingredient.

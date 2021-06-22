@@ -21,14 +21,15 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class SlaRepository {
-    private IngredientDao ingredientDao;
-    private RecipeDao recipeDao;
-    private SlItemDao slItemDao;
-    private TagDao tagDao;
-    private MealPlanDao mealPlanDao;
+    private final IngredientDao ingredientDao;
+    private final RecipeDao recipeDao;
+    private final SlItemDao slItemDao;
+    private final TagDao tagDao;
+    private final MealPlanDao mealPlanDao;
 
-    private LiveData<List<Recipe>> allRecipes;
-    private LiveData<List<SlItem>> allSlItems;
+    private final LiveData<List<Recipe>> allRecipes;
+    private final LiveData<List<SlItem>> allSlItems;
+    private final LiveData<List<SlItem>> allMealPlanSlItems;
 
     public SlaRepository(Context context){
         SlaDatabase db = SlaDatabase.getDatabase(context);
@@ -38,6 +39,7 @@ public class SlaRepository {
         tagDao = db.tagDao();
         mealPlanDao = db.mealPlanDao();
         allRecipes = recipeDao.getAllAlphabetical();
+        allMealPlanSlItems = slItemDao.getAll(1);
         allSlItems = slItemDao.getAll(2);
     }
 
@@ -250,12 +252,21 @@ public class SlaRepository {
         Future<MealPlan> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
         try {
             return future.get();
-        } catch (InterruptedException e1) {
+        } catch (InterruptedException | ExecutionException e1) {
             e1.printStackTrace();
             return null;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            return null;
         }
+    }
+
+    public LiveData<List<SlItem>> getAllMealPlanSlItems() {
+        return allMealPlanSlItems;
+    }
+
+    public void deleteAllMealPlans(int planId){
+        SlaDatabase.databaseWriteExecutor.execute(() -> mealPlanDao.deleteAll(planId));
+    }
+
+    public void clearAllDays(int planId) {
+        SlaDatabase.databaseWriteExecutor.execute(() -> mealPlanDao.clearAllDays(planId));
     }
 }
