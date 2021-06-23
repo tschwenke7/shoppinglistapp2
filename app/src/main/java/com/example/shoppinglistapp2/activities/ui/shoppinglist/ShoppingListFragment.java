@@ -77,9 +77,9 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu,inflater);
-        menu.clear();
-        inflater.inflate(R.menu.shopping_list_action_bar, menu);
+//        super.onCreateOptionsMenu(menu,inflater);
+//        menu.clear();
+//        inflater.inflate(R.menu.shopping_list_action_bar, menu);
     }
 
     @Override

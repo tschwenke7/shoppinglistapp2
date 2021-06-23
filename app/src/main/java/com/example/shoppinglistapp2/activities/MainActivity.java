@@ -2,6 +2,8 @@ package com.example.shoppinglistapp2.activities;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.mealplan.MealPlanFragment;
@@ -23,8 +25,8 @@ public class MainActivity extends AppCompatActivity implements MealPlanFragment.
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private Stack<Integer> viewPagerBackStack = new Stack<>();
     private SectionsPagerAdapter sectionsPagerAdapter;
+//    private Stack<Integer> viewPagerBackStack = new Stack<>();
 //    private boolean saveToBackStack = true;
 //    private int lastPage = 0;
 
@@ -44,14 +46,22 @@ public class MainActivity extends AppCompatActivity implements MealPlanFragment.
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_baseline_menu_book_24);
         tabLayout.getTabAt(2).setIcon(R.drawable.ic_baseline_format_list_bulleted_24);
 
-//        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//            @Override
-//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//            }
-//
-//            @Override
-//            public void onPageSelected(int position) {
-//                //we don't want multiple copies of the same page on backstack
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        //we don't want multiple copies of the same page on backstack
 //                //so duplicates replace the previous occurrence
 //                if(viewPagerBackStack.contains(lastPage)){
 //                    viewPagerBackStack.remove(Integer.valueOf(lastPage));
@@ -62,13 +72,6 @@ public class MainActivity extends AppCompatActivity implements MealPlanFragment.
 //                    viewPagerBackStack.push(lastPage);
 //                }
 //                lastPage = position;
-//            }
-//
-//            @Override
-//            public void onPageScrollStateChanged(int state) {
-//
-//            }
-//        });
 
         //start on shopping list tab
 //        viewPager.setCurrentItem(1, false);
@@ -137,5 +140,18 @@ public class MainActivity extends AppCompatActivity implements MealPlanFragment.
     @Override
     public void setViewpagerTo(int page) {
         viewPager.setCurrentItem(page);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        final int[] menuResourceIds = new int[]{
+                R.menu.meal_plan_action_bar,
+                R.menu.recipe_list_action_bar,
+                R.menu.shopping_list_action_bar
+        };
+
+        getMenuInflater().inflate(menuResourceIds[viewPager.getCurrentItem()], menu);
+
+        return true;
     }
 }

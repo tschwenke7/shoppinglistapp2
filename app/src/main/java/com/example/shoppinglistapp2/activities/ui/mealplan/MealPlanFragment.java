@@ -173,9 +173,9 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu,inflater);
-        menu.clear();
-        inflater.inflate(R.menu.meal_plan_action_bar, menu);
+//        super.onCreateOptionsMenu(menu,inflater);
+//        menu.clear();
+//        inflater.inflate(R.menu.meal_plan_action_bar, menu);
     }
 
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {

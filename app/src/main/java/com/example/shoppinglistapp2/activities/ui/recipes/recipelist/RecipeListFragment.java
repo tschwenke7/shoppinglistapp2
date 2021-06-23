@@ -173,7 +173,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     /** Merges extra menu items into the default activity action bar, according to provided menu xml */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.recipe_list_action_bar, menu);
+//        inflater.inflate(R.menu.recipe_list_action_bar, menu);
     }
 
     /** Handle onClick for the custom action bar menu items for this fragment */
