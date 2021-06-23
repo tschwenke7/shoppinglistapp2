@@ -1,7 +1,6 @@
 package com.example.shoppinglistapp2.activities.ui.mealplan;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -10,7 +9,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import com.example.shoppinglistapp2.db.SlaRepository;
-import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.SlItem;
@@ -104,5 +102,9 @@ public class MealPlanViewModel extends AndroidViewModel {
         slaRepository.deleteAllMealPlans(1);
         //clear ingredient list
         slaRepository.deleteAllSlItems(SlItemUtils.MEALPLAN_LIST_ID);
+    }
+
+    public List<SlItem> getAllUncheckedMealPlanSlItems() {
+        return slaRepository.getAllUncheckedListItems(SlItemUtils.MEALPLAN_LIST_ID);
     }
 }

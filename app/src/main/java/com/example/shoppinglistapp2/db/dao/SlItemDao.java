@@ -36,4 +36,5 @@ public interface SlItemDao {
 
     @Query("DELETE FROM slitems WHERE list_id = :listId")
     void clearAll(int listId);
+
 }

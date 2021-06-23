@@ -267,4 +267,16 @@ public class SlaRepository {
     public void clearAllDays(int planId) {
         SlaDatabase.databaseWriteExecutor.execute(() -> mealPlanDao.clearAllDays(planId));
     }
+
+    public List<SlItem> getAllUncheckedListItems(int listId) {
+        Callable<List<SlItem>> queryCallable = () -> slItemDao.getAllUncheckedNonLive(listId);
+
+        Future<List<SlItem>> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException e1) {
+            e1.printStackTrace();
+            return null;
+        }
+    }
 }

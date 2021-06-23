@@ -40,6 +40,21 @@ public class SlItem {
     @ColumnInfo(defaultValue = "0")
     private boolean checked;
 
+    public SlItem(){}
+
+    /** Copy constructor to make a deep copy of an SlItem,
+     * but without setting the id (which would violate primary key constraint) */
+    @Ignore
+    public SlItem(SlItem copy) {
+        this.listId = copy.getListId();
+        this.name = copy.getName();
+        this.qty1 = copy.getQty1();
+        this.unit1 = copy.getUnit1();
+        this.qty2 = copy.getQty2();
+        this.unit2 = copy.getUnit2();
+        this.checked = copy.isChecked();
+    }
+
     /**
      * Test whether this list item is the same type of item/is checked off or not.
      * Does not consider qty

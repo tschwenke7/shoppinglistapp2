@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,11 +21,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
+import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragmentDirections;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListAdapter;
+import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListViewModel;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 
@@ -34,6 +38,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     private MealPlanViewModel mealPlanViewModel;
     private RecipesViewModel recipesViewModel;
+    private ShoppingListViewModel shoppingListViewModel;
     private Callback callback;
 
     public static MealPlanFragment newInstance() {
@@ -56,6 +61,8 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                 new ViewModelProvider(getActivity()).get(MealPlanViewModel.class);
         recipesViewModel =
                 new ViewModelProvider(getActivity()).get(RecipesViewModel.class);
+        shoppingListViewModel =
+                new ViewModelProvider(getActivity()).get(ShoppingListViewModel.class);
 
         setupViews(view);
 
@@ -147,6 +154,21 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                 content.setVisibility(View.VISIBLE);
             }
         });
+
+        //listen to 'export ingredients to shopping list' icon
+        root.findViewById(R.id.export_ingredients_icon).setOnClickListener((view) ->
+                new AlertDialog.Builder(getContext())
+                .setTitle(R.string.export_ingredients_option)
+                .setMessage(R.string.export_ingredients_warning)
+                .setPositiveButton(R.string.export_ingredients_positive, (dialogInterface, i) -> {
+                    //add copy of all items to the shopping list
+                    shoppingListViewModel.addItemsToShoppingList(mealPlanViewModel.getAllUncheckedMealPlanSlItems());
+                    Toast.makeText(getContext(), getContext().getString(R.string.export_ingredients_success),Toast.LENGTH_SHORT).show();
+                    callback.setViewpagerTo(2);
+                })
+                //otherwise don't do anything
+                .setNegativeButton(R.string.cancel, null)
+                .show());
     }
 
     @Override
@@ -221,7 +243,11 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     @Override
     public void onRecipeClicked(int position) {
-
+        callback.setViewpagerTo(1);
+        //navigate to view recipe, passing id of clicked recipe along
+        RecipeListFragmentDirections.ActionRecipeListToViewRecipe action = RecipeListFragmentDirections.actionRecipeListToViewRecipe();
+        action.setRecipeId(mealPlanViewModel.getMealPlans().getValue().get(position).getRecipeId());
+        Navigation.findNavController(getView()).navigate(action);
     }
 
     @Override

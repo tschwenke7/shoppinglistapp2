@@ -98,4 +98,10 @@ public class ShoppingListViewModel extends AndroidViewModel {
             insertOrMergeItem(SlItemUtils.SHOPPING_LIST_ID, item);
         }
     }
+
+    public void addItemsToShoppingList(List<SlItem> slItems) {
+        for (SlItem item : slItems){
+            insertOrMergeItem(SlItemUtils.SHOPPING_LIST_ID, new SlItem(item));
+        }
+    }
 }

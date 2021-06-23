@@ -16,12 +16,17 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import java.util.Stack;
+
 
 public class MainActivity extends AppCompatActivity implements MealPlanFragment.Callback, RecipeListFragment.Callback {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private Stack<Integer> viewPagerBackStack = new Stack<>();
     private SectionsPagerAdapter sectionsPagerAdapter;
+//    private boolean saveToBackStack = true;
+//    private int lastPage = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +44,32 @@ public class MainActivity extends AppCompatActivity implements MealPlanFragment.
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_baseline_menu_book_24);
         tabLayout.getTabAt(2).setIcon(R.drawable.ic_baseline_format_list_bulleted_24);
 
+//        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+//            @Override
+//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+//            }
+//
+//            @Override
+//            public void onPageSelected(int position) {
+//                //we don't want multiple copies of the same page on backstack
+//                //so duplicates replace the previous occurrence
+//                if(viewPagerBackStack.contains(lastPage)){
+//                    viewPagerBackStack.remove(Integer.valueOf(lastPage));
+//                }
+//                //add the previous page to the viewpager back stack, unless we navigated by pressing
+//                //the back button (i.e. saveToBackStack == false)
+//                if(saveToBackStack){
+//                    viewPagerBackStack.push(lastPage);
+//                }
+//                lastPage = position;
+//            }
+//
+//            @Override
+//            public void onPageScrollStateChanged(int state) {
+//
+//            }
+//        });
+
         //start on shopping list tab
 //        viewPager.setCurrentItem(1, false);
     }
@@ -47,12 +78,12 @@ public class MainActivity extends AppCompatActivity implements MealPlanFragment.
     @Override
     public void onBackPressed() {
         Log.d("TOM_TEST", "onBackPressed: ");
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        if (fragmentManager.getBackStackEntryCount() > 1) {
-            fragmentManager.popBackStackImmediate();
-        } else {
-            super.onBackPressed();
-        }
+//        else if (!viewPagerBackStack.empty()){
+//            saveToBackStack = false;
+//            viewPager.setCurrentItem(viewPagerBackStack.pop());
+//            saveToBackStack = true;
+//        }
+        super.onBackPressed();
     }
 
     public void showUpButton() {

@@ -111,7 +111,6 @@
     <string name="add_day_button_text">Add meal…</string>
     <string name="choose_recipe_button">Choose recipe…</string>
 
-
     <string name="add_ingredients_to_list_option">Add all ingredients to shopping list</string>
     <string name="remove_recipes_option">Clear recipes</string>
     <string name="remove_recipes_warning">Are you sure? All recipes and ingredients will be removed from your plan, but the meal slots will be kept.</string>
@@ -119,4 +118,11 @@
     <string name="clear_meal_plans_option">Reset entire meal plan</string>
     <string name="clear_meal_plans_warning">This will delete all meal slots, recipes and ingredients. You will need to add days/meals before adding more recipes again. \nAre you sure?</string>
     <string name="clear_meal_plans_positive_button">Reset all</string>
+
+    <string name="export_ingredients_option">Send ingredients to shopping list</string>
+    <string name="export_ingredients_warning">Add all ingredients to the shopping list?\n(Crossed-off items will be ignored).</string>
+    <string name="export_ingredients_positive">Confirm</string>
+    <string name="export_ingredients_success">Ingredients added to shopping list</string>
+
+
 </resources>
