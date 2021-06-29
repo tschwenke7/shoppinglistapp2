@@ -113,7 +113,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             @Override
             public boolean onQueryTextChange(String newText) {
                 //end mutli-select if user changes search, as list weill change
-                if(actionMode != null){
+                if(actionMode != null && recipesViewModel.getSelectingForMeal() == null){
                     actionMode.finish();
                 }
                 adapter.getFilter().filter(newText);

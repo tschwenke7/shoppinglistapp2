@@ -110,7 +110,13 @@ public class MealPlanViewModel extends AndroidViewModel {
 
     public void updateNotes(int position, String newNotes) {
         MealPlan mealPlan = allMealPlans.getValue().get(position);
-        mealPlan.setNotes(newNotes);
+        //delete notes entirely if they are empty
+        if(newNotes.isEmpty()){
+            mealPlan.setNotes(null);
+        }
+        else{
+            mealPlan.setNotes(newNotes);
+        }
         slaRepository.updateMealPlan(mealPlan);
     }
 }

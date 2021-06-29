@@ -114,6 +114,10 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
         public void bind(MealPlan mealPlan) {
             this.mealPlan = mealPlan;
 
+            View addNotesButton = itemView.findViewById(R.id.add_plan_notes_button);
+            View chooseRecipeButton = itemView.findViewById(R.id.choose_recipe_button);
+            View plusIcon = itemView.findViewById(R.id.plus_icon);
+
             /* set day name */
             TextView dayTitle = itemView.findViewById(R.id.day_title);
             dayTitle.setText(mealPlan.getDayTitle());
@@ -123,6 +127,11 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
             dayTitle.setOnTouchListener((v, event) -> {
                 if(MotionEvent.ACTION_UP == event.getAction()){
                     confirmDayTitle.setVisibility(View.VISIBLE);
+
+                    //hide other buttons in title row
+                    plusIcon.setVisibility(View.GONE);
+                    chooseRecipeButton.setVisibility(View.GONE);
+                    addNotesButton.setVisibility(View.GONE);
                 }
                 return false;
             });
@@ -132,16 +141,26 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
                 mealPlanClickListener.onTitleConfirmClicked(getAdapterPosition(), dayTitle.getText().toString());
                 dayTitle.clearFocus();
                 confirmDayTitle.setVisibility(View.GONE);
+
+                //restore applicable buttons in title row
+                if(null == mealPlan.getRecipe()){
+                    chooseRecipeButton.setVisibility(View.VISIBLE);
+                }
+                if(null == mealPlan.getNotes()){
+                    addNotesButton.setVisibility(View.VISIBLE);
+                }
+                if(chooseRecipeButton.getVisibility() == View.VISIBLE || addNotesButton.getVisibility() == View.VISIBLE){
+                    itemView.findViewById(R.id.plus_icon).setVisibility(View.VISIBLE);
+                }
             });
 
             /* set recipe details if provided - otherwise hide recipe cardview */
             CardView cardView = itemView.findViewById(R.id.recipe_cardview);
-
             if (null != mealPlan.getRecipe()){
-                itemView.findViewById(R.id.choose_recipe_button).setVisibility(View.GONE);
+                chooseRecipeButton.setVisibility(View.GONE);
                 cardView.setVisibility(View.VISIBLE);
-                Recipe recipe = mealPlan.getRecipe();
 
+                Recipe recipe = mealPlan.getRecipe();
                 //recipe name
                 ((TextView) cardView.findViewById(R.id.recipe_title)).setText(recipe.getName());
 
@@ -164,30 +183,40 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
             }
             else{
                 cardView.setVisibility(View.GONE);
-                itemView.findViewById(R.id.choose_recipe_button).setVisibility(View.VISIBLE);
+                chooseRecipeButton.setVisibility(View.VISIBLE);
             }
 
             // set click listener for recipe
             cardView.setOnClickListener(v -> mealPlanClickListener.onRecipeClicked(getAdapterPosition()));
             // set click listener for choose recipe button
-            itemView.findViewById(R.id.choose_recipe_button)
+            chooseRecipeButton
                     .setOnClickListener(v -> mealPlanClickListener.onChooseRecipeClicked(getAdapterPosition()));
             //set click listener for delete recipe icon
             itemView.findViewById(R.id.delete_icon)
                     .setOnClickListener(v -> mealPlanClickListener.onRemoveRecipeClicked(getAdapterPosition()));
 
-            /* set notes and edit notes listeners */
+            /* set notes if provided, and edit notes listeners */
             //set values of notes
             EditText notesView = (EditText) itemView.findViewById(R.id.meal_plan_notes);
+
             if (mealPlan.getNotes() != null) {
                 notesView.setText(mealPlan.getNotes());
+
+                notesView.setVisibility(View.VISIBLE);
+                addNotesButton.setVisibility(View.GONE);
+            }
+            else{
+                notesView.setVisibility(View.GONE);
+                addNotesButton.setVisibility(View.VISIBLE);
             }
 
             //set listener for notes clicked to enable save button
             View confirmNotes = itemView.findViewById(R.id.edit_notes_confirm);//button to click to save notes
+            View deleteNotes = itemView.findViewById(R.id.delete_notes);//button to click to delete notes
             notesView.setOnTouchListener((v, event) -> {
                 if (MotionEvent.ACTION_UP == event.getAction()) {
                     confirmNotes.setVisibility(View.VISIBLE);
+                    deleteNotes.setVisibility(View.VISIBLE);
                 }
                 return false;
             });
@@ -195,15 +224,42 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
             confirmNotes.setOnClickListener((view) -> {
                 mealPlanClickListener.onNotesConfirmClicked(getAdapterPosition(), notesView.getText().toString());
                 confirmNotes.setVisibility(View.GONE);
+                deleteNotes.setVisibility(View.GONE);
                 notesView.clearFocus();
             });
 
+            deleteNotes.setOnClickListener((view) -> {
+                mealPlanClickListener.onDeleteNotesClicked(getAdapterPosition());
+                notesView.clearFocus();
+                notesView.setVisibility(View.GONE);
+                confirmNotes.setVisibility(View.GONE);
+                deleteNotes.setVisibility(View.GONE);
+                addNotesButton.setVisibility(View.VISIBLE);
+                plusIcon.setVisibility(View.VISIBLE);
+            });
+
+            //listen to add notes button
+            addNotesButton.setOnClickListener((view) -> {
+                addNotesButton.setVisibility(View.GONE);
+                notesView.setVisibility(View.VISIBLE);
+
+                //if recipe and notes are both provided, we can remove the plus icon too
+                if(chooseRecipeButton.getVisibility() == View.GONE && addNotesButton.getVisibility() == View.GONE){
+                    itemView.findViewById(R.id.plus_icon).setVisibility(View.GONE);
+                }
+            });
+
+            //if recipe and notes are both provided, we can remove the plus icon too
+            if(chooseRecipeButton.getVisibility() == View.GONE && addNotesButton.getVisibility() == View.GONE){
+                itemView.findViewById(R.id.plus_icon).setVisibility(View.GONE);
+            }
         }
     }
 
     public interface MealPlanClickListener {
         void onTitleConfirmClicked(int position, String newTitle);
         void onNotesConfirmClicked(int position, String newNotes);
+        void onDeleteNotesClicked(int position);
         void onChooseRecipeClicked(int position);
         void onRecipeClicked(int position);
         void onRemoveRecipeClicked(int position);

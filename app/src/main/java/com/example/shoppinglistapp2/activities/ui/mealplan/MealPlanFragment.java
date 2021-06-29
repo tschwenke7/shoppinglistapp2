@@ -226,7 +226,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     @Override
     public void onTitleConfirmClicked(int position, String newTitle) {
-        KeyboardHider.hideKeyboard(getActivity());
+        KeyboardHider.hideKeyboard(requireActivity());
 
         //update title in database
         mealPlanViewModel.updateDayTitle(position, newTitle);
@@ -234,10 +234,18 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     @Override
     public void onNotesConfirmClicked(int position, String newNotes) {
-        KeyboardHider.hideKeyboard(getActivity());
+        KeyboardHider.hideKeyboard(requireActivity());
 
         //update notes in database
         mealPlanViewModel.updateNotes(position, newNotes);
+    }
+
+    @Override
+    public void onDeleteNotesClicked(int position) {
+        KeyboardHider.hideKeyboard(requireActivity());
+
+        //set notes to be empty
+        mealPlanViewModel.updateNotes(position, "");
     }
 
     @Override
