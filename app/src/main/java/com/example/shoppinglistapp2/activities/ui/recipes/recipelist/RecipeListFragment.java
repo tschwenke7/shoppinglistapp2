@@ -333,7 +333,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                                     root.getContext().getString(R.string.delete_warning_prompt1),
                                     adapter.getSelectedItemCount(),
                                     root.getContext().getString(R.string.delete_warning_prompt2)))
-                            .setPositiveButton(R.string.delete_warning_yes_button, new DialogInterface.OnClickListener() {
+                            .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                                 //actually delete selected recipes if confirmed
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -343,7 +343,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                                 }
                             })
                             //otherwise don't do anything
-                            .setNegativeButton(R.string.delete_warning_cancel_button, null)
+                            .setNegativeButton(R.string.delete, null)
                             .show();
 
                     return true;

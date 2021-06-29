@@ -119,4 +119,9 @@ public class MealPlanViewModel extends AndroidViewModel {
         }
         slaRepository.updateMealPlan(mealPlan);
     }
+
+    public void deleteMealPlan(int position) {
+        MealPlan mealPlan = allMealPlans.getValue().get(position);
+        slaRepository.deleteMealPlan(mealPlan);
+    }
 }

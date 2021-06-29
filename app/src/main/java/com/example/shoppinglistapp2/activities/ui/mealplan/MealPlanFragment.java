@@ -275,6 +275,21 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     }
 
     @Override
+    public void onDeleteMealClicked(int position) {
+        KeyboardHider.hideKeyboard(requireActivity());
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.delete_meal_option)
+                .setMessage(R.string.delete_meal_warning)
+                .setPositiveButton(R.string.delete, (dialogInterface, i) -> {
+                    //delete all recipes and ingredients
+                    mealPlanViewModel.deleteMealPlan(position);
+                })
+                //otherwise don't do anything
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    @Override
     public void onSlItemClick(int position) {
         recipesViewModel.toggleChecked(mealPlanViewModel.getAllMealPlanSlItems().getValue().get(position));
     }

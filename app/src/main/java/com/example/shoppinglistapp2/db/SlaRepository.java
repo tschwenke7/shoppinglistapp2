@@ -279,4 +279,8 @@ public class SlaRepository {
             return null;
         }
     }
+
+    public void deleteMealPlan(MealPlan mealPlan) {
+        SlaDatabase.databaseWriteExecutor.execute(() -> mealPlanDao.delete(mealPlan));
+    }
 }

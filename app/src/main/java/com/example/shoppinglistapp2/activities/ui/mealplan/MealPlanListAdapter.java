@@ -126,9 +126,12 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
 
             /* Listen for click on day name for editing */
             View confirmDayTitle = itemView.findViewById(R.id.edit_day_title_confirm);
+            View deleteMealIcon = itemView.findViewById(R.id.delete_meal_icon);
+
             dayTitle.setOnTouchListener((v, event) -> {
                 if(MotionEvent.ACTION_UP == event.getAction()){
                     confirmDayTitle.setVisibility(View.VISIBLE);
+                    deleteMealIcon.setVisibility(View.VISIBLE);
 
                     //hide other buttons in title row
                     plusIcon.setVisibility(View.GONE);
@@ -143,6 +146,7 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
                 mealPlanClickListener.onTitleConfirmClicked(getAdapterPosition(), dayTitle.getText().toString());
                 dayTitle.clearFocus();
                 confirmDayTitle.setVisibility(View.GONE);
+                deleteMealIcon.setVisibility(View.GONE);
 
                 //restore applicable buttons in title row
                 if(cardView.getVisibility() == View.GONE){
@@ -154,6 +158,12 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
                 if(chooseRecipeButton.getVisibility() == View.VISIBLE || addNotesButton.getVisibility() == View.VISIBLE){
                     itemView.findViewById(R.id.plus_icon).setVisibility(View.VISIBLE);
                 }
+            });
+
+            /* Listen for delete meal icon click */
+            deleteMealIcon.setOnClickListener((view) -> {
+                mealPlanClickListener.onDeleteMealClicked(getAdapterPosition());
+                dayTitle.clearFocus();
             });
 
             /* set recipe details if provided - otherwise hide recipe cardview */
@@ -262,5 +272,6 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
         void onChooseRecipeClicked(int position);
         void onRecipeClicked(int position);
         void onRemoveRecipeClicked(int position);
+        void onDeleteMealClicked(int position);
     }
 }
