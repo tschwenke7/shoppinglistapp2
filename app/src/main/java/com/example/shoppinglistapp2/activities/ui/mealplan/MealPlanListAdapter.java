@@ -117,6 +117,8 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
             View addNotesButton = itemView.findViewById(R.id.add_plan_notes_button);
             View chooseRecipeButton = itemView.findViewById(R.id.choose_recipe_button);
             View plusIcon = itemView.findViewById(R.id.plus_icon);
+            CardView cardView = itemView.findViewById(R.id.recipe_cardview);
+            EditText notesView = (EditText) itemView.findViewById(R.id.meal_plan_notes);
 
             /* set day name */
             TextView dayTitle = itemView.findViewById(R.id.day_title);
@@ -143,10 +145,10 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
                 confirmDayTitle.setVisibility(View.GONE);
 
                 //restore applicable buttons in title row
-                if(null == mealPlan.getRecipe()){
+                if(cardView.getVisibility() == View.GONE){
                     chooseRecipeButton.setVisibility(View.VISIBLE);
                 }
-                if(null == mealPlan.getNotes()){
+                if(notesView.getVisibility() == View.GONE){
                     addNotesButton.setVisibility(View.VISIBLE);
                 }
                 if(chooseRecipeButton.getVisibility() == View.VISIBLE || addNotesButton.getVisibility() == View.VISIBLE){
@@ -155,7 +157,6 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
             });
 
             /* set recipe details if provided - otherwise hide recipe cardview */
-            CardView cardView = itemView.findViewById(R.id.recipe_cardview);
             if (null != mealPlan.getRecipe()){
                 chooseRecipeButton.setVisibility(View.GONE);
                 cardView.setVisibility(View.VISIBLE);
@@ -197,8 +198,6 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
 
             /* set notes if provided, and edit notes listeners */
             //set values of notes
-            EditText notesView = (EditText) itemView.findViewById(R.id.meal_plan_notes);
-
             if (mealPlan.getNotes() != null) {
                 notesView.setText(mealPlan.getNotes());
 
