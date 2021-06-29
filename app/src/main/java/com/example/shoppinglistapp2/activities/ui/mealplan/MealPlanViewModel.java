@@ -107,4 +107,10 @@ public class MealPlanViewModel extends AndroidViewModel {
     public List<SlItem> getAllUncheckedMealPlanSlItems() {
         return slaRepository.getAllUncheckedListItems(SlItemUtils.MEALPLAN_LIST_ID);
     }
+
+    public void updateNotes(int position, String newNotes) {
+        MealPlan mealPlan = allMealPlans.getValue().get(position);
+        mealPlan.setNotes(newNotes);
+        slaRepository.updateMealPlan(mealPlan);
+    }
 }

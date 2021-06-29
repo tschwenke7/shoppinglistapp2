@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -175,12 +176,34 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
             itemView.findViewById(R.id.delete_icon)
                     .setOnClickListener(v -> mealPlanClickListener.onRemoveRecipeClicked(getAdapterPosition()));
 
-            /* set notes */
+            /* set notes and edit notes listeners */
+            //set values of notes
+            EditText notesView = (EditText) itemView.findViewById(R.id.meal_plan_notes);
+            if (mealPlan.getNotes() != null) {
+                notesView.setText(mealPlan.getNotes());
+            }
+
+            //set listener for notes clicked to enable save button
+            View confirmNotes = itemView.findViewById(R.id.edit_notes_confirm);//button to click to save notes
+            notesView.setOnTouchListener((v, event) -> {
+                if (MotionEvent.ACTION_UP == event.getAction()) {
+                    confirmNotes.setVisibility(View.VISIBLE);
+                }
+                return false;
+            });
+
+            confirmNotes.setOnClickListener((view) -> {
+                mealPlanClickListener.onNotesConfirmClicked(getAdapterPosition(), notesView.getText().toString());
+                confirmNotes.setVisibility(View.GONE);
+                notesView.clearFocus();
+            });
+
         }
     }
 
     public interface MealPlanClickListener {
         void onTitleConfirmClicked(int position, String newTitle);
+        void onNotesConfirmClicked(int position, String newNotes);
         void onChooseRecipeClicked(int position);
         void onRecipeClicked(int position);
         void onRemoveRecipeClicked(int position);

@@ -233,6 +233,14 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     }
 
     @Override
+    public void onNotesConfirmClicked(int position, String newNotes) {
+        KeyboardHider.hideKeyboard(getActivity());
+
+        //update notes in database
+        mealPlanViewModel.updateNotes(position, newNotes);
+    }
+
+    @Override
     public void onChooseRecipeClicked(int position) {
         //notify the viewmodel we are wanting to find a recipe for the specified mealplan
         recipesViewModel.setSelectingForMeal(mealPlanViewModel.getMealPlans().getValue().get(position));

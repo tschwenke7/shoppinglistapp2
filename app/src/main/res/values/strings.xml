@@ -110,6 +110,7 @@
     <string name="meal_plan_notes_placeholder">Add notes…</string>
     <string name="add_day_button_text">Add meal…</string>
     <string name="choose_recipe_button">Choose recipe…</string>
+    <string name="plan_notes_hint">Click to add notes…</string>
 
     <string name="add_ingredients_to_list_option">Add all ingredients to shopping list</string>
     <string name="remove_recipes_option">Clear recipes</string>
@@ -123,6 +124,8 @@
     <string name="export_ingredients_warning">Add all ingredients to the shopping list?\n(Crossed-off items will be ignored).</string>
     <string name="export_ingredients_positive">Confirm</string>
     <string name="export_ingredients_success">Ingredients added to shopping list</string>
+
+
 
 
 </resources>
