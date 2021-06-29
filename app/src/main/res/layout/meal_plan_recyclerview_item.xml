@@ -193,7 +193,7 @@
             android:id="@+id/meal_plan_notes"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:ems="10"
+            android:textSize="16sp"
             android:background="@null"
             android:gravity="start|top"
             android:hint="@string/plan_notes_hint"

@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/plans_heading"
-                android:textSize="22sp"
+                android:textSize="24sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -46,14 +46,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            tools:visibility="gone">
+            tools:visibility="visible">
 
             <ProgressBar
                 android:id="@+id/meals_loading_spinner"
                 style="?android:attr/progressBarStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:visibility="gone"/>
+                tools:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/plan_recipes_recyclerview"
@@ -62,8 +62,7 @@
                 android:layout_marginBottom="8dp"
                 android:nestedScrollingEnabled="false"
                 tools:itemCount="7"
-                tools:listitem="@layout/meal_plan_recyclerview_item"
-                />
+                tools:listitem="@layout/meal_plan_recyclerview_item" />
 
             <Button
                 android:id="@+id/add_day_button"
@@ -95,7 +94,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="@string/plan_ingredients_heading"
-                android:textSize="22sp"
+                android:textSize="24sp"
                 android:textStyle="bold" />
 
             <ImageView
@@ -138,7 +137,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="@string/suggestions_heading"
-                android:textSize="22sp"
+                android:textSize="24sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
