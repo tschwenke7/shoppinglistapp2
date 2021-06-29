@@ -150,6 +150,17 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     @Override
     public void onResume() {
         super.onResume();
+        //check if we need to redirect to a recipe
+        Integer recipeId = recipesViewModel.getNavigateToRecipeId();
+        if(null != recipeId){
+            //navigate to view recipe, passing id of clicked recipe along
+            RecipeListFragmentDirections.ActionRecipeListToViewRecipe action = RecipeListFragmentDirections.actionRecipeListToViewRecipe();
+            action.setRecipeId(recipeId);
+            //clear value, so we don't redirect again next time
+            recipesViewModel.setNavigateToRecipeId(null);
+            Navigation.findNavController(root).navigate(action);
+        }
+
         //hide back button
         MainActivity activity = (MainActivity) getParentFragment().getActivity();
         if (activity != null) {

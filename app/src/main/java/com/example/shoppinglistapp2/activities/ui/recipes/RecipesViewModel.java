@@ -37,6 +37,8 @@ public class RecipesViewModel extends AndroidViewModel {
 
     private MealPlan selectingForMeal = null;
 
+    private Integer navigateToRecipeId = null;
+
     private Observer<List<Recipe>> recipeObserver = recipes -> {
         //when db changes, retrieve ingredients and tags for recipes returned
         List<Recipe> populatedRecipes = new ArrayList<>();
@@ -402,5 +404,14 @@ public class RecipesViewModel extends AndroidViewModel {
             item.setQty1("-" + item.getQty1());
             insertOrMergeItem(SlItemUtils.MEALPLAN_LIST_ID, item);
         }
+    }
+
+    /** Retrieves and clears the value of navigateToRecipeId, or returns null if not set */
+    public Integer getNavigateToRecipeId() {
+        return  navigateToRecipeId;
+    }
+
+    public void setNavigateToRecipeId(Integer navigateToRecipeId) {
+        this.navigateToRecipeId = navigateToRecipeId;
     }
 }

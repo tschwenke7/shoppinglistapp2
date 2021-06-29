@@ -243,11 +243,10 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     @Override
     public void onRecipeClicked(int position) {
+        //set id of recipe to navigate to, then change viewpager to recipe tab
+        //with a value set, the recipe list will redirect to this recipe automatically
+        recipesViewModel.setNavigateToRecipeId(mealPlanViewModel.getMealPlans().getValue().get(position).getRecipeId());
         callback.setViewpagerTo(1);
-        //navigate to view recipe, passing id of clicked recipe along
-        RecipeListFragmentDirections.ActionRecipeListToViewRecipe action = RecipeListFragmentDirections.actionRecipeListToViewRecipe();
-        action.setRecipeId(mealPlanViewModel.getMealPlans().getValue().get(position).getRecipeId());
-        Navigation.findNavController(getView()).navigate(action);
     }
 
     @Override

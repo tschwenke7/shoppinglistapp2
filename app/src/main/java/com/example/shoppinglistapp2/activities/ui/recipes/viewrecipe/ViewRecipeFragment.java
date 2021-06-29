@@ -27,12 +27,14 @@ import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
+import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragmentDirections;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListViewModel;
@@ -457,9 +459,18 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     public void onResume() {
         super.onResume();
         setHasOptionsMenu(true);
+
+        //show back button
         MainActivity activity = (MainActivity) getParentFragment().getActivity();
         if (activity != null) {
             activity.showUpButton();
+
+            //check if we need to redirect to a recipe, and if so, go back to recipe list so we
+            //can navigate to the desired recipe
+            if(null != recipesViewModel.getNavigateToRecipeId()){
+                activity.onBackPressed();
+                activity.onBackPressed();
+            }
         }
 
         //set name as action bar title
@@ -469,6 +480,12 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     @Override
     public void onPause() {
         setHasOptionsMenu(false);
+
+        //close action bar if user navigates away
+        if(null != actionMode){
+            actionMode.finish();
+        }
+
         super.onPause();
     }
 
@@ -487,7 +504,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         switch (item.getItemId()) {
             //back button pressed
             case android.R.id.home:
-                ((MainActivity) getActivity()).onBackPressed();
+                ((MainActivity) requireActivity()).onBackPressed();
                 return true;
 
             //edit button pressed
@@ -529,12 +546,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             deleteRecipe();
         }
         //hide keyboard if it was open
-        KeyboardHider.hideKeyboard(getActivity());
-
-        //close action bar if user navigates away
-        if(null != actionMode){
-            actionMode.finish();
-        }
+        KeyboardHider.hideKeyboard(requireActivity());
     }
 
     private void deleteRecipe() {
@@ -583,9 +595,9 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         public void onDestroyActionMode(ActionMode mode) {
             actionMode = null;
             //revert display to view-only UI
-            enterViewMode(getView());
+            enterViewMode(requireView());
             //hide keyboard if it was open
-            KeyboardHider.hideKeyboard(getActivity());
+            KeyboardHider.hideKeyboard(requireActivity());
         }
     }
 }

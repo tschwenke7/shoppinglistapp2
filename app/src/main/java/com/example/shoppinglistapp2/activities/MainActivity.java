@@ -152,9 +152,7 @@ public class MainActivity extends AppCompatActivity implements MealPlanFragment.
         };
         super.onCreateOptionsMenu(menu);
         menu.clear();
-        invalidateOptionsMenu();
         getMenuInflater().inflate(menuResourceIds[viewPager.getCurrentItem()], menu);
-
         return true;
     }
 }
