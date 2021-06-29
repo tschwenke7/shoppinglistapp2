@@ -1,6 +1,7 @@
 package com.example.shoppinglistapp2.activities.ui.shoppinglist;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,7 +52,9 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
 
         //set observer to update shopping list when it changes
         shoppingListViewModel.getAllItems().observe(getViewLifecycleOwner(), slItems -> {
+            Parcelable recyclerViewState = shoppingListRecyclerView.getLayoutManager().onSaveInstanceState();
             adapter.setItems(slItems);
+            shoppingListRecyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
         });
 
         //listen to add item button

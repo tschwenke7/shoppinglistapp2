@@ -41,6 +41,8 @@ import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 public class ViewRecipeFragment extends Fragment implements IngredientListAdapter.IngredientClickListener {
@@ -454,6 +456,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     @Override
     public void onResume() {
         super.onResume();
+        setHasOptionsMenu(true);
         MainActivity activity = (MainActivity) getParentFragment().getActivity();
         if (activity != null) {
             activity.showUpButton();
@@ -463,9 +466,17 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         ((AppCompatActivity) getParentFragment().getActivity()).getSupportActionBar().setTitle(pageTitle);
     }
 
+    @Override
+    public void onPause() {
+        setHasOptionsMenu(false);
+        super.onPause();
+    }
+
     /** Merges extra menu items into the default activity action bar, according to provided menu xml */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        menu.clear();
+        requireActivity().invalidateOptionsMenu();
         inflater.inflate(R.menu.view_recipe_action_bar, menu);
     }
 

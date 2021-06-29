@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements MealPlanFragment.
     //enable the back button in action bar to go to previous fragment
     @Override
     public void onBackPressed() {
-        Log.d("TOM_TEST", "onBackPressed: ");
 //        else if (!viewPagerBackStack.empty()){
 //            saveToBackStack = false;
 //            viewPager.setCurrentItem(viewPagerBackStack.pop());
@@ -142,6 +141,8 @@ public class MainActivity extends AppCompatActivity implements MealPlanFragment.
         viewPager.setCurrentItem(page);
     }
 
+
+
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         final int[] menuResourceIds = new int[]{
@@ -149,7 +150,9 @@ public class MainActivity extends AppCompatActivity implements MealPlanFragment.
                 R.menu.recipe_list_action_bar,
                 R.menu.shopping_list_action_bar
         };
-
+        super.onCreateOptionsMenu(menu);
+        menu.clear();
+        invalidateOptionsMenu();
         getMenuInflater().inflate(menuResourceIds[viewPager.getCurrentItem()], menu);
 
         return true;
