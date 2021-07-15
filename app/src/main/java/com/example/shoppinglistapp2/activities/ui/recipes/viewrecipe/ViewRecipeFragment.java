@@ -27,12 +27,14 @@ import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
+import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragmentDirections;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListViewModel;
@@ -40,6 +42,8 @@ import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -454,18 +458,42 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     @Override
     public void onResume() {
         super.onResume();
+        setHasOptionsMenu(true);
+
+        //show back button
         MainActivity activity = (MainActivity) getParentFragment().getActivity();
         if (activity != null) {
             activity.showUpButton();
+
+            //check if we need to redirect to a recipe, and if so, go back to recipe list so we
+            //can navigate to the desired recipe
+            if(null != recipesViewModel.getNavigateToRecipeId()){
+                activity.onBackPressed();
+                activity.onBackPressed();
+            }
         }
 
         //set name as action bar title
         ((AppCompatActivity) getParentFragment().getActivity()).getSupportActionBar().setTitle(pageTitle);
     }
 
+    @Override
+    public void onPause() {
+        setHasOptionsMenu(false);
+
+        //close action bar if user navigates away
+        if(null != actionMode){
+            actionMode.finish();
+        }
+
+        super.onPause();
+    }
+
     /** Merges extra menu items into the default activity action bar, according to provided menu xml */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        menu.clear();
+        requireActivity().invalidateOptionsMenu();
         inflater.inflate(R.menu.view_recipe_action_bar, menu);
     }
 
@@ -476,7 +504,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         switch (item.getItemId()) {
             //back button pressed
             case android.R.id.home:
-                ((MainActivity) getActivity()).onBackPressed();
+                ((MainActivity) requireActivity()).onBackPressed();
                 return true;
 
             //edit button pressed
@@ -511,6 +539,11 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     }
 
     @Override
+    public void onConfirmEditClicked(int position, String newIngredientText) {
+        recipesViewModel.editIngredient(ingredients.getValue().get(position), newIngredientText);
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         //delete recipe if it was new and user navigated away before saving
@@ -518,12 +551,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             deleteRecipe();
         }
         //hide keyboard if it was open
-        KeyboardHider.hideKeyboard(getActivity());
-
-        //close action bar if user navigates away
-        if(null != actionMode){
-            actionMode.finish();
-        }
+        KeyboardHider.hideKeyboard(requireActivity());
     }
 
     private void deleteRecipe() {
@@ -572,9 +600,9 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         public void onDestroyActionMode(ActionMode mode) {
             actionMode = null;
             //revert display to view-only UI
-            enterViewMode(getView());
+            enterViewMode(requireView());
             //hide keyboard if it was open
-            KeyboardHider.hideKeyboard(getActivity());
+            KeyboardHider.hideKeyboard(requireActivity());
         }
     }
 }

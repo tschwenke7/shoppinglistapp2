@@ -1,7 +1,7 @@
 package com.example.shoppinglistapp2.activities.ui.shoppinglist;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,12 +17,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
+import com.example.shoppinglistapp2.db.tables.SlItem;
 
 public class ShoppingListFragment extends Fragment implements ShoppingListAdapter.SlItemClickListener {
     private ShoppingListViewModel shoppingListViewModel;
@@ -53,7 +53,9 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
 
         //set observer to update shopping list when it changes
         shoppingListViewModel.getAllItems().observe(getViewLifecycleOwner(), slItems -> {
+            Parcelable recyclerViewState = shoppingListRecyclerView.getLayoutManager().onSaveInstanceState();
             adapter.setItems(slItems);
+            shoppingListRecyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
         });
 
         //listen to add item button
@@ -79,9 +81,9 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu,inflater);
-        menu.clear();
-        inflater.inflate(R.menu.shopping_list_action_bar, menu);
+//        super.onCreateOptionsMenu(menu,inflater);
+//        menu.clear();
+//        inflater.inflate(R.menu.shopping_list_action_bar, menu);
     }
 
     @Override
@@ -124,5 +126,10 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
     @Override
     public void onSlItemClick(int position) {
         shoppingListViewModel.toggleChecked(position);
+    }
+
+    @Override
+    public void onSlItemEditConfirm(SlItem oldItem, String newItemString) {
+        shoppingListViewModel.editItem(oldItem, newItemString);
     }
 }

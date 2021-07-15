@@ -13,6 +13,8 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +26,10 @@ import android.widget.Toast;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
+import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragmentDirections;
 import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -170,14 +175,26 @@ public class CreateRecipeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
         //show back button
         MainActivity activity = (MainActivity) getParentFragment().getActivity();
         if (activity != null) {
             activity.showUpButton();
+
+            //check if we need to redirect to a recipe, and if so, go back to recipe list so we
+            //can navigate to the desired recipe
+            if(null != recipesViewModel.getNavigateToRecipeId()){
+                activity.onBackPressed();
+                activity.onBackPressed();
+            }
         }
 
         //set title of page
         ((AppCompatActivity) getParentFragment().getActivity()).getSupportActionBar().setTitle(R.string.create_recipe_title);
+    }
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull @NotNull Menu menu, @NonNull @NotNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
     }
 }

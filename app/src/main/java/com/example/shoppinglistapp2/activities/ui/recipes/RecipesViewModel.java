@@ -13,9 +13,12 @@ import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment;
 import com.example.shoppinglistapp2.db.SlaRepository;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
+import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
+import com.example.shoppinglistapp2.db.tables.SlItem;
 import com.example.shoppinglistapp2.helpers.IngredientUtils;
 import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
+import com.example.shoppinglistapp2.helpers.SlItemUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -31,6 +34,10 @@ public class RecipesViewModel extends AndroidViewModel {
     private final LiveData<List<Recipe>> allRecipesBase;
     /** Contains the Recipes with their ingredients and tags combined in */
     private final MutableLiveData<List<Recipe>> allRecipes = new MutableLiveData<>();
+
+    private MealPlan selectingForMeal = null;
+
+    private Integer navigateToRecipeId = null;
 
     private Observer<List<Recipe>> recipeObserver = recipes -> {
         //when db changes, retrieve ingredients and tags for recipes returned
@@ -238,13 +245,7 @@ public class RecipesViewModel extends AndroidViewModel {
 
     private Recipe populateIngredientsAndTags(Recipe recipe) {
         //combine ingredients
-        try {
-            recipe.setIngredients(slaRepository.getIngredientsByRecipeIdNonLive(recipe.getId()).get());
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        recipe.setIngredients(slaRepository.getIngredientsByRecipeIdNonLive(recipe.getId()));
 
         //combine tags
         recipe.setTags(getTagsByRecipe(recipe.getId()));
@@ -257,5 +258,173 @@ public class RecipesViewModel extends AndroidViewModel {
     protected void onCleared() {
         allRecipesBase.removeObserver(recipeObserver);
         super.onCleared();
+    }
+
+    public void setSelectingForMeal(MealPlan mealPlan) {
+        selectingForMeal = mealPlan;
+    }
+
+    public void clearSelectingForMeal(){
+        selectingForMeal = null;
+    }
+
+    public void saveToMealPlan(int position) {
+        //get id of recipe
+        int recipeId = getRecipeIdAtPosition(position);
+
+        //retrieve mealplan object and update its recipe id
+        selectingForMeal.setRecipeId(recipeId);
+
+        //update meal plan in db
+        slaRepository.updateMealPlan(selectingForMeal);
+
+        //update meal plan ingredients needed accordingly
+        List<Ingredient> newIngredients = slaRepository.getIngredientsByRecipeIdNonLive(recipeId);
+        for(Ingredient ingredient : newIngredients){
+            insertOrMergeItem(SlItemUtils.MEALPLAN_LIST_ID, SlItemUtils.toSlItem(ingredient));
+        }
+    }
+
+    private void insertOrMergeItem(int listId, SlItem newItem){
+        //attempt to find an existing item with the same name/checked status
+        SlItem existingItem = slaRepository.findSlItemWithSameName(listId, newItem);
+
+        //if none found, just insert
+        if(null == existingItem){
+            //if the new item has negative qty (i.e. we're removing), check if there's a crossed off
+            //entry we can still merge with/subtract from instead
+            if (newItem.getQty1().charAt(0) == '-') {
+                if(!newItem.isChecked()) {
+                    newItem.setChecked(true);
+                    insertOrMergeItem(listId, newItem);
+                }
+            }
+            //if no match and not negative, simply insert it to the db
+            else {
+                try {
+                    //calling "get()" forces the insert to have completed before checking if the next item
+                    //is already on the list
+                    newItem.setListId(listId);
+                    slaRepository.insertSlItem(newItem).get();
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        //if a match was found, merge their quantities then persist the change
+        else{
+            //perform the merge
+            SlItemUtils.mergeQuantities(existingItem, newItem);
+
+            /* Check for and nullify 0 or negative qtys, splitting and re-merging if negatives */
+            //if qty1 is 0, set it to null
+            if(existingItem.getQty1().equals("0")){
+                existingItem.setQty1(null);
+                existingItem.setUnit1(null);
+            }
+            //if qty1 is negative, set it to null...
+            else if (existingItem.getQty1().charAt(0) == '-'){
+                //if it isn't crossed off, create a new item which IS with the negative qty and merge it
+                //else if it's already crossed off, we can ignore the excess negative
+                if(!existingItem.isChecked()){
+                    SlItem negativeSplit = new SlItem();
+                    negativeSplit.setQty1(existingItem.getQty1());
+                    negativeSplit.setUnit1(existingItem.getUnit1());
+                    negativeSplit.setName(existingItem.getName());
+                    negativeSplit.setChecked(true);
+                    insertOrMergeItem(listId, negativeSplit);
+                }
+
+                existingItem.setQty1(null);
+                existingItem.setUnit1(null);
+            }
+
+            //if qty2 is 0, set it to null
+            if(null != existingItem.getQty2()){
+                if(existingItem.getQty2().equals("0")){
+                    existingItem.setQty2(null);
+                    existingItem.setUnit2(null);
+                }
+
+                //if qty2 is negative, set it to null
+                else if (existingItem.getQty2().charAt(0) == '-'){
+                    //if it isn't crossed off, create a new item which IS with the negative qty and merge it
+                    //else if it's already crossed off, we can ignore the excess negative
+                    if(!existingItem.isChecked()){
+                        SlItem negativeSplit = new SlItem();
+                        negativeSplit.setQty2(existingItem.getQty2());
+                        negativeSplit.setUnit2(existingItem.getUnit2());
+                        negativeSplit.setName(existingItem.getName());
+                        negativeSplit.setChecked(true);
+                        insertOrMergeItem(listId, negativeSplit);
+                    }
+
+                    existingItem.setQty2(null);
+                    existingItem.setUnit2(null);
+                }
+            }
+
+            //if qty1 is null but qty2 isn't, move qty 2 to qty 1
+            if (existingItem.getQty1() == null && existingItem.getQty2() != null){
+                existingItem.setUnit1(existingItem.getUnit2());
+                existingItem.setQty1(existingItem.getQty2());
+                existingItem.setUnit2(null);
+                existingItem.setQty2(null);
+            }
+
+            /* Now that all possible nullifying has happened... */
+            //if qty1 is still null, delete the db entry
+            if (existingItem.getQty1() == null){
+                slaRepository.deleteSlItems(existingItem);
+            }
+
+            //else update it
+            else{
+                slaRepository.updateSlItems(existingItem);
+            }
+        }
+    }
+
+    public void toggleChecked(SlItem item) {
+        item.setChecked(!item.isChecked());
+        slaRepository.deleteSlItems(item);
+        insertOrMergeItem(item.getListId(), item);
+    }
+
+    public MealPlan getSelectingForMeal() {
+        return selectingForMeal;
+    }
+
+    public void removeIngredientsFromList(List<Ingredient> ingredients) {
+        //remove the recipe's ingredients from the "ingredients needed" list
+        for(Ingredient ingredient : ingredients){
+            //remove the right amount of the ingredient
+            //by negating the quantity and then "adding" it to the list
+            SlItem item = SlItemUtils.toSlItem(ingredient);
+            item.setQty1("-" + item.getQty1());
+            insertOrMergeItem(SlItemUtils.MEALPLAN_LIST_ID, item);
+        }
+    }
+
+    /** Retrieves and clears the value of navigateToRecipeId, or returns null if not set */
+    public Integer getNavigateToRecipeId() {
+        return  navigateToRecipeId;
+    }
+
+    public void setNavigateToRecipeId(Integer navigateToRecipeId) {
+        this.navigateToRecipeId = navigateToRecipeId;
+    }
+
+    public void editIngredient(Ingredient oldIngredient, String newIngredientText) {
+        //convert string to ingredient
+        Ingredient newIngredient = IngredientUtils.toIngredient(newIngredientText);
+
+        //overwrite old ingredient values with those from the newly converted one
+        oldIngredient.setName(newIngredient.getName());
+        oldIngredient.setQty(newIngredient.getQty());
+        oldIngredient.setUnit(newIngredient.getUnit());
+
+        //update the ingredient in the db
+        slaRepository.updateIngredient(oldIngredient);
     }
 }

@@ -1,6 +1,11 @@
 <resources>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+
+
     <string name="app_name">SLA2</string>
     <string name="title_activity_main2">MainActivity</string>
+    <string name="title_meal_plan">Meal Plan</string>
     <string name="title_recipes">Recipes</string>
     <string name="title_shopping_list">Shopping List</string>
     <string name="title_recipe_editor">Edit Recipe</string>
@@ -33,8 +38,6 @@
     <string name="delete_recipes_warning_title">Delete recipes</string>
     <string name="delete_warning_prompt1">Are you sure you want to permanently delete</string>
     <string name="delete_warning_prompt2">recipe/s?</string>
-    <string name="delete_warning_yes_button">Delete</string>
-    <string name="delete_warning_cancel_button">Cancel</string>
 
     <!-- New recipe page -->
     <string name="create_recipe_title">Create New Recipe</string>
@@ -98,7 +101,33 @@
     <string name="clear_list_positive_button">Clear list</string>
     <string name="clear_list_negative_button">Cancel</string>
     <string name="serves_heading">Serves:</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Meal Plan Fragment -->
+    <string name="plans_heading">Meals</string>
+    <string name="plan_ingredients_heading">Ingredients needed</string>
+    <string name="suggestions_heading">Suggested Recipes</string>
+    <string name="meal_plan_notes_placeholder">Add notes…</string>
+    <string name="add_day_button_text">Add meal…</string>
+    <string name="choose_plan_recipe_button">Recipe</string>
+    <string name="add_plan_notes_button">Notes</string>
+    <string name="plan_notes_hint">Click to add notes…</string>
+    <string name="delete_meal_warning">Are you sure you want to delete this meal?</string>
+    <string name="delete_meal_option">Delete meal</string>
+
+    <string name="add_ingredients_to_list_option">Add all ingredients to shopping list</string>
+    <string name="remove_recipes_option">Clear all meal slots</string>
+    <string name="remove_recipes_warning">Are you sure? All recipes, notes and ingredients will be removed from your plan, but the meal slots will be kept.</string>
+    <string name="remove_recipes_positive_button">Clear</string>
+    <string name="clear_meal_plans_option">Reset entire meal plan</string>
+    <string name="clear_meal_plans_warning">This will delete all meal slots, recipes and ingredients. You will need to add days/meals before adding more recipes again. \nAre you sure?</string>
+    <string name="clear_meal_plans_positive_button">Reset all</string>
+
+    <string name="export_ingredients_option">Send ingredients to shopping list</string>
+    <string name="export_ingredients_warning">Add all ingredients to the shopping list?\n(Crossed-off items will be ignored).</string>
+    <string name="export_ingredients_positive">Confirm</string>
+    <string name="export_ingredients_success">Ingredients added to shopping list</string>
+
+
+
 
 </resources>

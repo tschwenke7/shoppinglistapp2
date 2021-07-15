@@ -11,7 +11,6 @@ import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.SlItem;
 import com.example.shoppinglistapp2.helpers.SlItemUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -33,19 +32,18 @@ public class ShoppingListViewModel extends AndroidViewModel {
         slaRepository.deleteSlItems(slItems);
     }
 
-    private void insertOrMergeItem(SlItem newItem){
+    private void insertOrMergeItem(int listId, SlItem newItem){
         //attempt to find an existing item with the same name
-        SlItem existingItemWithSameName = slaRepository.getSlItemByName(newItem.getName());
+        SlItem existingItemWithSameName = slaRepository.findSlItemWithSameName(listId, newItem);
 
         //if none found, just insert
         if(null == existingItemWithSameName){
             try {
                 //calling "get()" forces the insert to have completed before checking if the next item
                 //is already on the list
+                newItem.setListId(listId);
                 slaRepository.insertSlItem(newItem).get();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
 
@@ -62,11 +60,11 @@ public class ShoppingListViewModel extends AndroidViewModel {
     }
 
     public void deleteCheckedSlItems(){
-        slaRepository.deleteCheckedSlItems();
+        slaRepository.deleteCheckedSlItems(SlItemUtils.SHOPPING_LIST_ID);
     }
 
     public void deleteAllSlItems(){
-        slaRepository.deleteAllSlItems();
+        slaRepository.deleteAllSlItems(SlItemUtils.SHOPPING_LIST_ID);
     }
 
     /**
@@ -74,9 +72,10 @@ public class ShoppingListViewModel extends AndroidViewModel {
      * @param position - the position of the item to toggle
      */
     public void toggleChecked(int position) {
-        SlItem slItem = allItems.getValue().get(position);
-        slItem.setChecked(!slItem.isChecked());
-        updateSlItem(slItem);
+        SlItem item = allItems.getValue().get(position);
+        item.setChecked(!item.isChecked());
+        slaRepository.deleteSlItems(item);
+        insertOrMergeItem(item.getListId(), item);
     }
 
     public void addItems(String inputText) {
@@ -86,7 +85,7 @@ public class ShoppingListViewModel extends AndroidViewModel {
         //convert each line to an item
         //and either add it or merge it with an existing item of same name
         for (String item : items){
-            insertOrMergeItem(SlItemUtils.toSlItem(item.trim()));
+            insertOrMergeItem(SlItemUtils.SHOPPING_LIST_ID, SlItemUtils.toSlItem(item.trim()));
         }
     }
 
@@ -95,7 +94,38 @@ public class ShoppingListViewModel extends AndroidViewModel {
         //either add that item if it's new, or merge qtys if it already existed
         for (Ingredient ingredient : ingredients){
             SlItem item = SlItemUtils.toSlItem(ingredient);
-            insertOrMergeItem(item);
+            insertOrMergeItem(SlItemUtils.SHOPPING_LIST_ID, item);
+        }
+    }
+
+    public void addItemsToShoppingList(List<SlItem> slItems) {
+        for (SlItem item : slItems){
+            insertOrMergeItem(SlItemUtils.SHOPPING_LIST_ID, new SlItem(item));
+        }
+    }
+
+    public void editItem(SlItem oldItem, String newItemString) {
+        //convert user's string to a new item
+        SlItem newItem = SlItemUtils.toSlItem(newItemString);
+
+        //copy values across
+        oldItem.setQty1(newItem.getQty1());
+        oldItem.setUnit1(newItem.getUnit1());
+        oldItem.setName(newItem.getName());
+
+        //if name of ingredient has been changed to one which already exists,
+        //we need to merge it with an existing item.
+        //therefore, we delete the old item and then merge the modified one in.
+        SlItem existingItemWithSameName = slaRepository.findSlItemWithSameName(oldItem.getListId(), oldItem);
+        if (null != existingItemWithSameName){
+            slaRepository.deleteSlItems(oldItem);
+            SlItemUtils.mergeQuantities(existingItemWithSameName, newItem);
+            slaRepository.updateSlItems(existingItemWithSameName);
+        }
+
+        //if it wasn't changed to an existing item, simply update this item in the db
+        else{
+            slaRepository.updateSlItems(oldItem);
         }
     }
 }

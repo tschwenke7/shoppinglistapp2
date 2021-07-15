@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
@@ -109,6 +110,9 @@ public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAd
             //show or hide delete icon depending on whether edit mode is active
             View deleteIcon = itemView.findViewById(R.id.delete_icon);
             if(editMode){
+                View confirmEditButton = itemView.findViewById(R.id.confirm_icon);
+                EditText editText = itemView.findViewById(R.id.edit_text_modify_ingredient);
+
                 deleteIcon.setVisibility(View.VISIBLE);
                 //set listener for when delete icon clicked
                 deleteIcon.setOnClickListener((view) -> {
@@ -118,6 +122,37 @@ public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAd
                 //hide checkbox
                 Drawable transparentDrawable = new ColorDrawable(Color.TRANSPARENT);
                 checkBoxView.setButtonDrawable(transparentDrawable);
+
+                //set longclick listener for editing ingredients
+                checkBoxView.setOnLongClickListener(v -> {
+                    //hide textview and delete button
+                    checkBoxView.setVisibility(View.GONE);
+                    deleteIcon.setVisibility(View.GONE);
+
+                    //show edittext and confirm button
+                    editText.setText(checkBoxView.getText());
+                    editText.setVisibility(View.VISIBLE);
+                    editText.requestFocus();
+
+                    confirmEditButton.setVisibility(View.VISIBLE);
+                    return true;
+                });
+
+                //set listener for confirm edit button
+                confirmEditButton.setOnClickListener(v -> {
+                    //copy new text into checkbox
+                    checkBoxView.setText(editText.getText());
+
+                    //invert visible components back to default
+                    editText.setVisibility(View.GONE);
+                    confirmEditButton.setVisibility(View.GONE);
+                    checkBoxView.setVisibility(View.VISIBLE);
+                    deleteIcon.setVisibility(View.VISIBLE);
+
+                    //notify parent fragment to update db
+                    ingredientClickListener.onConfirmEditClicked(getAdapterPosition(),
+                            editText.getText().toString());
+                });
             }
             else{
                 deleteIcon.setVisibility(View.GONE);
@@ -183,5 +218,6 @@ public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAd
 
     public interface IngredientClickListener{
         void onDeleteClicked(int position);
+        void onConfirmEditClicked(int position, String newIngredientText);
     }
 }

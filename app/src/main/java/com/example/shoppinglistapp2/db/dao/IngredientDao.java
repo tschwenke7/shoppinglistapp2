@@ -5,6 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 
@@ -23,6 +24,9 @@ public interface IngredientDao {
 
     @Delete
     void deleteAll(Ingredient... ingredients);
+
+    @Update
+    void update(Ingredient ingredient);
 
 
 }

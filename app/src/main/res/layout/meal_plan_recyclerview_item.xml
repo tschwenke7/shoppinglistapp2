@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginBottom="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_marginBottom="4dp">
+
+        <EditText
+            android:id="@+id/day_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
+            android:textColor="@color/day_title_edittext_font_color"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="Monday" />
+
+        <ImageView
+            android:id="@+id/plus_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            app:srcCompat="@drawable/add_icon_black_24dp"
+            app:tint="@color/colorPrimary"/>
+
+        <TextView
+            android:id="@+id/choose_recipe_button"
+            android:textSize="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:padding="4dp"
+            android:paddingEnd="6dp"
+            android:paddingStart="6dp"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
+            android:background="@drawable/button_choose_recipe_2"
+            android:textColor="@color/primary_text_selected"
+            android:text="@string/choose_plan_recipe_button" />
+        <TextView
+            android:id="@+id/add_plan_notes_button"
+            android:textSize="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="4dp"
+            android:padding="4dp"
+            android:paddingEnd="6dp"
+            android:paddingStart="6dp"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
+            android:background="@drawable/button_choose_recipe_2"
+            android:textColor="@color/primary_text_selected"
+            android:text="@string/add_plan_notes_button" />
+
+        <ImageView
+            android:id="@+id/edit_day_title_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_tick"
+            android:visibility="gone"
+            android:layout_marginEnd="8dp"/>
+
+        <ImageView
+            android:id="@+id/delete_meal_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="8dp"
+            app:srcCompat="@drawable/ic_baseline_delete_24" />
+    </LinearLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/recipe_cardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/recipe_item_background"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="2dp"
+        android:layout_marginBottom="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="9"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/recipe_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/recipe_item_text_primary"
+                    android:textSize="16sp"
+                    tools:text="Curried Sausages" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/clock_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/ic_baseline_access_time_24"
+                        app:tint="@color/recipe_item_text_secondary" />
+
+                    <TextView
+                        android:id="@+id/prep_time_heading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="4dp"
+                        android:text="@string/prep_time_heading_short"
+                        android:textColor="@color/recipe_item_text_secondary"
+                        app:layout_constraintBottom_toBottomOf="@+id/clock_icon"
+                        app:layout_constraintStart_toEndOf="@+id/clock_icon"
+                        app:layout_constraintTop_toTopOf="@+id/clock_icon" />
+
+                    <TextView
+                        android:id="@+id/edit_text_prep_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="2dp"
+                        android:textColor="@color/recipe_item_text_secondary"
+                        tools:text="15 mins" />
+
+                    <TextView
+                        android:id="@+id/cook_time_heading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/cook_time_heading_short"
+                        android:textColor="@color/recipe_item_text_secondary" />
+
+                    <TextView
+                        android:id="@+id/cook_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="2dp"
+                        android:textColor="@color/recipe_item_text_secondary"
+                        tools:text="180 mins" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/recipe_ingredients"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/recipe_item_text_secondary"
+                    android:visibility="gone"
+                    tools:text="curry powder, sausages, beef stock, cheese, onions, broccoli, cabbage, sardines" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/delete_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/ic_baseline_delete_24" />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/meal_plan_notes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:background="@null"
+            android:gravity="start|top"
+            android:hint="@string/plan_notes_hint"
+            android:layout_weight="1"
+            android:inputType="textMultiLine|textAutoCorrect|textCapSentences"/>
+
+        <ImageView
+            android:id="@+id/edit_notes_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_marginEnd="6dp"
+            app:srcCompat="@drawable/ic_tick" />
+
+        <ImageView
+            android:id="@+id/delete_notes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:srcCompat="@drawable/ic_baseline_delete_24" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider5"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        android:layout_marginTop="8dp"/>
+
+</LinearLayout>

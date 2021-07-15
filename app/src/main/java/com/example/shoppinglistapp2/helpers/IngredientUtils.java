@@ -1,8 +1,11 @@
 package com.example.shoppinglistapp2.helpers;
 
+import android.util.Log;
+
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -283,8 +286,14 @@ public class IngredientUtils {
             numerator = new BigDecimal(components[0]);
         }
 
-        //compute the value of the fraction, and add to whole number part if applicable
-        result += (numerator.divide(denominator)).doubleValue();
+        //compute the value of the fraction, and add/subtract to whole number part if applicable
+        //subtract if the whole number part was negative, otherwise add
+        if (result < 0){
+            result -= (numerator.divide(denominator, 2, RoundingMode.HALF_UP)).doubleValue();
+        }
+        else{
+            result += (numerator.divide(denominator, 2, RoundingMode.HALF_UP)).doubleValue();
+        }
 
         return result;
     }

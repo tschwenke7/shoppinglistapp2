@@ -32,16 +32,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
-import com.example.shoppinglistapp2.helpers.KeyboardHider;
 
 public class RecipeListFragment extends Fragment implements RecipeListAdapter.OnRecipeClickListener, AdapterView.OnItemSelectedListener {
 
     private View root;
     private RecipesViewModel recipesViewModel;
     private ActionMode actionMode;
-    private ActionMode.Callback actionModeCallback = new ActionModeCallback();
+    private ActionMode.Callback multiSelectActionModeCallback = new ActionModeCallback(1);
+    private ActionMode.Callback chooseMealPlanItemActionModeCallback = new ActionModeCallback(2);
     private RecipeListAdapter adapter;
     private boolean advancedSearchVisible;
+    private Callback callback;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -50,7 +51,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         root = inflater.inflate(R.layout.fragment_recipe_list, container, false);
 
-
+        callback = (Callback) getActivity();
 
         //this will delete ALL recipes and load recipetineats websites from the spreadsheet in res/raw/<name>.csv
 //        recipesViewModel.loadFromBackup(this);
@@ -112,7 +113,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             @Override
             public boolean onQueryTextChange(String newText) {
                 //end mutli-select if user changes search, as list weill change
-                if(actionMode != null){
+                if(actionMode != null && recipesViewModel.getSelectingForMeal() == null){
                     actionMode.finish();
                 }
                 adapter.getFilter().filter(newText);
@@ -149,6 +150,17 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     @Override
     public void onResume() {
         super.onResume();
+        //check if we need to redirect to a recipe
+        Integer recipeId = recipesViewModel.getNavigateToRecipeId();
+        if(null != recipeId){
+            //navigate to view recipe, passing id of clicked recipe along
+            RecipeListFragmentDirections.ActionRecipeListToViewRecipe action = RecipeListFragmentDirections.actionRecipeListToViewRecipe();
+            action.setRecipeId(recipeId);
+            //clear value, so we don't redirect again next time
+            recipesViewModel.setNavigateToRecipeId(null);
+            Navigation.findNavController(root).navigate(action);
+        }
+
         //hide back button
         MainActivity activity = (MainActivity) getParentFragment().getActivity();
         if (activity != null) {
@@ -158,12 +170,21 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         //set title of page
         ((AppCompatActivity) getParentFragment().getActivity()).getSupportActionBar().setTitle(R.string.title_recipes);
 
+        //if we've arrived at this page to select a recipe for a meal plan,
+        if(recipesViewModel.getSelectingForMeal() != null){
+            //activate the appropriate action mode
+            actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(chooseMealPlanItemActionModeCallback);
+
+            //change title accordingly
+            actionMode.setTitle(String.format("Choose a recipe for %s", recipesViewModel.getSelectingForMeal().getDayTitle()));
+            actionMode.invalidate();
+        }
     }
 
     /** Merges extra menu items into the default activity action bar, according to provided menu xml */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.recipe_list_action_bar, menu);
+//        inflater.inflate(R.menu.recipe_list_action_bar, menu);
     }
 
     /** Handle onClick for the custom action bar menu items for this fragment */
@@ -184,16 +205,28 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     public void onRecipeClick(int position) {
         Log.d("TOM_TEST", "onRecipeClick triggered for item " + position);
 
-        //navigate to view recipe, passing id of clicked recipe along
-        RecipeListFragmentDirections.ActionRecipeListToViewRecipe action = RecipeListFragmentDirections.actionRecipeListToViewRecipe();
-        action.setRecipeId(recipesViewModel.getRecipeIdAtPosition(position));
-        Navigation.findNavController(root).navigate(action);
+        //if we are currently in select for mealplan mode, click should instead save this recipe as a mealplan
+        if(recipesViewModel.getSelectingForMeal() != null){
+            //update db with this recipe in the specified meal plan slot
+            recipesViewModel.saveToMealPlan(position);
+
+            //navigate back to meal plan tab
+            actionMode.finish();
+            callback.setViewpagerTo(0);
+        }
+        //otherwise, the click should send the user to view that recipe
+        else{
+            //navigate to view recipe, passing id of clicked recipe along
+            RecipeListFragmentDirections.ActionRecipeListToViewRecipe action = RecipeListFragmentDirections.actionRecipeListToViewRecipe();
+            action.setRecipeId(recipesViewModel.getRecipeIdAtPosition(position));
+            Navigation.findNavController(root).navigate(action);
+        }
     }
 
     @Override
     public boolean onRecipeLongPress(View view, int position) {
         if (actionMode == null){
-            actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallback);
+            actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(multiSelectActionModeCallback);
         }
 
         //check if all items have been deselected to close actionMode
@@ -249,12 +282,31 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         //neither spinner has a "nothing" option
     }
 
-    /**Creates and handles a contextual action bar for when one or more recipes are selected */
+    /** Creates and handles a contextual action bar for when one or more recipes are selected
+     * Can be for one of the following options, differentiated in constructor by actionCode:
+     * 1 - multi select for deletion or bulk adding ingredients to shopping list
+     * 2 - select a recipe to add to meal plan slot */
     private class ActionModeCallback implements ActionMode.Callback{
+        /** 1 - multi select for deletion or bulk adding ingredients to shopping list
+         *  2 - select a recipe to add to meal plan slot */
+        private int actionCode;
+
+        public int getActionCode() {
+            return actionCode;
+        }
+
+        public ActionModeCallback(int actionCode) {
+            super();
+            this.actionCode = actionCode;
+        }
 
         @Override
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-            actionMode.getMenuInflater().inflate(R.menu.recipe_selected_action_bar, menu);
+            switch (actionCode){
+                case 1: actionMode.getMenuInflater().inflate(R.menu.recipe_selected_action_bar, menu);
+                    break;
+                case 2: actionMode.getMenuInflater().inflate(R.menu.choose_meal_plan_item_menu, menu);
+            }
             return true;
         }
 
@@ -281,7 +333,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                                     root.getContext().getString(R.string.delete_warning_prompt1),
                                     adapter.getSelectedItemCount(),
                                     root.getContext().getString(R.string.delete_warning_prompt2)))
-                            .setPositiveButton(R.string.delete_warning_yes_button, new DialogInterface.OnClickListener() {
+                            .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                                 //actually delete selected recipes if confirmed
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -291,11 +343,19 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                                 }
                             })
                             //otherwise don't do anything
-                            .setNegativeButton(R.string.delete_warning_cancel_button, null)
+                            .setNegativeButton(R.string.delete, null)
                             .show();
 
                     return true;
 
+                //Case where user was choosing a recipe to add to meal plan, but cancels
+                case R.id.action_cancel_selection:
+                    //end action mode
+                    actionMode.finish();
+
+                    //navigate back to meal plan tab
+                    callback.setViewpagerTo(0);
+                    return true;
                 default:
                     return false;
             }
@@ -304,6 +364,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             adapter.clearSelections();
+            recipesViewModel.clearSelectingForMeal();
             actionMode = null;
         }
     }
@@ -316,5 +377,10 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             actionMode.finish();
         }
 
+    }
+
+    /** Navigation between viewpager fragments via activity */
+    public interface Callback {
+        void setViewpagerTo(int page);
     }
 }

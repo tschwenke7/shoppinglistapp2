@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/remove_all_recipes"
+        android:icon="@drawable/ic_baseline_delete_24"
+        android:title="@string/remove_recipes_option"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/clear_meal_plans"
+        android:icon="@drawable/ic_baseline_delete_24"
+        android:title="@string/clear_meal_plans_option"
+        app:showAsAction="never"
+        />
+</menu>
