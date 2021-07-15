@@ -149,6 +149,14 @@ public class SlaRepository {
         return allSlItems;
     }
 
+    /**
+     * Returns, if found, an SlItem from the given list which has the same name and checked status,
+     * but not the same id (i.e. a potential merge candidate).
+     * @param listId list to search within.
+     * @param itemToMatch an SlItem to find a match for.
+     * @return an item other than itemToMatch with the same name and checked status,
+     * or null if none exist.
+     */
     public SlItem findSlItemWithSameName(int listId, SlItem itemToMatch){
         Callable<SlItem> queryCallable = () -> slItemDao.getAnotherByName(listId, itemToMatch.getName(), itemToMatch.isChecked(), itemToMatch.getId());
 
@@ -282,5 +290,9 @@ public class SlaRepository {
 
     public void deleteMealPlan(MealPlan mealPlan) {
         SlaDatabase.databaseWriteExecutor.execute(() -> mealPlanDao.delete(mealPlan));
+    }
+
+    public void updateIngredient(Ingredient ingredient) {
+        SlaDatabase.databaseWriteExecutor.execute(() -> ingredientDao.update(ingredient));
     }
 }

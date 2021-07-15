@@ -414,4 +414,17 @@ public class RecipesViewModel extends AndroidViewModel {
     public void setNavigateToRecipeId(Integer navigateToRecipeId) {
         this.navigateToRecipeId = navigateToRecipeId;
     }
+
+    public void editIngredient(Ingredient oldIngredient, String newIngredientText) {
+        //convert string to ingredient
+        Ingredient newIngredient = IngredientUtils.toIngredient(newIngredientText);
+
+        //overwrite old ingredient values with those from the newly converted one
+        oldIngredient.setName(newIngredient.getName());
+        oldIngredient.setQty(newIngredient.getQty());
+        oldIngredient.setUnit(newIngredient.getUnit());
+
+        //update the ingredient in the db
+        slaRepository.updateIngredient(oldIngredient);
+    }
 }

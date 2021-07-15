@@ -539,6 +539,11 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     }
 
     @Override
+    public void onConfirmEditClicked(int position, String newIngredientText) {
+        recipesViewModel.editIngredient(ingredients.getValue().get(position), newIngredientText);
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         //delete recipe if it was new and user navigated away before saving
