@@ -11,7 +11,6 @@ import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.SlItem;
 import com.example.shoppinglistapp2.helpers.SlItemUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -35,7 +34,7 @@ public class ShoppingListViewModel extends AndroidViewModel {
 
     private void insertOrMergeItem(int listId, SlItem newItem){
         //attempt to find an existing item with the same name
-        SlItem existingItemWithSameName = slaRepository.getSlItemByName(listId, newItem.getName(), newItem.isChecked());
+        SlItem existingItemWithSameName = slaRepository.findSlItemWithSameName(listId, newItem);
 
         //if none found, just insert
         if(null == existingItemWithSameName){
@@ -102,6 +101,31 @@ public class ShoppingListViewModel extends AndroidViewModel {
     public void addItemsToShoppingList(List<SlItem> slItems) {
         for (SlItem item : slItems){
             insertOrMergeItem(SlItemUtils.SHOPPING_LIST_ID, new SlItem(item));
+        }
+    }
+
+    public void editItem(SlItem oldItem, String newItemString) {
+        //convert user's string to a new item
+        SlItem newItem = SlItemUtils.toSlItem(newItemString);
+
+        //copy values across
+        oldItem.setQty1(newItem.getQty1());
+        oldItem.setUnit1(newItem.getUnit1());
+        oldItem.setName(newItem.getName());
+
+        //if name of ingredient has been changed to one which already exists,
+        //we need to merge it with an existing item.
+        //therefore, we delete the old item and then merge the modified one in.
+        SlItem existingItemWithSameName = slaRepository.findSlItemWithSameName(oldItem.getListId(), oldItem);
+        if (null != existingItemWithSameName){
+            slaRepository.deleteSlItems(oldItem);
+            SlItemUtils.mergeQuantities(existingItemWithSameName, newItem);
+            slaRepository.updateSlItems(existingItemWithSameName);
+        }
+
+        //if it wasn't changed to an existing item, simply update this item in the db
+        else{
+            slaRepository.updateSlItems(oldItem);
         }
     }
 }

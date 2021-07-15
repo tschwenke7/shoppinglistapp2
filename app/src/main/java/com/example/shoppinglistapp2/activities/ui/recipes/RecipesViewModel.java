@@ -287,7 +287,7 @@ public class RecipesViewModel extends AndroidViewModel {
 
     private void insertOrMergeItem(int listId, SlItem newItem){
         //attempt to find an existing item with the same name/checked status
-        SlItem existingItem = slaRepository.getSlItemByName(listId, newItem.getName(), newItem.isChecked());
+        SlItem existingItem = slaRepository.findSlItemWithSameName(listId, newItem);
 
         //if none found, just insert
         if(null == existingItem){

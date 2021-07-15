@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
+import com.example.shoppinglistapp2.db.tables.SlItem;
 
 public class ShoppingListFragment extends Fragment implements ShoppingListAdapter.SlItemClickListener {
     private ShoppingListViewModel shoppingListViewModel;
@@ -125,5 +126,10 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
     @Override
     public void onSlItemClick(int position) {
         shoppingListViewModel.toggleChecked(position);
+    }
+
+    @Override
+    public void onSlItemEditConfirm(SlItem oldItem, String newItemString) {
+        shoppingListViewModel.editItem(oldItem, newItemString);
     }
 }

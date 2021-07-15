@@ -4,6 +4,7 @@ import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -58,7 +59,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         this.items = newItems;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private View itemView;
         private SlItemClickListener slItemClickListener;
 
@@ -66,13 +67,16 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
             super(itemView);
             this.itemView = itemView;
             this.slItemClickListener = slItemClickListener;
-            itemView.setOnClickListener(this);
         }
 
         public void bind (SlItem item){
             TextView textView = (TextView) itemView.findViewById(R.id.item_name);
+            View editItemContainer = itemView.findViewById(R.id.edit_item_container);
+            EditText editText = itemView.findViewById(R.id.edit_text_item_name);
+            View confirmEditItemButton = itemView.findViewById(R.id.confirm_edit_item_button);
             //set text to contents of slItem
             textView.setText(item.toString());
+            editText.setText(item.toString());
 
             //if checked, then cross out and fade item
             if(item.isChecked()){
@@ -83,11 +87,28 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
                 textView.setPaintFlags(textView.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
                 textView.setTextColor(0xff000000);//todo - use color resources instead
             }
-        }
 
-        @Override
-        public void onClick(View view) {
-            slItemClickListener.onSlItemClick(getAdapterPosition());
+            //set click listener to toggle this item checked/unchecked from list
+            textView.setOnClickListener(v -> slItemClickListener.onSlItemClick(getAdapterPosition()));
+
+            //set long click listener to enable editing
+            textView.setOnLongClickListener(v -> {
+                //hide textview, show edittext instead
+                textView.setVisibility(View.GONE);
+                editItemContainer.setVisibility(View.VISIBLE);
+                editText.requestFocus();
+                return true;
+            });
+
+            //set listener to edit item when edit confirm clicked
+            confirmEditItemButton.setOnClickListener(v -> {
+                //delegate updating the item to fragment
+                slItemClickListener.onSlItemEditConfirm(item, editText.getText().toString());
+                //swap editing view back to plain textview
+                textView.setVisibility(View.VISIBLE);
+                editItemContainer.setVisibility(View.GONE);
+            });
+
         }
     }
 
@@ -136,5 +157,6 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
     public interface SlItemClickListener {
         void onSlItemClick(int position);
+        void onSlItemEditConfirm(SlItem oldItem, String newItemString);
     }
 }

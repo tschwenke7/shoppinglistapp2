@@ -30,6 +30,7 @@ import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListF
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListAdapter;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListViewModel;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
+import com.example.shoppinglistapp2.db.tables.SlItem;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 
 import org.jetbrains.annotations.NotNull;
@@ -292,6 +293,11 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     @Override
     public void onSlItemClick(int position) {
         recipesViewModel.toggleChecked(mealPlanViewModel.getAllMealPlanSlItems().getValue().get(position));
+    }
+
+    @Override
+    public void onSlItemEditConfirm(SlItem oldItem, String newItem) {
+
     }
 
     /** Navigation between viewpager fragments via activity */

@@ -149,8 +149,8 @@ public class SlaRepository {
         return allSlItems;
     }
 
-    public SlItem getSlItemByName(int listId, String name, boolean checked){
-        Callable<SlItem> queryCallable = () -> slItemDao.getByName(listId, name, checked);
+    public SlItem findSlItemWithSameName(int listId, SlItem itemToMatch){
+        Callable<SlItem> queryCallable = () -> slItemDao.getAnotherByName(listId, itemToMatch.getName(), itemToMatch.isChecked(), itemToMatch.getId());
 
         Future<SlItem> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
         try {
