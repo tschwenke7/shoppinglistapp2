@@ -128,4 +128,19 @@ public class ShoppingListViewModel extends AndroidViewModel {
             slaRepository.updateSlItems(oldItem);
         }
     }
+
+    public String getAllItemsAsString() {
+        try{
+            StringBuilder builder = new StringBuilder();
+            for (SlItem item : allItems.getValue()){
+                builder.append(item.toString());
+                builder.append("\n");
+            }
+            return builder.toString().trim();
+        }
+        catch (NullPointerException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }

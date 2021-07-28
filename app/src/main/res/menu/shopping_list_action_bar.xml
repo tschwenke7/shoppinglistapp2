@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_copy_list_to_clipboard"
+        android:title="@string/copy_list_to_clipboard"
+        app:showAsAction="never"
+        />
+    <item
         android:id="@+id/action_clear_checked_list_items"
         android:title="@string/clear_checked_list_items_title"
         app:showAsAction="never"
