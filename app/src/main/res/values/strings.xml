@@ -126,8 +126,8 @@
     <string name="export_ingredients_warning">Add all ingredients to the shopping list?\n(Crossed-off items will be ignored).</string>
     <string name="export_ingredients_positive">Confirm</string>
     <string name="export_ingredients_success">Ingredients added to shopping list</string>
-
-
+    <string name="copy_list_to_clipboard">Copy list to clipboard</string>
+    <string name="toast_copied_list_to_clipboard">Shopping list copied to clipboard.\nYou can now paste wherever you want.</string>
 
 
 </resources>

@@ -1,5 +1,8 @@
 package com.example.shoppinglistapp2.activities.ui.shoppinglist;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
@@ -104,6 +107,14 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                         //otherwise don't do anything
                         .setNegativeButton(R.string.clear_list_negative_button, null)
                         .show();
+                break;
+            case R.id.action_copy_list_to_clipboard:
+                ClipboardManager clipboard = (ClipboardManager) requireActivity()
+                        .getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("shopping_list",
+                        shoppingListViewModel.getAllItemsAsString());
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(requireContext(), R.string.toast_copied_list_to_clipboard, Toast.LENGTH_LONG).show();
                 break;
             default:
                 return super.onOptionsItemSelected(item);
