@@ -81,3 +81,6 @@ Clicking add recipe will navigate you to the recipes tab, where you can search f
 
 ### Meal plan ingredients
 A combined list of ingredients used by all of the recipes you've selected in your meal plan will be automatically generated below. You can cross off items you already have by tapping on them, just like in the shopping list. Once your meal plan is complete, review this list, the click the "add to list" icon next to the "Ingredients Needed" heading to add all remaining items to your shopping list.
+
+### Suggested Meals
+This feature is currently under development. For now, it will not show anything.
