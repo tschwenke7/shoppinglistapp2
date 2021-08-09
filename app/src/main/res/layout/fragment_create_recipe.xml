@@ -37,7 +37,9 @@
                 android:layout_height="wrap_content"
                 android:text="@string/supported_recipes"
                 android:textAlignment="center"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:autoLink="web"
+                android:linksClickable="true"/>
 
             <EditText
                 android:id="@+id/edit_text_recipe_website"
