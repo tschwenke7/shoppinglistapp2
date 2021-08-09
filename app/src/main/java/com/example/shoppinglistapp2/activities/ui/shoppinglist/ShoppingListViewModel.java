@@ -129,7 +129,7 @@ public class ShoppingListViewModel extends AndroidViewModel {
         }
     }
 
-    public String getAllItemsAsString() {
+    public String  getAllItemsAsString() {
         try{
             StringBuilder builder = new StringBuilder();
             for (SlItem item : allItems.getValue()){

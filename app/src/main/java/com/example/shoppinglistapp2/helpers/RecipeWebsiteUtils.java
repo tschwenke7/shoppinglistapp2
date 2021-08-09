@@ -1,5 +1,10 @@
 package com.example.shoppinglistapp2.helpers;
 
+import android.content.res.Resources;
+
+import com.example.shoppinglistapp2.App;
+import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ui.recipes.creator.InvalidRecipeUrlExeception;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 
@@ -57,23 +62,26 @@ public class RecipeWebsiteUtils {
      * @param url - the website for a recipe
      * @return - A Recipe object populated with the website's data.
      */
-    public static Recipe getRecipeFromWebsite(String url){
+    public static Recipe getRecipeFromWebsite(String url) throws InvalidRecipeUrlExeception {
         //validate url before attempting to convert
-        if(!isValidUrl(url)){
-            return null;
+        //check that something was provided
+        if (url.isEmpty()) {
+            throw new InvalidRecipeUrlExeception(App.getRes().getString(R.string.recipe_url_empty));
+        }
+        //check that it is a valid url
+        if (!isValidUrl(url)){
+            throw new InvalidRecipeUrlExeception(App.getRes().getString(R.string.recipe_url_invalid));
+        }
+        //check that it's one of the currently supported URLs
+        if (getDomain(url) == Domain.NOT_SUPPORTED){
+            throw new InvalidRecipeUrlExeception(App.getRes().getString(R.string.recipe_url_unsupported));
         }
 
-        try{
-            switch (getDomain(url)){
-                case RECIPE_TIN_EATS:
-                    return convertRecipeTinEats(url);
-                default:
-                    return null;
-            }
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            return null;
+        switch (getDomain(url)){
+            case RECIPE_TIN_EATS:
+                return convertRecipeTinEats(url);
+            default:
+                return null;
         }
     }
 

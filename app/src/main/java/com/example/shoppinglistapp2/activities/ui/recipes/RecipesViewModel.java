@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ui.recipes.creator.InvalidRecipeUrlExeception;
 import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment;
 import com.example.shoppinglistapp2.db.SlaRepository;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
@@ -89,8 +90,7 @@ public class RecipesViewModel extends AndroidViewModel {
      * @param url - the website to get a recipe from
      * @return - the rowId of the newly generated recipe
      */
-    public int generateRecipeIdFromUrl(String url){
-
+    public int generateRecipeIdFromUrl(String url) throws InvalidRecipeUrlExeception {
         //scrape the website and fill as many Recipe fields as possible
         Recipe newRecipe = RecipeWebsiteUtils.getRecipeFromWebsite(url);
 

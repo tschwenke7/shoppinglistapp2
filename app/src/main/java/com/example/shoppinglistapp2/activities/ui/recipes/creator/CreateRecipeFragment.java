@@ -1,11 +1,13 @@
 package com.example.shoppinglistapp2.activities.ui.recipes.creator;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -23,11 +25,15 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragmentDirections;
 import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -44,7 +50,7 @@ import java.util.concurrent.Future;
 public class CreateRecipeFragment extends Fragment {
     private RecipesViewModel recipesViewModel;
     private View root;
-    private ExecutorService websiteExecutor = Executors.newSingleThreadExecutor();
+//    private ExecutorService websiteExecutor = Executors.newSingleThreadExecutor();
 
     public CreateRecipeFragment() {
         // Required empty public constructor
@@ -108,31 +114,19 @@ public class CreateRecipeFragment extends Fragment {
 
         String url = ((EditText) root.findViewById(R.id.edit_text_recipe_website)).getText().toString().trim();
 
-        //check that something was entered
-        if(url.isEmpty()){
-            Toast.makeText(getContext(), getContext().getString(R.string.recipe_url_empty),Toast.LENGTH_LONG).show();
-        }
 
-        //validate url format
-        else if(!RecipeWebsiteUtils.isValidUrl(url)){
-            Toast.makeText(getContext(), getContext().getString(R.string.recipe_url_invalid),Toast.LENGTH_LONG).show();
-        }
-
-        //check that this website is one of the supported websites
-        else if(RecipeWebsiteUtils.getDomain(url) == RecipeWebsiteUtils.Domain.NOT_SUPPORTED){
-            Toast.makeText(getContext(), getContext().getString(R.string.recipe_url_unsupported),Toast.LENGTH_LONG).show();
-        }
 
         //attempt to create a Recipe from the website
-        else{
-            //attempt to load the website
-            Callable<Integer> generateRecipe = () -> recipesViewModel.generateRecipeIdFromUrl(url);
-            Future<Integer> recipeId = websiteExecutor.submit(generateRecipe);
+        //attempt to load the website
+        ListenableFuture<Integer> recipeId = ((App) getActivity().getApplication())
+                .backgroundExecutorService.submit(() -> recipesViewModel.generateRecipeIdFromUrl(url));
 
-            try{
-                //if it failed, display error message
-                if(recipeId.get() == -1){
-                    Toast.makeText(getContext(), getContext().getString(R.string.recipe_url_error),Toast.LENGTH_LONG).show();
+        Futures.addCallback(recipeId, new FutureCallback<Integer>() {
+            @Override
+            public void onSuccess(@Nullable Integer recipeId) {
+                //if recipe loading failed, display error message
+                if(recipeId == null || recipeId == -1){
+                    Toast.makeText(getContext(), requireContext().getString(R.string.recipe_url_error),Toast.LENGTH_LONG).show();
                 }
                 //otherwise, navigate to editor for the new recipe
                 else{
@@ -140,22 +134,37 @@ public class CreateRecipeFragment extends Fragment {
                             CreateRecipeFragmentDirections.actionCreateRecipeToViewRecipe();
 
                     //pass id of newly created recipe
-                    action.setRecipeId(recipeId.get());
+                    action.setRecipeId(recipeId);
 
                     //navigate
                     Navigation.findNavController(root).navigate(action);
+                    //hide progress bar and reset opacity of everything else
+                    progressBar.setVisibility(View.GONE);
+                    mainContent.setAlpha(1.0f);
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                Toast.makeText(getContext(), getContext().getString(R.string.recipe_url_timeout_error),Toast.LENGTH_LONG).show();
-            } catch (ExecutionException e) {
-                Toast.makeText(getContext(), getContext().getString(R.string.recipe_url_timeout_error),Toast.LENGTH_LONG).show();
-                e.printStackTrace();
             }
-        }
-        //hide progress bar and reset opacity of everything else
-        progressBar.setVisibility(View.GONE);
-        mainContent.setAlpha(1.0f);
+            //respond to differenct potential errors
+            @Override
+            public void onFailure(Throwable t) {
+                //the url entered was not valid for some reason
+                if (t instanceof InvalidRecipeUrlExeception){
+                    Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+                //the thread processing this was interrupted
+                else if (t instanceof ExecutionException) {
+                    t.printStackTrace();
+                    Toast.makeText(getContext(), R.string.recipe_url_timeout_error, Toast.LENGTH_LONG).show();
+                }
+                //another error I wasn't expecting
+                else{
+                    t.printStackTrace();
+                    Toast.makeText(getContext(), R.string.unknown_error + t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+                //hide progress bar and reset opacity of everything else
+                progressBar.setVisibility(View.GONE);
+                mainContent.setAlpha(1.0f);
+            }
+        }, ContextCompat.getMainExecutor(this.requireContext()));
     }
 
     @Override

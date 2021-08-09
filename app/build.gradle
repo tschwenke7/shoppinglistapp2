@@ -74,4 +74,10 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
 
+    //Guava background tasks library
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    implementation group: 'com.google.guava', name: 'guava', version: '30.0-android'
+
+
+
 }

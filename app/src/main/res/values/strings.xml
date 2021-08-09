@@ -128,6 +128,7 @@
     <string name="export_ingredients_success">Ingredients added to shopping list</string>
     <string name="copy_list_to_clipboard">Copy list to clipboard</string>
     <string name="toast_copied_list_to_clipboard">Shopping list copied to clipboard.\nYou can now paste wherever you want.</string>
+    <string name="unknown_error">Oops, something went wrong. Please submit a bug report to the app\'s creator letting them know what caused this.</string>
 
 
 </resources>
