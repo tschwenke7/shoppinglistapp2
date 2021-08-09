@@ -22,8 +22,14 @@ public interface IngredientDao {
     @Insert
     void insertAll(Ingredient... ingredients);
 
+    @Insert
+    void insertAll(List<Ingredient> ingredients);
+
     @Delete
     void deleteAll(Ingredient... ingredients);
+
+    @Delete
+    int deleteAll(List<Ingredient> ingredients);
 
     @Update
     void update(Ingredient ingredient);

@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
+import com.example.shoppinglistapp2.activities.ui.ViewPagerNavigationCallback;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 
 public class RecipeListFragment extends Fragment implements RecipeListAdapter.OnRecipeClickListener, AdapterView.OnItemSelectedListener {
@@ -42,7 +43,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     private ActionMode.Callback chooseMealPlanItemActionModeCallback = new ActionModeCallback(2);
     private RecipeListAdapter adapter;
     private boolean advancedSearchVisible;
-    private Callback callback;
+    private ViewPagerNavigationCallback callback;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -51,7 +52,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         root = inflater.inflate(R.layout.fragment_recipe_list, container, false);
 
-        callback = (Callback) getActivity();
+        callback = (ViewPagerNavigationCallback) getActivity();
 
         //this will delete ALL recipes and load recipetineats websites from the spreadsheet in res/raw/<name>.csv
 //        recipesViewModel.loadFromBackup(this);
@@ -377,10 +378,5 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             actionMode.finish();
         }
 
-    }
-
-    /** Navigation between viewpager fragments via activity */
-    public interface Callback {
-        void setViewpagerTo(int page);
     }
 }

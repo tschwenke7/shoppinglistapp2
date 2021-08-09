@@ -88,7 +88,7 @@
 
     <string name="add_ingredient_button">Add</string>
     <string name="save_recipe_button">Save</string>
-    <string name="save_recipe_toat">Recipe saved.</string>
+    <string name="save_recipe_toast">Recipe saved.</string>
 
     <!-- Shopping list page -->
     <string name="new_list_item_button">Add</string>
@@ -129,6 +129,10 @@
     <string name="copy_list_to_clipboard">Copy list to clipboard</string>
     <string name="toast_copied_list_to_clipboard">Shopping list copied to clipboard.\nYou can now paste wherever you want.</string>
     <string name="unknown_error">Oops, something went wrong. Please submit a bug report to the app\'s creator letting them know what caused this.</string>
+    <string name="save_recipe_prompt_title">Save changes to recipe?</string>
+    <string name="save_recipe_prompt_message">Do you wish to save any changes you may have just made to this recipe?</string>
+    <string name="save_recipe_prompt_positive_button">Save changes</string>
+    <string name="save_recipe_prompt_negative_button">Discard changes</string>
 
 
 </resources>

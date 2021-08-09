@@ -26,4 +26,10 @@ public interface TagDao {
 
     @Query("SELECT name FROM tags WHERE recipe_id = :recipeId")
     List<String> getTagsByRecipe(int recipeId);
+
+    @Insert
+    List<Long> insertAll(List<Tag> tags);
+
+    @Query("DELETE FROM tags WHERE recipe_id = :recipeId")
+    int deleteAllByRecipeId(int recipeId);
 }

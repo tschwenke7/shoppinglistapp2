@@ -1,14 +1,12 @@
 package com.example.shoppinglistapp2.activities;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ui.ViewPagerNavigationCallback;
 import com.example.shoppinglistapp2.activities.ui.mealplan.MealPlanFragment;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesParentFragment;
-import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListFragment;
 import com.google.android.material.tabs.TabLayout;
 
@@ -18,10 +16,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import java.util.Stack;
 
-
-public class MainActivity extends AppCompatActivity implements MealPlanFragment.Callback, RecipeListFragment.Callback {
+public class MainActivity extends AppCompatActivity implements MealPlanFragment.Callback, ViewPagerNavigationCallback {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -29,6 +25,10 @@ public class MainActivity extends AppCompatActivity implements MealPlanFragment.
 //    private Stack<Integer> viewPagerBackStack = new Stack<>();
 //    private boolean saveToBackStack = true;
 //    private int lastPage = 0;
+
+    public static int MEAL_PLAN_VIEWPAGER_INDEX = 0;
+    public static int RECIPE_LIST_VIEWPAGER_INDEX = 1;
+    public static int SHOPPING_LIST_VIEWPAGER_INDEX = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

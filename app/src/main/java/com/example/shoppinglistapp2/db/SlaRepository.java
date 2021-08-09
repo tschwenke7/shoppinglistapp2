@@ -17,6 +17,7 @@ import com.example.shoppinglistapp2.db.tables.Tag;
 import com.example.shoppinglistapp2.helpers.SlItemUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -69,6 +70,10 @@ public class SlaRepository {
         SlaDatabase.databaseWriteExecutor.execute(() -> {
             ingredientDao.insertAll(ingredients);
         });
+    }
+
+    public void insertIngredients(List<Ingredient> ingredients) {
+        SlaDatabase.databaseWriteExecutor.execute(() -> ingredientDao.insertAll(ingredients));
     }
 
     public LiveData<List<Ingredient>> getIngredientsByRecipeId(int id){
@@ -147,6 +152,10 @@ public class SlaRepository {
 
     public void deleteIngredients(Ingredient... ingredients) {
         SlaDatabase.databaseWriteExecutor.execute(() -> ingredientDao.deleteAll(ingredients));
+    }
+
+    public Future<Integer> deleteIngredients(List<Ingredient> ingredients) {
+        return SlaDatabase.databaseWriteExecutor.submit(() -> ingredientDao.deleteAll(ingredients));
     }
 
     public LiveData<List<SlItem>> getSlItems(){
@@ -298,5 +307,13 @@ public class SlaRepository {
 
     public void updateIngredient(Ingredient ingredient) {
         SlaDatabase.databaseWriteExecutor.execute(() -> ingredientDao.update(ingredient));
+    }
+
+    public Future<List<Long>> insertTags(List<Tag> tags) {
+        return SlaDatabase.databaseWriteExecutor.submit(() -> tagDao.insertAll(tags));
+    }
+
+    public Future<Integer> deleteAllTagsForRecipe(int recipeId) {
+        return SlaDatabase.databaseWriteExecutor.submit(() -> tagDao.deleteAllByRecipeId(recipeId));
     }
 }

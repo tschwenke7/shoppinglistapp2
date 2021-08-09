@@ -22,9 +22,11 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
@@ -34,16 +36,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
-import com.example.shoppinglistapp2.activities.ui.recipes.creator.InvalidRecipeUrlExeception;
+import com.example.shoppinglistapp2.activities.ui.ViewPagerNavigationCallback;
+import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListViewModel;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
-import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
+import org.apache.commons.validator.routines.UrlValidator;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class ViewRecipeFragment extends Fragment implements IngredientListAdapter.IngredientClickListener {
@@ -60,6 +65,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     private IngredientListAdapter adapter;
     private RecyclerView ingredientRecyclerView;
     private String pageTitle;
+    private ViewPagerNavigationCallback callback;
+
+    private List<Ingredient> ingredientsBackup;
+    private List<String> tagsBackup;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -69,6 +78,8 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
                 new ViewModelProvider(getActivity()).get(ShoppingListViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_view_recipe, container, false);
+
+        callback = (ViewPagerNavigationCallback) getActivity();
 
         //retrieve navigation args
         //recipe to be viewed
@@ -107,9 +118,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         ingredientRecyclerView.setAdapter(adapter);
         ingredientRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
-        ingredients.observe(getViewLifecycleOwner(), (list) -> {
-            adapter.setList(list);
-        });
+        ingredients.observe(getViewLifecycleOwner(), (list) -> adapter.setList(list));
 
         //handle ingredient being added
         Button addIngredientButton = root.findViewById(R.id.recipe_add_ingredient_button);
@@ -144,10 +153,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
         //configure either in edit mode or view only mode
         if(editingFlag){
-            enterEditMode(root);
+            enterEditMode();
         }
         else{
-            enterViewMode(root);
+            enterViewMode();
         }
 
         //make back button work within these nested fragments
@@ -165,7 +174,16 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     private void populateRecipeViews(View root, Recipe recipe){
         //set name as action bar title
         pageTitle = recipe.getName();
-        ((AppCompatActivity) getParentFragment().getActivity()).getSupportActionBar().setTitle(pageTitle);
+        ActionBar actionBar = ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar();
+        //don't change the title if we've navigated to another tab of the viewpager
+        if (!(null != actionBar.getTitle()
+            && (
+                actionBar.getTitle().equals(requireActivity().getResources().getString(R.string.title_shopping_list)) ||
+                actionBar.getTitle().equals(requireActivity().getResources().getString(R.string.title_meal_plan))
+            )
+        )){
+            actionBar.setTitle(pageTitle);
+        }
 
         //prefill recipe name field
         ((TextView) root.findViewById(R.id.edit_text_recipe_name)).setText(recipe.getName());
@@ -256,7 +274,15 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         }
     }
 
-    private void enterEditMode(View root){
+    private void enterEditMode(){
+        View root = requireView();
+        //save backups of current state of chips, ingredients in case changes are to be discarded
+        tagsBackup = new ArrayList<>();
+        if(null != ingredients.getValue()){
+            ingredientsBackup = new ArrayList<>();
+            ingredientsBackup.addAll(ingredients.getValue());
+        }
+
         //start edit mode - replacing the action bar with edit mode bar
         if (actionMode == null){
             actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallback);
@@ -282,6 +308,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         for (int i = 0; i < tagContainer.getChildCount(); i++){
             Chip chip = (Chip) tagContainer.getChildAt(i);
             chip.setCloseIconVisible(true);
+            tagsBackup.add(chip.getText().toString());
         }
 
         //swap serves textView to editText
@@ -310,10 +337,13 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //show per-ingredient delete icons
         adapter.setEditMode(true);
         ingredientRecyclerView.setAdapter(adapter);
-
     }
 
-    private void enterViewMode(View root){
+    private void enterViewMode(){
+        //hide keyboard in case it was open
+        KeyboardHider.hideKeyboard(requireActivity());
+
+        View root = requireView();
         //hide recipe name field
         root.findViewById(R.id.edit_text_recipe_name).setVisibility(View.GONE);
 
@@ -372,7 +402,8 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
      * object in the database with the form values.
      */
     private void saveRecipe(){
-        View root = getView();
+        View root = requireView();
+        NestedScrollView scrollView = root.findViewById(R.id.scrollview);
         Recipe recipe = currentRecipe.getValue();
 
         /* Read all fields */
@@ -400,62 +431,123 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //ingredients are already saved, and so don't need to be read
 
         /* VALIDATION */
-        try {
-            //throws InvalidRecipeUrlException if invalid
-            RecipeWebsiteUtils.validateUrl(url);
+        UrlValidator urlValidator = new UrlValidator();
+        //check that a recipe name was entered
+        if (recipeName.isEmpty()){
+            //show error message
+            Toast.makeText(this.getContext(), "Please enter a name for this recipe",Toast.LENGTH_LONG).show();
 
-            //check that a recipe name was entered
-            if (recipeName.isEmpty()){
-                Toast.makeText(this.getContext(), "Please enter a name for this recipe",Toast.LENGTH_LONG).show();
+            //restore to action mode if we are validating after user cancelled edit mode
+            // but then chose to save changes, only to receive this message.
+            if (actionMode == null){
+                actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallback);
+                actionMode.setTitle(R.string.edit_mode_title);
+                actionMode.invalidate();
+                callback.setViewpagerTo(MainActivity.RECIPE_LIST_VIEWPAGER_INDEX);
             }
-
-            //check that the name is unique if it has been changed
-            else if (!recipeName.equals(recipe.getName()) && !recipesViewModel.recipeNameIsUnique(recipeName)){
-                Toast.makeText(this.getContext(), "This recipe name is already in use - please choose another",Toast.LENGTH_LONG).show();
-            }
-
-            /* Save recipe if validation passed*/
-            else{
-                //set all fields to form values
-                recipe.setName(recipeName);
-
-                if(!serves.isEmpty()){
-                    recipe.setServes(Integer.parseInt(serves));
-                }
-                else{
-                    recipe.setServes(0);
-                }
-
-                if(!prepTime.isEmpty()){
-                    recipe.setPrepTime(Integer.parseInt(prepTime));
-                }
-                else{
-                    recipe.setPrepTime(0);
-                }
-                if(!cookTime.isEmpty()){
-                    recipe.setCookTime(Integer.parseInt(cookTime));
-                }
-                else{
-                    recipe.setCookTime(0);
-                }
-
-                recipe.setTier_rating(tierRating);
-                recipe.setTom_rating(tomRating);
-                recipe.setUrl(url);
-                recipe.setNotes(notes);
-
-                //update the database entry for recipe accordingly
-                recipesViewModel.updateRecipe(recipe);
-
-                //set saved flag so recipe is not deleted when exiting fragment if it's a brand new recipe
-                saved = true;
-
-                //hide keyboard in case it was open
-                KeyboardHider.hideKeyboard(getActivity());
-            }
-        } catch (InvalidRecipeUrlExeception e) {
-            Toast.makeText(this.getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            scrollView.post(() -> {
+                scrollView.smoothScrollTo(0, root.findViewById(R.id.edit_text_recipe_name).getTop());
+            });
+            ((ActionModeCallback) actionModeCallback).saveClicked = false;
         }
+
+        //check that the name is unique if it has been changed
+        else if (!recipeName.equals(recipe.getName()) && !recipesViewModel.recipeNameIsUnique(recipeName)){
+            Toast.makeText(this.getContext(), "This recipe name is already in use - please choose another",Toast.LENGTH_LONG).show();
+            if (actionMode == null){
+                enterEditMode();
+            }
+            scrollView.post(() -> {
+                scrollView.smoothScrollTo(0, root.findViewById(R.id.edit_text_recipe_name).getTop());
+            });
+            ((ActionModeCallback) actionModeCallback).saveClicked = false;
+        }
+
+        else if (!url.isEmpty() && !urlValidator.isValid(url)){
+            Toast.makeText(this.getContext(), R.string.recipe_url_invalid, Toast.LENGTH_LONG).show();
+            if (actionMode == null){
+                enterEditMode();
+            }
+            ((ActionModeCallback) actionModeCallback).saveClicked = false;
+        }
+
+        /* Save recipe if validation passed*/
+        else{
+            //set all fields to form values
+            recipe.setName(recipeName);
+
+            if(!serves.isEmpty()){
+                recipe.setServes(Integer.parseInt(serves));
+            }
+            else{
+                recipe.setServes(0);
+            }
+
+            if(!prepTime.isEmpty()){
+                recipe.setPrepTime(Integer.parseInt(prepTime));
+            }
+            else{
+                recipe.setPrepTime(0);
+            }
+            if(!cookTime.isEmpty()){
+                recipe.setCookTime(Integer.parseInt(cookTime));
+            }
+            else{
+                recipe.setCookTime(0);
+            }
+
+            recipe.setTier_rating(tierRating);
+            recipe.setTom_rating(tomRating);
+            recipe.setUrl(url);
+            recipe.setNotes(notes);
+
+            //update the database entry for recipe accordingly
+            recipesViewModel.updateRecipe(recipe);
+
+            //set saved flag so recipe is not deleted when exiting fragment if it's a brand new recipe
+            saved = true;
+
+            //ends edit mode (if applicable), returning control of action bar back to the fragment
+            //and calling onDestroyActionMode
+            if (actionMode != null) {
+                actionMode.finish();
+            }
+
+            //notify user of success
+            Toast.makeText(getContext(),R.string.save_recipe_toast,Toast.LENGTH_SHORT).show();
+            enterViewMode();
+        }
+    }
+
+    private void discardChanges() {
+        //restore ingredients to previous state
+        if (null != ingredientsBackup){
+            recipesViewModel.resetIngredientsToBackup(recipeId, ingredientsBackup);
+        }
+
+        //restore tags to previous state
+        LiveData<Boolean> needsRestoringCheck = recipesViewModel.restoreTagsToBackup(recipeId, tagsBackup);
+        //wait to see if they tags need to be reloaded without blocking
+        needsRestoringCheck.observe(getViewLifecycleOwner(), (needsRestoring) -> {
+            if (needsRestoring) {
+                //clear all chips
+                ChipGroup chipGroup = requireView().findViewById(R.id.recipe_tags);
+                chipGroup.removeAllViews();
+
+                //re-add backup tags
+                for (String tag : tagsBackup){
+                    addTag(requireView(), tag);
+                }
+            }
+        });
+
+        //restore other views to previous state
+        if (null != currentRecipe.getValue()){
+            populateRecipeViews(requireView(), currentRecipe.getValue());
+        }
+
+        //revert display to view-only UI
+        enterViewMode();
     }
 
     //hide back button in action bar for this fragment
@@ -514,7 +606,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             //edit button pressed
             case R.id.action_edit_recipe:
                 //modify UI to edit mode
-                enterEditMode(getView());
+                enterEditMode();
                 return true;
 
             case R.id.action_add_all_to_list:
@@ -569,10 +661,12 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
     /**Creates and handles a contextual action bar for when one or more recipes are selected */
     private class ActionModeCallback implements ActionMode.Callback{
+        public boolean saveClicked;
 
         @Override
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
             actionMode.getMenuInflater().inflate(R.menu.recipe_editor_action_bar, menu);
+            saveClicked = false;
             return true;
         }
 
@@ -586,15 +680,12 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             switch (menuItem.getItemId()){
                 //Handle clicking of save button
                 case R.id.action_save_recipe:
-                    //ends the actionmode, returning control of action bar back to the fragment
-                    //and calling onDestroyActionMode
-                    actionMode.finish();
+                    //sets this flag to prevent prompt to save/discard changes onActionModeDestroyed
+                    saveClicked = true;
+
                     //save recipe
                     saveRecipe();
-                    //notify user
-                    Toast.makeText(getContext(),R.string.save_recipe_toat,Toast.LENGTH_SHORT).show();
                     return true;
-
                 default:
                     return false;
             }
@@ -602,12 +693,26 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
+            //prompt user to save changes if they haven't yet done so
             actionMode = null;
-            //revert display to view-only UI
-            enterViewMode(requireView());
-            //hide keyboard if it was open
-            KeyboardHider.hideKeyboard(requireActivity());
+            if(!saveClicked){
+                showSavePrompt();
+            }
         }
+    }
+
+    public void showSavePrompt() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.save_recipe_prompt_title)
+                .setMessage(R.string.save_recipe_prompt_message)
+                .setPositiveButton(R.string.save_recipe_prompt_positive_button,
+                        (DialogInterface.OnClickListener) (dialog, which) -> {
+                    saveRecipe();
+                })
+                .setNegativeButton(R.string.save_recipe_prompt_negative_button, (dialog, which) -> {
+                    discardChanges();
+                })
+                .show();
     }
 }
 

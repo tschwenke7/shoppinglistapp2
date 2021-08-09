@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
+import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.recipes.creator.InvalidRecipeUrlExeception;
 import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment;
@@ -17,6 +18,7 @@ import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.SlItem;
+import com.example.shoppinglistapp2.db.tables.Tag;
 import com.example.shoppinglistapp2.helpers.IngredientUtils;
 import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
 import com.example.shoppinglistapp2.helpers.SlItemUtils;
@@ -430,5 +432,105 @@ public class RecipesViewModel extends AndroidViewModel {
 
         //update the ingredient in the db
         slaRepository.updateIngredient(oldIngredient);
+    }
+
+    public void resetIngredientsToBackup(int recipeId, List<Ingredient> ingredientsBackup) {
+
+        //compare the current ingredients with the backup list to see if they are the same, or
+        //if we need to restore the backup
+        LiveData<List<Ingredient>> currentIngredients = getRecipeIngredientsById(recipeId);
+        currentIngredients.observeForever(new Observer<List<Ingredient>>() {
+            @Override
+            public void onChanged(List<Ingredient> ingredients) {
+                currentIngredients.removeObserver(this);
+
+                ((App) getApplication()).backgroundExecutorService.execute(() -> {
+                    //if the lists are different lengths, then a change must've occurred.
+                    if (ingredients.size() != ingredientsBackup.size()){
+                        //restore old values
+                        restoreOldValues(ingredients, ingredientsBackup);
+                    }
+                    //otherwise compare all elements of lists to see if there has been a change
+                    else {
+                        boolean different = false;
+                        int i = 0;
+                        while (!different && i < ingredients.size()){
+                            if (!ingredients.get(i).equals(ingredientsBackup.get(i))){
+                                different = true;
+                            }
+                            i++;
+                        }
+
+                        if (different) {
+                            //restore old values
+                            restoreOldValues(ingredients, ingredientsBackup);
+                        }
+                    }
+                    //otherwise they are the same, and we don't need to restore the db or do anything
+                });
+            }
+
+            private void restoreOldValues(List<Ingredient> ingredients, List<Ingredient> ingredientsBackup) {
+                try {
+                    //get() forces deletion to complete and block before inserting ingredients in
+                    //which may have duplicate ids (primary keys)
+                    slaRepository.deleteIngredients(ingredients).get();
+                    slaRepository.insertIngredients(ingredientsBackup);
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public LiveData<Boolean> restoreTagsToBackup(int recipeId, List<String> tagsBackup) {
+        MutableLiveData<Boolean> needsRestoring = new MutableLiveData<>();
+
+        //check whether tags have actually changed since backup
+        ((App) getApplication()).backgroundExecutorService.execute(() -> {
+            List<String> currentTags = slaRepository.getTagsByRecipe(recipeId);
+
+            //if lists are the same length, we need to compare all items
+            if (currentTags.size() == tagsBackup.size()){
+                boolean different = false;
+                int i = 0;
+                while (!different && i < currentTags.size()){
+                    if (!currentTags.get(i).equals(tagsBackup.get(i))){
+                        different = true;
+                    }
+                    i++;
+                }
+
+                if (different) {
+                    //restore database values to backup
+                    restoreTags(recipeId, tagsBackup, needsRestoring);
+
+                }
+                else{
+                    needsRestoring.postValue(false);
+                }
+            }
+            //if lists are different lengths, then there have definitely been changes
+            else {
+                restoreTags(recipeId, tagsBackup, needsRestoring);
+            }
+        });
+        return needsRestoring;
+    }
+
+    private void restoreTags(int recipeId, List<String> tagsBackup, MutableLiveData<Boolean> needsRestoring) {
+        try{
+            //restore database values to backup
+            slaRepository.deleteAllTagsForRecipe(recipeId).get();
+            List<Tag> tagsToInsert = new ArrayList<>();
+            for (String name : tagsBackup){
+                tagsToInsert.add(new Tag(recipeId, name));
+            }
+            slaRepository.insertTags(tagsToInsert).get();
+            needsRestoring.postValue(true);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            needsRestoring.postValue(false);
+        }
     }
 }
