@@ -1,6 +1,5 @@
 package com.example.shoppinglistapp2.activities.ui.recipes.creator;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -13,6 +12,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,26 +24,20 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
-import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragmentDirections;
-import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -77,6 +72,9 @@ public class CreateRecipeFragment extends Fragment {
     private void setupUi(View root){
         //setup action bar to allow back button
         this.setHasOptionsMenu(true);
+        TextView supportedSitesText = root.findViewById(R.id.text_view_supported_websites);
+        supportedSitesText.setText(Html.fromHtml(getString(R.string.supported_recipes)));
+        supportedSitesText.setMovementMethod(LinkMovementMethod.getInstance());
 
         //setup "create recipe from website" button
         Button websiteButton = root.findViewById(R.id.create_recipe_from_website_button);
@@ -92,6 +90,8 @@ public class CreateRecipeFragment extends Fragment {
             action.setRecipeId(recipesViewModel.generateNewRecipeId());
             Navigation.findNavController(root).navigate(action);
         });
+
+
 
         //configure back button to work within parent fragment
         Fragment f1 = this;

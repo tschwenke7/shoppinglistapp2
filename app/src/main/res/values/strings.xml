@@ -41,18 +41,22 @@
 
     <!-- New recipe page -->
     <string name="create_recipe_title">Create New Recipe</string>
-    <string name="create_recipe_preamble_1">Enter a website to create a recipe from. </string>
-    <string name="supported_recipes">Currently supported websites:\n
-    \u25CF\trecipetineats.com</string>
-    <string name="recipe_website_hint">Recipe website…</string>
-    <string name="create_recipe_website_button">Create recipe from website</string>
+    <string name="create_recipe_preamble_1_1">Enter a link to prefill a recipe from.</string>
+    <string name="create_recipe_preamble_1_2">A new recipe will be generated and prefilled using any ingredients and other details from that webpage.</string>
+    <string name="supported_recipes"><![CDATA[
+    <b>Currently supported websites:</b><br>
+    • <a href="https://www.recipetineats.com/">RecipeTin Eats</a><br>
+    • <a href="https://www.hellofresh.com.au/recipes/">Hello Fresh</a>
+    ]]></string>
+    <string name="recipe_website_hint">Paste in link to recipe here…</string>
+    <string name="create_recipe_website_button">Prefill recipe from website</string>
     <string name="or_separator">OR</string>
     <string name="create_recipe_preamble_2">Create a new recipe manually by clicking the button below.</string>
     <string name="create_recipe_manual_button">Create recipe from scratch</string>
 
     <string name="recipe_url_empty">Please enter a website to create a recipe from</string>
     <string name="recipe_url_invalid">The website you have provided is not a valid url. Be sure to include the full \"https://www.\" address.</string>
-    <string name="recipe_url_unsupported">The website you have provided is not currently supported. Check the list above for supported sites.</string>
+    <string name="recipe_url_unsupported">The website you have provided is not currently supported. Check the list below for supported sites.</string>
     <string name="recipe_url_error">Error - a recipe could not be read from this website. Please check the link you\'ve provided.</string>
     <string name="recipe_url_timeout_error">Error - website too long to respond. Check your internet connection and try again.</string>
 
@@ -89,6 +93,12 @@
     <string name="add_ingredient_button">Add</string>
     <string name="save_recipe_button">Save</string>
     <string name="save_recipe_toast">Recipe saved.</string>
+    <string name="unknown_error">Oops, something went wrong. Please submit a bug report to the app\'s creator letting them know what caused this.</string>
+    <string name="save_recipe_prompt_title">Save changes to recipe?</string>
+    <string name="save_recipe_prompt_message">Do you wish to save any changes you may have just made to this recipe?</string>
+    <string name="save_recipe_prompt_positive_button">Save changes</string>
+    <string name="save_recipe_prompt_negative_button">Discard changes</string>
+
 
     <!-- Shopping list page -->
     <string name="new_list_item_button">Add</string>
@@ -101,6 +111,14 @@
     <string name="clear_list_positive_button">Clear list</string>
     <string name="clear_list_negative_button">Cancel</string>
     <string name="serves_heading">Serves:</string>
+
+    <string name="export_ingredients_option">Send ingredients to shopping list</string>
+    <string name="export_ingredients_warning">Add all ingredients to the shopping list?\n(Crossed-off items will be ignored).</string>
+    <string name="export_ingredients_positive">Confirm</string>
+    <string name="export_ingredients_success">Ingredients added to shopping list</string>
+    <string name="copy_list_to_clipboard">Copy list to clipboard</string>
+    <string name="export_ingredients_toast">Shopping list copied to clipboard.\nYou can now paste wherever you want.</string>
+
 
     <!-- Meal Plan Fragment -->
     <string name="plans_heading">Meals</string>
@@ -121,18 +139,4 @@
     <string name="clear_meal_plans_option">Reset entire meal plan</string>
     <string name="clear_meal_plans_warning">This will delete all meal slots, recipes and ingredients. You will need to add days/meals before adding more recipes again. \nAre you sure?</string>
     <string name="clear_meal_plans_positive_button">Reset all</string>
-
-    <string name="export_ingredients_option">Send ingredients to shopping list</string>
-    <string name="export_ingredients_warning">Add all ingredients to the shopping list?\n(Crossed-off items will be ignored).</string>
-    <string name="export_ingredients_positive">Confirm</string>
-    <string name="export_ingredients_success">Ingredients added to shopping list</string>
-    <string name="copy_list_to_clipboard">Copy list to clipboard</string>
-    <string name="toast_copied_list_to_clipboard">Shopping list copied to clipboard.\nYou can now paste wherever you want.</string>
-    <string name="unknown_error">Oops, something went wrong. Please submit a bug report to the app\'s creator letting them know what caused this.</string>
-    <string name="save_recipe_prompt_title">Save changes to recipe?</string>
-    <string name="save_recipe_prompt_message">Do you wish to save any changes you may have just made to this recipe?</string>
-    <string name="save_recipe_prompt_positive_button">Save changes</string>
-    <string name="save_recipe_prompt_negative_button">Discard changes</string>
-
-
 </resources>
