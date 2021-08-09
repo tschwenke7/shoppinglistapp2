@@ -1,7 +1,5 @@
 package com.example.shoppinglistapp2.helpers;
 
-import android.content.res.Resources;
-
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.recipes.creator.InvalidRecipeUrlExeception;
@@ -18,7 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 
 public class RecipeWebsiteUtils {
@@ -50,9 +47,22 @@ public class RecipeWebsiteUtils {
         }
     }
 
-    public static boolean isValidUrl(String url){
+    public static boolean validateUrl(String url) throws InvalidRecipeUrlExeception{
+        //check that something was provided
+        if (url.isEmpty()) {
+            throw new InvalidRecipeUrlExeception(App.getRes().getString(R.string.recipe_url_empty));
+        }
+        //check that it is a valid url
         UrlValidator urlValidator = new UrlValidator();
-        return urlValidator.isValid(url);
+        if (!urlValidator.isValid(url)){
+            throw new InvalidRecipeUrlExeception(App.getRes().getString(R.string.recipe_url_invalid));
+        }
+        //check that it's one of the currently supported URLs
+        if (getDomain(url) == Domain.NOT_SUPPORTED){
+            throw new InvalidRecipeUrlExeception(App.getRes().getString(R.string.recipe_url_unsupported));
+        }
+
+        return true;
     }
 
     /**
@@ -64,19 +74,10 @@ public class RecipeWebsiteUtils {
      */
     public static Recipe getRecipeFromWebsite(String url) throws InvalidRecipeUrlExeception {
         //validate url before attempting to convert
-        //check that something was provided
-        if (url.isEmpty()) {
-            throw new InvalidRecipeUrlExeception(App.getRes().getString(R.string.recipe_url_empty));
-        }
-        //check that it is a valid url
-        if (!isValidUrl(url)){
-            throw new InvalidRecipeUrlExeception(App.getRes().getString(R.string.recipe_url_invalid));
-        }
-        //check that it's one of the currently supported URLs
-        if (getDomain(url) == Domain.NOT_SUPPORTED){
-            throw new InvalidRecipeUrlExeception(App.getRes().getString(R.string.recipe_url_unsupported));
-        }
+        //throws InvalidRecipeUrlException if not valid
+        validateUrl(url);
 
+        //use appropriate prefiller for url's domain
         switch (getDomain(url)){
             case RECIPE_TIN_EATS:
                 return convertRecipeTinEats(url);

@@ -20,6 +20,9 @@ public interface RecipeDao {
     @Query("SELECT * FROM recipes WHERE id = :id")
     public Recipe getById(int id);
 
+    @Query("SELECT * FROM recipes WHERE id = :id")
+    public LiveData<Recipe> getByIdLive(int id);
+
     @Query("SELECT * FROM recipes WHERE name = :name LIMIT 1")
     public Recipe getByName(String name);
 

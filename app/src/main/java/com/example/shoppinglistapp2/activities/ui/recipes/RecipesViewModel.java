@@ -179,6 +179,10 @@ public class RecipesViewModel extends AndroidViewModel {
         return slaRepository.getRecipeById(id);
     }
 
+    public LiveData<Recipe> getRecipeByIdLive(int id){
+        return slaRepository.getRecipeByIdLive(id);
+    }
+
     public void deleteTag(int recipeId, String tag){
         slaRepository.deleteTag(recipeId, tag);
     }

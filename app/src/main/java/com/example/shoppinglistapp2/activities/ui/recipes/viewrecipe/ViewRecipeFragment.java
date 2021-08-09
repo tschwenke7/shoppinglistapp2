@@ -1,5 +1,6 @@
 package com.example.shoppinglistapp2.activities.ui.recipes.viewrecipe;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,23 +28,21 @@ import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
-import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragmentDirections;
+import com.example.shoppinglistapp2.activities.ui.recipes.creator.InvalidRecipeUrlExeception;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListViewModel;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
+import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -53,7 +52,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     private int recipeId;
     private boolean editingFlag;
     private boolean newRecipeFlag;
-    private Recipe currentRecipe;
+    private LiveData<Recipe> currentRecipe;
     private boolean saved;
     private LiveData<List<Ingredient>> ingredients;
     private ActionMode actionMode;
@@ -69,16 +68,18 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         shoppingListViewModel =
                 new ViewModelProvider(getActivity()).get(ShoppingListViewModel.class);
 
+        View root = inflater.inflate(R.layout.fragment_view_recipe, container, false);
+
         //retrieve navigation args
         //recipe to be viewed
         recipeId = ViewRecipeFragmentArgs.fromBundle(getArguments()).getRecipeId();
-        currentRecipe = recipesViewModel.getRecipeById(recipeId);
+        currentRecipe = recipesViewModel.getRecipeByIdLive(recipeId);
+
+
         //decide whether to start in edit mode or not
         editingFlag = ViewRecipeFragmentArgs.fromBundle(getArguments()).getEditingFlag();
         //true if this recipe was just created rather than selected from recipe list
         newRecipeFlag = ViewRecipeFragmentArgs.fromBundle(getArguments()).getNewRecipeFlag();
-
-        View root = inflater.inflate(R.layout.fragment_view_recipe, container, false);
 
         saved = false;
 
@@ -96,7 +97,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         this.setHasOptionsMenu(true);
 
         /* fill in textViews with saved recipe data where available */
-        populateViews(root, currentRecipe);
+        currentRecipe.observe(getViewLifecycleOwner(),(recipe -> populateRecipeViews(root, recipe)));
 
         //setup ingredient list recyclerview
         ingredientRecyclerView = root.findViewById(R.id.recipe_ingredients_list);
@@ -106,11 +107,13 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         ingredientRecyclerView.setAdapter(adapter);
         ingredientRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
-        ingredients.observe(getViewLifecycleOwner(), (list) -> adapter.setList(list));
+        ingredients.observe(getViewLifecycleOwner(), (list) -> {
+            adapter.setList(list);
+        });
 
         //handle ingredient being added
         Button addIngredientButton = root.findViewById(R.id.recipe_add_ingredient_button);
-        addIngredientButton.setOnClickListener(view -> addIngredients(view));
+        addIngredientButton.setOnClickListener(this::addIngredients);
 
         //add existing tags
         for (String tag : recipesViewModel.getTagsByRecipe(recipeId)){
@@ -159,7 +162,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
     }
 
-    private void populateViews(View root, Recipe recipe){
+    private void populateRecipeViews(View root, Recipe recipe){
         //set name as action bar title
         pageTitle = recipe.getName();
         ((AppCompatActivity) getParentFragment().getActivity()).getSupportActionBar().setTitle(pageTitle);
@@ -181,13 +184,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //website link
         Button websiteButton = root.findViewById(R.id.recipe_url_button);
         if (null != recipe.getUrl() && !recipe.getUrl().isEmpty()){
-            websiteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Uri uri = Uri.parse(recipe.getUrl());
-                    Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uri);
-                    startActivity(launchBrowser);
-                }
+            websiteButton.setOnClickListener(view -> {
+                Uri uri = Uri.parse(recipe.getUrl());
+                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(launchBrowser);
             });
         }
         else{
@@ -195,8 +195,8 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         }
 
         //ratings
-        ((RatingBar) root.findViewById(R.id.tiernan_rating_bar)).setRating(((float) currentRecipe.getTier_rating()) / 2f);
-        ((RatingBar) root.findViewById(R.id.tom_rating_bar)).setRating(((float) currentRecipe.getTom_rating()) / 2f);
+        ((RatingBar) root.findViewById(R.id.tiernan_rating_bar)).setRating(((float) recipe.getTier_rating()) / 2f);
+        ((RatingBar) root.findViewById(R.id.tom_rating_bar)).setRating(((float) recipe.getTom_rating()) / 2f);
 
         //url field
         if(null != recipe.getUrl()){
@@ -245,7 +245,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             String[] items = inputText.split("(\\r\\n|\\r|\\n)");
 
             //send all items to viewModel to be processed/stored
-            recipesViewModel.addIngredientsToRecipe(currentRecipe.getId(), items);
+            recipesViewModel.addIngredientsToRecipe(recipeId, items);
 
             //clear new item input
             input.setText("");
@@ -373,6 +373,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
      */
     private void saveRecipe(){
         View root = getView();
+        Recipe recipe = currentRecipe.getValue();
 
         /* Read all fields */
         String recipeName = ((TextView) root.findViewById(R.id.edit_text_recipe_name))
@@ -399,58 +400,61 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //ingredients are already saved, and so don't need to be read
 
         /* VALIDATION */
+        try {
+            //throws InvalidRecipeUrlException if invalid
+            RecipeWebsiteUtils.validateUrl(url);
 
-        //check that a recipe name was entered
-        if (recipeName.isEmpty()){
-            Toast.makeText(this.getContext(), "Please enter a name for this recipe",Toast.LENGTH_LONG).show();
-        }
-
-        //check that the name is unique if it has been changed
-        else if (!recipeName.equals(currentRecipe.getName()) && !recipesViewModel.recipeNameIsUnique(recipeName)){
-            Toast.makeText(this.getContext(), "This recipe name is already in use - please choose another",Toast.LENGTH_LONG).show();
-        }
-
-        /* Save recipe if validation passed*/
-        else{
-            //set all fields to form values
-            currentRecipe.setName(recipeName);
-
-            if(!serves.isEmpty()){
-                currentRecipe.setServes(Integer.parseInt(serves));
+            //check that a recipe name was entered
+            if (recipeName.isEmpty()){
+                Toast.makeText(this.getContext(), "Please enter a name for this recipe",Toast.LENGTH_LONG).show();
             }
+
+            //check that the name is unique if it has been changed
+            else if (!recipeName.equals(recipe.getName()) && !recipesViewModel.recipeNameIsUnique(recipeName)){
+                Toast.makeText(this.getContext(), "This recipe name is already in use - please choose another",Toast.LENGTH_LONG).show();
+            }
+
+            /* Save recipe if validation passed*/
             else{
-                currentRecipe.setServes(0);
+                //set all fields to form values
+                recipe.setName(recipeName);
+
+                if(!serves.isEmpty()){
+                    recipe.setServes(Integer.parseInt(serves));
+                }
+                else{
+                    recipe.setServes(0);
+                }
+
+                if(!prepTime.isEmpty()){
+                    recipe.setPrepTime(Integer.parseInt(prepTime));
+                }
+                else{
+                    recipe.setPrepTime(0);
+                }
+                if(!cookTime.isEmpty()){
+                    recipe.setCookTime(Integer.parseInt(cookTime));
+                }
+                else{
+                    recipe.setCookTime(0);
+                }
+
+                recipe.setTier_rating(tierRating);
+                recipe.setTom_rating(tomRating);
+                recipe.setUrl(url);
+                recipe.setNotes(notes);
+
+                //update the database entry for recipe accordingly
+                recipesViewModel.updateRecipe(recipe);
+
+                //set saved flag so recipe is not deleted when exiting fragment if it's a brand new recipe
+                saved = true;
+
+                //hide keyboard in case it was open
+                KeyboardHider.hideKeyboard(getActivity());
             }
-
-            if(!prepTime.isEmpty()){
-                currentRecipe.setPrepTime(Integer.parseInt(prepTime));
-            }
-            else{
-                currentRecipe.setPrepTime(0);
-            }
-            if(!cookTime.isEmpty()){
-                currentRecipe.setCookTime(Integer.parseInt(cookTime));
-            }
-            else{
-                currentRecipe.setCookTime(0);
-            }
-
-            currentRecipe.setTier_rating(tierRating);
-            currentRecipe.setTom_rating(tomRating);
-            currentRecipe.setUrl(url);
-            currentRecipe.setNotes(notes);
-
-            //update the database entry for recipe accordingly
-            recipesViewModel.updateRecipe(currentRecipe);
-
-            //set saved flag so recipe is not deleted when exiting fragment if its a brand new recipe
-            saved = true;
-
-            //update any fields with their newly saved values
-            populateViews(getView(), currentRecipe);
-
-            //hide keyboard in case it was open
-            KeyboardHider.hideKeyboard(getActivity());
+        } catch (InvalidRecipeUrlExeception e) {
+            Toast.makeText(this.getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -559,7 +563,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         if (newRecipeFlag){
             Toast.makeText(this.getContext(), "Recipe draft discarded",Toast.LENGTH_LONG).show();
             //delete the recipe from db
-            recipesViewModel.deleteRecipes(currentRecipe);
+            recipesViewModel.deleteRecipes(currentRecipe.getValue());
         }
     }
 
