@@ -72,6 +72,13 @@ public class IngredientUtils {
             "hot water"
     );
 
+    private static enum UNIT_TYPE {
+        NONE,
+        WEIGHT,
+        VOLUME,
+        OTHER
+    }
+
     public static Ingredient toIngredient(String ingText){
         //the return will be two strings, the first being qty and the second the ingredient name
         String qty = "";

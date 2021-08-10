@@ -12,7 +12,7 @@
 
     <!-- Recipe list page -->
     <string name="add_recipe_action_title">Add new recipe</string>
-    <string name="add_all_to_list_action_title">Add all ingredients to list</string>
+    <string name="add_all_to_list_action_title">Add all ingListItems to list</string>
     <string name="delete_recipe_action_title">Delete recipe</string>
     <string name="default_rating">0</string>
     <string name="show_advanced_search_prompt">Advanced search ▼</string>
@@ -32,7 +32,7 @@
         <item>Tiernan\'s rating</item>
         <item>Combined rating</item>
     </string-array>
-    <string name="ingredient_search_hint">Enter one or more ingredients separated by commas</string>
+    <string name="ingredient_search_hint">Enter one or more ingListItems separated by commas</string>
     <string name="tag_search_hint">Enter one or more tags separated by commas</string>
 
     <string name="delete_recipes_warning_title">Delete recipes</string>
@@ -42,7 +42,7 @@
     <!-- New recipe page -->
     <string name="create_recipe_title">Create New Recipe</string>
     <string name="create_recipe_preamble_1_1">Enter a link to prefill a recipe from.</string>
-    <string name="create_recipe_preamble_1_2">A new recipe will be generated and prefilled using any ingredients and other details from that webpage.</string>
+    <string name="create_recipe_preamble_1_2">A new recipe will be generated and prefilled using any ingListItems and other details from that webpage.</string>
     <string name="supported_recipes"><![CDATA[
     <b>Currently supported websites:</b><br>
     • <a href="https://www.recipetineats.com/">RecipeTin Eats</a><br>
@@ -69,9 +69,9 @@
     <string name="cook_time_heading_short">Cook:</string>
     <string name="abbreviated_time_unit">mins</string>
     <string name="default_notes_text">You\'ve not written any notes for this recipe.</string>
-    <string name="add_all_ingredients_toast">All selected ingredients added to shopping list.</string>
+    <string name="add_all_ingredients_toast">All selected ingListItems added to shopping list.</string>
     <string name="add_all_ingredients_dialog_title">Confirm</string>
-    <string name="add_all_ingredients_dialog">Add all selected ingredients from this recipe to your shopping list?</string>
+    <string name="add_all_ingredients_dialog">Add all selected ingListItems from this recipe to your shopping list?</string>
     <string name="add_all_ingredients_dialog_positive_button">Yes</string>
     <string name="add_all_ingredients_dialog_negative_button">Cancel</string>
 
@@ -112,8 +112,8 @@
     <string name="clear_list_negative_button">Cancel</string>
     <string name="serves_heading">Serves:</string>
 
-    <string name="export_ingredients_option">Send ingredients to shopping list</string>
-    <string name="export_ingredients_warning">Add all ingredients to the shopping list?\n(Crossed-off items will be ignored).</string>
+    <string name="export_ingredients_option">Send ingListItems to shopping list</string>
+    <string name="export_ingredients_warning">Add all ingListItems to the shopping list?\n(Crossed-off items will be ignored).</string>
     <string name="export_ingredients_positive">Confirm</string>
     <string name="export_ingredients_success">Ingredients added to shopping list</string>
     <string name="copy_list_to_clipboard">Copy list to clipboard</string>
@@ -132,11 +132,11 @@
     <string name="delete_meal_warning">Are you sure you want to delete this meal?</string>
     <string name="delete_meal_option">Delete meal</string>
 
-    <string name="add_ingredients_to_list_option">Add all ingredients to shopping list</string>
+    <string name="add_ingredients_to_list_option">Add all ingListItems to shopping list</string>
     <string name="remove_recipes_option">Clear all meal slots</string>
-    <string name="remove_recipes_warning">Are you sure? All recipes, notes and ingredients will be removed from your plan, but the meal slots will be kept.</string>
+    <string name="remove_recipes_warning">Are you sure? All recipes, notes and ingListItems will be removed from your plan, but the meal slots will be kept.</string>
     <string name="remove_recipes_positive_button">Clear</string>
     <string name="clear_meal_plans_option">Reset entire meal plan</string>
-    <string name="clear_meal_plans_warning">This will delete all meal slots, recipes and ingredients. You will need to add days/meals before adding more recipes again. \nAre you sure?</string>
+    <string name="clear_meal_plans_warning">This will delete all meal slots, recipes and ingListItems. You will need to add days/meals before adding more recipes again. \nAre you sure?</string>
     <string name="clear_meal_plans_positive_button">Reset all</string>
 </resources>
