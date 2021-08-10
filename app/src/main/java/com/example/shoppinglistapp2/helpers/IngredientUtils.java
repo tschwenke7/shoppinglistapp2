@@ -1,12 +1,11 @@
 package com.example.shoppinglistapp2.helpers;
 
-import android.util.Log;
-
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -67,12 +66,21 @@ public class IngredientUtils {
             "ounces"
     );
 
+    /** Ingredients which really don't need to be on a shopping list ever. */
+    public static final List<String> pointlessIngredients = Arrays.asList(
+            "water",
+            "hot water"
+    );
+
     public static Ingredient toIngredient(String ingText){
         //the return will be two strings, the first being qty and the second the ingredient name
         String qty = "";
         String unit = null;
         String name = "";
 
+        //expand any single-character fractions into <digit>/<digit>
+        ingText = Normalizer.normalize(ingText, Normalizer.Form.NFKD);
+        ingText = ingText.replaceAll("\u2044","/");
 
         //normalise case, then split into individual words
         ingText = ingText.toLowerCase().trim();
