@@ -15,22 +15,22 @@ import java.util.List;
 public interface RecipeDao {
 
     @Query("SELECT * FROM recipes ORDER BY name ASC")
-    public LiveData<List<Recipe>> getAllAlphabetical();
+    LiveData<List<Recipe>> getAllAlphabetical();
 
     @Query("SELECT * FROM recipes WHERE id = :id")
-    public Recipe getById(int id);
+    Recipe getById(int id);
 
     @Query("SELECT * FROM recipes WHERE id = :id")
-    public LiveData<Recipe> getByIdLive(int id);
+    LiveData<Recipe> getByIdLive(int id);
 
     @Query("SELECT * FROM recipes WHERE name = :name LIMIT 1")
-    public Recipe getByName(String name);
+    Recipe getByName(String name);
 
     @Insert
-    public long insert(Recipe recipe);
+    long insert(Recipe recipe);
 
     @Delete
-    public void deleteAll(Recipe... recipes);
+    void deleteAll(Recipe... recipes);
 
     @Update
     void updateRecipe(Recipe recipe);

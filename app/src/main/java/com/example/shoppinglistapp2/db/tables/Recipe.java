@@ -3,7 +3,7 @@ package com.example.shoppinglistapp2.db.tables;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Fts4;
+import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
@@ -12,8 +12,16 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity(
-    tableName = "recipes",
-    indices = {@Index(value = {"name"}, unique = true)}//the recipe name must be unique
+        tableName = "recipes",
+        indices = {@Index(value = {"name"}, unique = true)},//the recipe name must be unique
+        foreignKeys = {
+            @ForeignKey(
+                    entity = IngList.class,
+                    parentColumns = "id",
+                    childColumns = "list_id",
+                    onDelete = ForeignKey.CASCADE
+            )
+        }
 )
 public class Recipe {
 
@@ -39,8 +47,8 @@ public class Recipe {
     private int tom_rating;
     private int tier_rating;
 
-    @Ignore
-    private List<Ingredient> ingredients;
+    @ColumnInfo(name = "list_id")
+    private int listId;
 
     @Ignore
     private List<String> tags;
@@ -94,14 +102,6 @@ public class Recipe {
         this.tier_rating = tier_rating;
     }
 
-    public List<Ingredient> getIngredients() {
-        return ingredients;
-    }
-
-    public void setIngredients(List<Ingredient> ingredients) {
-        this.ingredients = ingredients;
-    }
-
     public int getPrepTime() {
         return prepTime;
     }
@@ -132,6 +132,14 @@ public class Recipe {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    public int getListId() {
+        return listId;
+    }
+
+    public void setListId(int listId) {
+        this.listId = listId;
     }
 
     @Ignore

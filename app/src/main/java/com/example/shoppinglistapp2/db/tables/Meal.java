@@ -1,12 +1,10 @@
-package com.example.shoppinglistapp2.db2.tables;
+package com.example.shoppinglistapp2.db.tables;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-
-import com.example.shoppinglistapp2.db.tables.Recipe;
 
 import java.util.Objects;
 
@@ -16,7 +14,7 @@ import java.util.Objects;
                 entity = Recipe.class,
                 parentColumns = "id",
                 childColumns = "recipe_id",
-                onDelete = ForeignKey.CASCADE
+                onDelete = ForeignKey.SET_NULL
             ),
             @ForeignKey(
                 entity = MealPlan.class,

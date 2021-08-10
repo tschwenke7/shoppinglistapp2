@@ -9,25 +9,26 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.example.shoppinglistapp2.db.dao.IngredientDao;
+import com.example.shoppinglistapp2.db.dao.IngListItemDao;
+import com.example.shoppinglistapp2.db.dao.MealDao;
 import com.example.shoppinglistapp2.db.dao.MealPlanDao;
 import com.example.shoppinglistapp2.db.dao.RecipeDao;
-import com.example.shoppinglistapp2.db.dao.SlItemDao;
 import com.example.shoppinglistapp2.db.dao.TagDao;
-import com.example.shoppinglistapp2.db.tables.Ingredient;
+import com.example.shoppinglistapp2.db.tables.IngList;
+import com.example.shoppinglistapp2.db.tables.IngListItem;
+import com.example.shoppinglistapp2.db.tables.Meal;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
-import com.example.shoppinglistapp2.db.tables.SlItem;
 import com.example.shoppinglistapp2.db.tables.Tag;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Recipe.class, Ingredient.class, SlItem.class, Tag.class, MealPlan.class}, version = 12, exportSchema = false)
+@Database(entities = {Recipe.class, IngList.class, IngListItem.class, Tag.class, MealPlan.class, Meal.class}, version = 13, exportSchema = false)
 public abstract class SlaDatabase extends RoomDatabase {
     public abstract RecipeDao recipeDao();
-    public abstract IngredientDao ingredientDao();
-    public abstract SlItemDao slItemDao();
+    public abstract IngListItemDao ingListItemDao();
+    public abstract MealDao mealDao();
     public abstract TagDao tagDao();
     public abstract MealPlanDao mealPlanDao();
 
@@ -44,7 +45,7 @@ public abstract class SlaDatabase extends RoomDatabase {
                             SlaDatabase.class, "sla_database")
                             .addCallback(sRoomDatabaseCallback)
                             .addMigrations(MIGRATION_10_11, MIGRATION_11_12)
-//                            .fallbackToDestructiveMigration()
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }
@@ -57,6 +58,12 @@ public abstract class SlaDatabase extends RoomDatabase {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
+            db.beginTransaction();
+            try {
+                db.execSQL("INSERT OR IGNORE INTO ing_lists(id) VALUES(0)");
+            } finally {
+                db.endTransaction();
+            }
         }
     };
 

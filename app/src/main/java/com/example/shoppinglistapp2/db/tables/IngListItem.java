@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2.db2.tables;
+package com.example.shoppinglistapp2.db.tables;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;

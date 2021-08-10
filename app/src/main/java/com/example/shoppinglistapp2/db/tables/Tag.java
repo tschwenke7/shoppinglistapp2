@@ -1,6 +1,5 @@
 package com.example.shoppinglistapp2.db.tables;
 
-
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -10,10 +9,10 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "tags",
         foreignKeys = @ForeignKey(
-        entity = Recipe.class,
-        parentColumns = "id",
-        childColumns = "recipe_id",
-        onDelete = ForeignKey.CASCADE)
+                entity = Recipe.class,
+                parentColumns = "id",
+                childColumns = "recipe_id",
+                onDelete = ForeignKey.CASCADE)
 )
 public class Tag {
 
@@ -59,3 +58,4 @@ public class Tag {
         this.recipeId = recipeId;
     }
 }
+
