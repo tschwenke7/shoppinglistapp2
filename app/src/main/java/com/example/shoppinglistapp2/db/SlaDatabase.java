@@ -20,6 +20,8 @@ import com.example.shoppinglistapp2.db.tables.Meal;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,8 +36,8 @@ public abstract class SlaDatabase extends RoomDatabase {
 
     private static volatile SlaDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;
-    static final ExecutorService databaseWriteExecutor =
-            Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+    static final ListeningExecutorService databaseWriteExecutor =
+            MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(NUMBER_OF_THREADS));
 
     static SlaDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {

@@ -87,7 +87,7 @@ public class CreateRecipeFragment extends Fragment {
             //create new empty recipe and navigate to recipe editor screen when "+" icon clicked
             CreateRecipeFragmentDirections.ActionCreateRecipeToViewRecipe action =
                     CreateRecipeFragmentDirections.actionCreateRecipeToViewRecipe();
-            action.setRecipeId(recipesViewModel.generateNewRecipeId());
+            //todo action.setRecipeId(recipesViewModel.generateNewRecipeId());
             Navigation.findNavController(root).navigate(action);
         });
 
@@ -118,53 +118,53 @@ public class CreateRecipeFragment extends Fragment {
 
         //attempt to create a Recipe from the website
         //attempt to load the website
-        ListenableFuture<Integer> recipeId = ((App) getActivity().getApplication())
-                .backgroundExecutorService.submit(() -> recipesViewModel.generateRecipeIdFromUrl(url));
+//       todo ListenableFuture<Integer> recipeId = ((App) getActivity().getApplication())
+//                .backgroundExecutorService.submit(() -> recipesViewModel.generateRecipeIdFromUrl(url));
 
-        Futures.addCallback(recipeId, new FutureCallback<Integer>() {
-            @Override
-            public void onSuccess(@Nullable Integer recipeId) {
-                //if recipe loading failed, display error message
-                if(recipeId == null || recipeId == -1){
-                    Toast.makeText(getContext(), requireContext().getString(R.string.recipe_url_error),Toast.LENGTH_LONG).show();
-                }
-                //otherwise, navigate to editor for the new recipe
-                else{
-                    CreateRecipeFragmentDirections.ActionCreateRecipeToViewRecipe action =
-                            CreateRecipeFragmentDirections.actionCreateRecipeToViewRecipe();
-
-                    //pass id of newly created recipe
-                    action.setRecipeId(recipeId);
-
-                    //navigate
-                    Navigation.findNavController(root).navigate(action);
-                    //hide progress bar and reset opacity of everything else
-                    progressBar.setVisibility(View.GONE);
-                    mainContent.setAlpha(1.0f);
-                }
-            }
-            //respond to differenct potential errors
-            @Override
-            public void onFailure(Throwable t) {
-                //the url entered was not valid for some reason
-                if (t instanceof InvalidRecipeUrlExeception){
-                    Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_LONG).show();
-                }
-                //the thread processing this was interrupted
-                else if (t instanceof ExecutionException) {
-                    t.printStackTrace();
-                    Toast.makeText(getContext(), R.string.recipe_url_timeout_error, Toast.LENGTH_LONG).show();
-                }
-                //another error I wasn't expecting
-                else{
-                    t.printStackTrace();
-                    Toast.makeText(getContext(), R.string.unknown_error + t.getMessage(), Toast.LENGTH_LONG).show();
-                }
-                //hide progress bar and reset opacity of everything else
-                progressBar.setVisibility(View.GONE);
-                mainContent.setAlpha(1.0f);
-            }
-        }, ContextCompat.getMainExecutor(this.requireContext()));
+//        Futures.addCallback(recipeId, new FutureCallback<Integer>() {
+//            @Override
+//            public void onSuccess(@Nullable Integer recipeId) {
+//                //if recipe loading failed, display error message
+//                if(recipeId == null || recipeId == -1){
+//                    Toast.makeText(getContext(), requireContext().getString(R.string.recipe_url_error),Toast.LENGTH_LONG).show();
+//                }
+//                //otherwise, navigate to editor for the new recipe
+//                else{
+//                    CreateRecipeFragmentDirections.ActionCreateRecipeToViewRecipe action =
+//                            CreateRecipeFragmentDirections.actionCreateRecipeToViewRecipe();
+//
+//                    //pass id of newly created recipe
+//                    action.setRecipeId(recipeId);
+//
+//                    //navigate
+//                    Navigation.findNavController(root).navigate(action);
+//                    //hide progress bar and reset opacity of everything else
+//                    progressBar.setVisibility(View.GONE);
+//                    mainContent.setAlpha(1.0f);
+//                }
+//            }
+//            //respond to differenct potential errors
+//            @Override
+//            public void onFailure(Throwable t) {
+//                //the url entered was not valid for some reason
+//                if (t instanceof InvalidRecipeUrlExeception){
+//                    Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+//                }
+//                //the thread processing this was interrupted
+//                else if (t instanceof ExecutionException) {
+//                    t.printStackTrace();
+//                    Toast.makeText(getContext(), R.string.recipe_url_timeout_error, Toast.LENGTH_LONG).show();
+//                }
+//                //another error I wasn't expecting
+//                else{
+//                    t.printStackTrace();
+//                    Toast.makeText(getContext(), R.string.unknown_error + t.getMessage(), Toast.LENGTH_LONG).show();
+//                }
+//                //hide progress bar and reset opacity of everything else
+//                progressBar.setVisibility(View.GONE);
+//                mainContent.setAlpha(1.0f);
+//            }
+//        }, ContextCompat.getMainExecutor(this.requireContext()));
     }
 
     @Override
@@ -192,10 +192,10 @@ public class CreateRecipeFragment extends Fragment {
 
             //check if we need to redirect to a recipe, and if so, go back to recipe list so we
             //can navigate to the desired recipe
-            if(null != recipesViewModel.getNavigateToRecipeId()){
-                activity.onBackPressed();
-                activity.onBackPressed();
-            }
+//    todo        if(null != recipesViewModel.getNavigateToRecipeId()){
+//                activity.onBackPressed();
+//                activity.onBackPressed();
+//            }
         }
 
         //set title of page

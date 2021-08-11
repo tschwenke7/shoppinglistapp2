@@ -14,6 +14,7 @@ import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;
 import com.example.shoppinglistapp2.helpers.SlItemUtils;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -29,7 +30,7 @@ public class SlaRepository {
 
     private final LiveData<List<Recipe>> allRecipes;
     private final LiveData<List<IngListItem>> shoppingListItems;
-    private final LiveData<List<IngListItem>> allMealPlanSlItems;
+//    private final LiveData<List<IngListItem>> allMealPlanSlItems;
 
     public SlaRepository(Context context){
         SlaDatabase db = SlaDatabase.getDatabase(context);
@@ -39,7 +40,7 @@ public class SlaRepository {
         tagDao = db.tagDao();
         mealPlanDao = db.mealPlanDao();
         allRecipes = recipeDao.getAllAlphabetical();
-        allMealPlanSlItems = slItemDao.getAll(SlItemUtils.MEALPLAN_LIST_ID);
+//        allMealPlanSlItems = slItemDao.getAll(SlItemUtils.MEALPLAN_LIST_ID);
         shoppingListItems = ingListItemDao.getAllFromMealPlan(SlItemUtils.SHOPPING_LIST_ID);
     }
 
@@ -156,7 +157,7 @@ public class SlaRepository {
         return SlaDatabase.databaseWriteExecutor.submit(() -> ingredientDao.deleteAll(ingredients));
     }
 
-    public LiveData<List<SlItem>> getSlItems(){
+    public LiveData<List<IngListItem>> getSlItems(){
         return shoppingListItems;
     }
 
@@ -168,10 +169,11 @@ public class SlaRepository {
      * @return an item other than itemToMatch with the same name and checked status,
      * or null if none exist.
      */
-    public SlItem findSlItemWithSameName(int listId, SlItem itemToMatch){
-        Callable<SlItem> queryCallable = () -> slItemDao.getAnotherByName(listId, itemToMatch.getName(), itemToMatch.isChecked(), itemToMatch.getId());
+    public IngListItem findSlItemWithSameName(int listId, IngListItem itemToMatch){
+        Callable<IngListItem> queryCallable = () -> ingListItemDao.getAnotherByName(listId, itemToMatch.getName(), itemToMatch.isChecked(), itemToMatch.getId());
 
-        Future<SlItem> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
+        Future<IngListItem> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
+
         try {
             return future.get();
         } catch (InterruptedException | ExecutionException e1) {
@@ -184,8 +186,8 @@ public class SlaRepository {
         SlaDatabase.databaseWriteExecutor.execute(() -> slItemDao.deleteAll(slItems));
     }
 
-    public Future<Long> insertSlItem(SlItem slItem){
-        Callable<Long> queryCallable = () -> slItemDao.insert(slItem);
+    public ListenableFuture<Long> insertIngListItem(IngListItem slItem){
+        Callable<Long> queryCallable = () -> ingListItemDao.insert(slItem);
         return SlaDatabase.databaseWriteExecutor.submit(queryCallable);
     }
 

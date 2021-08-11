@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
-import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.helpers.RecipeComparators;
 import com.google.android.material.chip.Chip;
@@ -237,16 +236,16 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
                     // as we iterate through the list of ingredients
                     boolean[] found = new boolean[ingredientsToMatch.length];
                     //for each ingredient of the recipe
-                    for(Ingredient ing : recipe.getIngredients()) {
-                        //check its name against all search parameter ingredients which haven't yet been found
-                        int i = 0;
-                        while(i < ingredientsToMatch.length && !isAllTrue(found)){
-                            if (!found[i] && ing.getName().toLowerCase().contains(ingredientsToMatch[i])) {
-                                found[i] = true;
-                            }
-                            i++;
-                        }
-                    }
+//                    for(Ingredient ing : recipe.getIngredients()) {
+//                        //check its name against all search parameter ingredients which haven't yet been found
+//                        int i = 0;
+//                        while(i < ingredientsToMatch.length && !isAllTrue(found)){
+//                            if (!found[i] && ing.getName().toLowerCase().contains(ingredientsToMatch[i])) {
+//                                found[i] = true;
+//                            }
+//                            i++;
+//                        }
+//                    }
                     //if we found all search parameter ingredients, then add this to the list
                     if (isAllTrue((found))) {
                         filteredList.add(recipe);

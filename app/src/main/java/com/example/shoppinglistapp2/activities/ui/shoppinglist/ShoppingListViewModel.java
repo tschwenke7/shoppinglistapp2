@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.example.shoppinglistapp2.db.SlaRepository;
+import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Ingredient;
 import com.example.shoppinglistapp2.db.tables.SlItem;
 import com.example.shoppinglistapp2.helpers.SlItemUtils;
@@ -16,25 +17,21 @@ import java.util.concurrent.ExecutionException;
 
 public class ShoppingListViewModel extends AndroidViewModel {
     private final SlaRepository slaRepository;
-    private final LiveData<List<SlItem>> allItems;
+    private final LiveData<List<IngListItem>> slItems;
 
     public ShoppingListViewModel(@NonNull Application application) {
         super(application);
         slaRepository = new SlaRepository(application);
-        allItems = slaRepository.getSlItems();
+        slItems = slaRepository.getSlItems();
     }
 
-    public LiveData<List<SlItem>> getAllItems() {
-        return allItems;
+    public LiveData<List<IngListItem>> getSlItems() {
+        return slItems;
     }
 
-    public void deleteSlItems(SlItem... slItems){
-        slaRepository.deleteSlItems(slItems);
-    }
-
-    private void insertOrMergeItem(int listId, SlItem newItem){
+    private void insertOrMergeItem(int listId, IngListItem newItem){
         //attempt to find an existing item with the same name
-        SlItem existingItemWithSameName = slaRepository.findSlItemWithSameName(listId, newItem);
+        IngListItem existingItemWithSameName = slaRepository.findSlItemWithSameName(listId, newItem);
 
         //if none found, just insert
         if(null == existingItemWithSameName){
@@ -42,7 +39,7 @@ public class ShoppingListViewModel extends AndroidViewModel {
                 //calling "get()" forces the insert to have completed before checking if the next item
                 //is already on the list
                 newItem.setListId(listId);
-                slaRepository.insertSlItem(newItem).get();
+                slaRepository.insertIngListItem(newItem).get();
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
@@ -72,7 +69,7 @@ public class ShoppingListViewModel extends AndroidViewModel {
      * @param position - the position of the item to toggle
      */
     public void toggleChecked(int position) {
-        SlItem item = allItems.getValue().get(position);
+        SlItem item = slItems.getValue().get(position);
         item.setChecked(!item.isChecked());
         slaRepository.deleteSlItems(item);
         insertOrMergeItem(item.getListId(), item);
@@ -132,7 +129,7 @@ public class ShoppingListViewModel extends AndroidViewModel {
     public String  getAllItemsAsString() {
         try{
             StringBuilder builder = new StringBuilder();
-            for (SlItem item : allItems.getValue()){
+            for (SlItem item : slItems.getValue()){
                 builder.append(item.toString());
                 builder.append("\n");
             }

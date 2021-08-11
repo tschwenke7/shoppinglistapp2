@@ -9,7 +9,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,11 +25,9 @@ import android.widget.Toast;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
-import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragmentDirections;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListAdapter;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListViewModel;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
-import com.example.shoppinglistapp2.db.tables.SlItem;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 
 import org.jetbrains.annotations.NotNull;
@@ -252,7 +249,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     @Override
     public void onChooseRecipeClicked(int position) {
         //notify the viewmodel we are wanting to find a recipe for the specified mealplan
-        recipesViewModel.setSelectingForMeal(mealPlanViewModel.getMealPlans().getValue().get(position));
+//todo        recipesViewModel.setSelectingForMeal(mealPlanViewModel.getMealPlans().getValue().get(position));
 
         //navigate to recipes tab
         callback.setViewpagerTo(1);
@@ -262,17 +259,17 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     public void onRecipeClicked(int position) {
         //set id of recipe to navigate to, then change viewpager to recipe tab
         //with a value set, the recipe list will redirect to this recipe automatically
-        recipesViewModel.setNavigateToRecipeId(mealPlanViewModel.getMealPlans().getValue().get(position).getRecipeId());
-        callback.setViewpagerTo(1);
+//        recipesViewModel.setNavigateToRecipeId(mealPlanViewModel.getMealPlans().getValue().get(position).getRecipeId());
+//        callback.setViewpagerTo(1);
     }
 
     @Override
     public void onRemoveRecipeClicked(int position) {
-        MealPlan mealPlan = mealPlanViewModel.getMealPlans().getValue().get(position);
-        //remove the recipe from the meal plan slot
-        mealPlanViewModel.removeRecipe(mealPlan);
-        //remove all ingredients from this recipe from the "ingredients needed" list
-        recipesViewModel.removeIngredientsFromList(mealPlan.getRecipe().getIngredients());
+//        MealPlan mealPlan = mealPlanViewModel.getMealPlans().getValue().get(position);
+//        //remove the recipe from the meal plan slot
+//        mealPlanViewModel.removeRecipe(mealPlan);
+//        //remove all ingredients from this recipe from the "ingredients needed" list
+//        recipesViewModel.removeIngredientsFromList(mealPlan.getRecipe().getIngredients());
     }
 
     @Override
@@ -292,7 +289,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     @Override
     public void onSlItemClick(int position) {
-        recipesViewModel.toggleChecked(mealPlanViewModel.getAllMealPlanSlItems().getValue().get(position));
+//        recipesViewModel.toggleChecked(mealPlanViewModel.getAllMealPlanSlItems().getValue().get(position));
     }
 
     @Override

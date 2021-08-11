@@ -122,7 +122,7 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
 
             /* set day name */
             TextView dayTitle = itemView.findViewById(R.id.day_title);
-            dayTitle.setText(mealPlan.getDayTitle());
+//            dayTitle.setText(mealPlan.getDayTitle());
 
             /* Listen for click on day name for editing */
             View confirmDayTitle = itemView.findViewById(R.id.edit_day_title_confirm);
@@ -167,101 +167,101 @@ public class MealPlanListAdapter extends RecyclerView.Adapter<MealPlanListAdapte
             });
 
             /* set recipe details if provided - otherwise hide recipe cardview */
-            if (null != mealPlan.getRecipe()){
-                chooseRecipeButton.setVisibility(View.GONE);
-                cardView.setVisibility(View.VISIBLE);
-
-                Recipe recipe = mealPlan.getRecipe();
-                //recipe name
-                ((TextView) cardView.findViewById(R.id.recipe_title)).setText(recipe.getName());
-
-                //set prep and cook times
-                String timeUnit = itemView.getContext().getString(R.string.abbreviated_time_unit);
-                TextView prepTimeView = itemView.findViewById(R.id.edit_text_prep_time);
-                if(0 != recipe.getPrepTime()){
-                    prepTimeView.setText(String.format("%d %s",recipe.getPrepTime(), timeUnit));
-                }
-                else{
-                    prepTimeView.setText("-");
-                }
-                TextView cookTimeView = itemView.findViewById(R.id.cook_time);
-                if(0 != recipe.getCookTime()){
-                    cookTimeView.setText(String.format("%d %s",recipe.getCookTime(),timeUnit));
-                }
-                else{
-                    cookTimeView.setText("-");
-                }
-            }
-            else{
-                cardView.setVisibility(View.GONE);
-                chooseRecipeButton.setVisibility(View.VISIBLE);
-            }
-
-            // set click listener for recipe
-            cardView.setOnClickListener(v -> mealPlanClickListener.onRecipeClicked(getAdapterPosition()));
-            // set click listener for choose recipe button
-            chooseRecipeButton
-                    .setOnClickListener(v -> mealPlanClickListener.onChooseRecipeClicked(getAdapterPosition()));
-            //set click listener for delete recipe icon
-            itemView.findViewById(R.id.delete_icon)
-                    .setOnClickListener(v -> mealPlanClickListener.onRemoveRecipeClicked(getAdapterPosition()));
-
-            /* set notes if provided, and edit notes listeners */
-            //set values of notes
-            if (mealPlan.getNotes() != null) {
-                notesView.setText(mealPlan.getNotes());
-
-                notesView.setVisibility(View.VISIBLE);
-                addNotesButton.setVisibility(View.GONE);
-            }
-            else{
-                notesView.setVisibility(View.GONE);
-                addNotesButton.setVisibility(View.VISIBLE);
-            }
-
-            //set listener for notes clicked to enable save button
-            View confirmNotes = itemView.findViewById(R.id.edit_notes_confirm);//button to click to save notes
-            View deleteNotes = itemView.findViewById(R.id.delete_notes);//button to click to delete notes
-            notesView.setOnTouchListener((v, event) -> {
-                if (MotionEvent.ACTION_UP == event.getAction()) {
-                    confirmNotes.setVisibility(View.VISIBLE);
-                    deleteNotes.setVisibility(View.VISIBLE);
-                }
-                return false;
-            });
-
-            confirmNotes.setOnClickListener((view) -> {
-                mealPlanClickListener.onNotesConfirmClicked(getAdapterPosition(), notesView.getText().toString());
-                confirmNotes.setVisibility(View.GONE);
-                deleteNotes.setVisibility(View.GONE);
-                notesView.clearFocus();
-            });
-
-            deleteNotes.setOnClickListener((view) -> {
-                mealPlanClickListener.onDeleteNotesClicked(getAdapterPosition());
-                notesView.clearFocus();
-                notesView.setVisibility(View.GONE);
-                confirmNotes.setVisibility(View.GONE);
-                deleteNotes.setVisibility(View.GONE);
-                addNotesButton.setVisibility(View.VISIBLE);
-                plusIcon.setVisibility(View.VISIBLE);
-            });
-
-            //listen to add notes button
-            addNotesButton.setOnClickListener((view) -> {
-                addNotesButton.setVisibility(View.GONE);
-                notesView.setVisibility(View.VISIBLE);
-
-                //if recipe and notes are both provided, we can remove the plus icon too
-                if(chooseRecipeButton.getVisibility() == View.GONE && addNotesButton.getVisibility() == View.GONE){
-                    itemView.findViewById(R.id.plus_icon).setVisibility(View.GONE);
-                }
-            });
-
-            //if recipe and notes are both provided, we can remove the plus icon too
-            if(chooseRecipeButton.getVisibility() == View.GONE && addNotesButton.getVisibility() == View.GONE){
-                itemView.findViewById(R.id.plus_icon).setVisibility(View.GONE);
-            }
+//            if (null != mealPlan.getRecipe()){
+//                chooseRecipeButton.setVisibility(View.GONE);
+//                cardView.setVisibility(View.VISIBLE);
+//
+//                Recipe recipe = mealPlan.getRecipe();
+//                //recipe name
+//                ((TextView) cardView.findViewById(R.id.recipe_title)).setText(recipe.getName());
+//
+//                //set prep and cook times
+//                String timeUnit = itemView.getContext().getString(R.string.abbreviated_time_unit);
+//                TextView prepTimeView = itemView.findViewById(R.id.edit_text_prep_time);
+//                if(0 != recipe.getPrepTime()){
+//                    prepTimeView.setText(String.format("%d %s",recipe.getPrepTime(), timeUnit));
+//                }
+//                else{
+//                    prepTimeView.setText("-");
+//                }
+//                TextView cookTimeView = itemView.findViewById(R.id.cook_time);
+//                if(0 != recipe.getCookTime()){
+//                    cookTimeView.setText(String.format("%d %s",recipe.getCookTime(),timeUnit));
+//                }
+//                else{
+//                    cookTimeView.setText("-");
+//                }
+//            }
+//            else{
+//                cardView.setVisibility(View.GONE);
+//                chooseRecipeButton.setVisibility(View.VISIBLE);
+//            }
+//
+//            // set click listener for recipe
+//            cardView.setOnClickListener(v -> mealPlanClickListener.onRecipeClicked(getAdapterPosition()));
+//            // set click listener for choose recipe button
+//            chooseRecipeButton
+//                    .setOnClickListener(v -> mealPlanClickListener.onChooseRecipeClicked(getAdapterPosition()));
+//            //set click listener for delete recipe icon
+//            itemView.findViewById(R.id.delete_icon)
+//                    .setOnClickListener(v -> mealPlanClickListener.onRemoveRecipeClicked(getAdapterPosition()));
+//
+//            /* set notes if provided, and edit notes listeners */
+//            //set values of notes
+//            if (mealPlan.getNotes() != null) {
+//                notesView.setText(mealPlan.getNotes());
+//
+//                notesView.setVisibility(View.VISIBLE);
+//                addNotesButton.setVisibility(View.GONE);
+//            }
+//            else{
+//                notesView.setVisibility(View.GONE);
+//                addNotesButton.setVisibility(View.VISIBLE);
+//            }
+//
+//            //set listener for notes clicked to enable save button
+//            View confirmNotes = itemView.findViewById(R.id.edit_notes_confirm);//button to click to save notes
+//            View deleteNotes = itemView.findViewById(R.id.delete_notes);//button to click to delete notes
+//            notesView.setOnTouchListener((v, event) -> {
+//                if (MotionEvent.ACTION_UP == event.getAction()) {
+//                    confirmNotes.setVisibility(View.VISIBLE);
+//                    deleteNotes.setVisibility(View.VISIBLE);
+//                }
+//                return false;
+//            });
+//
+//            confirmNotes.setOnClickListener((view) -> {
+//                mealPlanClickListener.onNotesConfirmClicked(getAdapterPosition(), notesView.getText().toString());
+//                confirmNotes.setVisibility(View.GONE);
+//                deleteNotes.setVisibility(View.GONE);
+//                notesView.clearFocus();
+//            });
+//
+//            deleteNotes.setOnClickListener((view) -> {
+//                mealPlanClickListener.onDeleteNotesClicked(getAdapterPosition());
+//                notesView.clearFocus();
+//                notesView.setVisibility(View.GONE);
+//                confirmNotes.setVisibility(View.GONE);
+//                deleteNotes.setVisibility(View.GONE);
+//                addNotesButton.setVisibility(View.VISIBLE);
+//                plusIcon.setVisibility(View.VISIBLE);
+//            });
+//
+//            //listen to add notes button
+//            addNotesButton.setOnClickListener((view) -> {
+//                addNotesButton.setVisibility(View.GONE);
+//                notesView.setVisibility(View.VISIBLE);
+//
+//                //if recipe and notes are both provided, we can remove the plus icon too
+//                if(chooseRecipeButton.getVisibility() == View.GONE && addNotesButton.getVisibility() == View.GONE){
+//                    itemView.findViewById(R.id.plus_icon).setVisibility(View.GONE);
+//                }
+//            });
+//
+//            //if recipe and notes are both provided, we can remove the plus icon too
+//            if(chooseRecipeButton.getVisibility() == View.GONE && addNotesButton.getVisibility() == View.GONE){
+//                itemView.findViewById(R.id.plus_icon).setVisibility(View.GONE);
+//            }
         }
     }
 

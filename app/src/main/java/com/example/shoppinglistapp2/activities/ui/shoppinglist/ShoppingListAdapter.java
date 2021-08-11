@@ -12,12 +12,13 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
-import com.example.shoppinglistapp2.db.tables.SlItem;
+import com.example.shoppinglistapp2.db.tables.IngListItem;
 
 import java.util.List;
 
+
 public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewHolder> {
-    private List<SlItem> items;
+    private List<IngListItem> items;
     private final SlItemClickListener slItemClickListener;
 
     public ShoppingListAdapter(SlItemClickListener slItemClickListener){
@@ -34,7 +35,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        SlItem current = getItem(position);
+        IngListItem current = getItem(position);
         holder.bind(current);
     }
 
@@ -46,14 +47,14 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         return 0;
     }
 
-    public SlItem getItem(int position){
+    public IngListItem getItem(int position){
         if(null != items){
             return items.get(position);
         }
         return null;
     }
 
-    public void setItems(List<SlItem> newItems) {
+    public void setItems(List<IngListItem> newItems) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SlItemDiff(newItems, items));
         diffResult.dispatchUpdatesTo(this);
         this.items = newItems;
@@ -69,7 +70,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
             this.slItemClickListener = slItemClickListener;
         }
 
-        public void bind (SlItem item){
+        public void bind (IngListItem item){
             TextView textView = (TextView) itemView.findViewById(R.id.item_name);
             View editItemContainer = itemView.findViewById(R.id.edit_item_container);
             EditText editText = itemView.findViewById(R.id.edit_text_item_name);
@@ -113,10 +114,10 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
     }
 
     private class SlItemDiff extends DiffUtil.Callback {
-        List<SlItem> newList;
-        List<SlItem> oldList;
+        List<IngListItem> newList;
+        List<IngListItem> oldList;
 
-        public SlItemDiff(List<SlItem> newList, List<SlItem> oldList) {
+        public SlItemDiff(List<IngListItem> newList, List<IngListItem> oldList) {
             this.newList = newList;
             this.oldList = oldList;
         }
@@ -144,19 +145,15 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
         @Override
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            SlItem newItem = newList.get(newItemPosition);
-            SlItem oldItem = oldList.get(oldItemPosition);
+            IngListItem newItem = newList.get(newItemPosition);
+            IngListItem oldItem = oldList.get(oldItemPosition);
 
-            return
-                newItem.isChecked() == oldItem.isChecked()
-                && newItem.getQty1() == oldItem.getQty1()
-                && newItem.getQty2() == (oldItem.getQty2())
-                && newItem.getName().equals(oldItem.getName());
+            return newItem.equals(oldItem);
         }
     }
 
     public interface SlItemClickListener {
         void onSlItemClick(int position);
-        void onSlItemEditConfirm(SlItem oldItem, String newItemString);
+        void onSlItemEditConfirm(IngListItem oldItem, String newItemString);
     }
 }

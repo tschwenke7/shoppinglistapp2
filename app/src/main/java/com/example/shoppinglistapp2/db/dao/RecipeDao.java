@@ -7,6 +7,7 @@ import androidx.room.Transaction;
 
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.relations.RecipeWithIngredients;
+import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
 
 import java.util.List;
 
@@ -29,8 +30,12 @@ public interface RecipeDao extends BaseDao<Recipe> {
     void deleteEverything();
 
     @Transaction
-    @Query("SELECT * FROM recipes ORDER BY name ASC")
+    @Query("SELECT * FROM recipes ORDER BY recipes.name ASC")
     LiveData<List<RecipeWithIngredients>> getAllWithIngLists();
+
+    @Transaction
+    @Query("SELECT * FROM recipes ORDER BY recipes.name ASC")
+    LiveData<List<RecipeWithTagsAndIngredients>> getAllWithTagsAndIngLists();
 
     @Transaction
     @Query("SELECT * FROM recipes WHERE id = :id")
