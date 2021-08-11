@@ -13,6 +13,9 @@ public class IngListItemUtils {
     private static DecimalFormat twodp = new DecimalFormat("#.##");
     private static DecimalFormat zerodp = new DecimalFormat("#");
 
+    public static final int MEALPLAN_LIST_ID = 1;
+    public static final int SHOPPING_LIST_ID = 0;
+
     private static final List<String> unitsOfMeasurement = Arrays.asList(
             "cup",
 //            "cups",
@@ -418,6 +421,100 @@ public class IngListItemUtils {
                     ingredient.setMassUnit("g");
                 }
                 break;
+        }
+    }
+
+    /**
+     * Adds the quantities from itemToMerge into itemToKeep
+     * @param itemToKeep - the item to contain the quantities of both items after merging
+     * @param itemToMerge - the item whose quantities to transfer into the itemToKeep
+     */
+    public static void mergeQuantities(IngListItem itemToKeep, IngListItem itemToMerge){
+        /* whole unit quantities */
+        itemToKeep.setWholeItemQty(itemToKeep.getWholeItemQty() + itemToKeep.getWholeItemQty());
+
+        /* mass quantities */
+        //if itemToKeep has no mass qty, simply transfer in itemToMerge's
+        if (itemToKeep.getMassQty() == 0){
+            itemToKeep.setMassQty(itemToMerge.getMassQty());
+            itemToKeep.setMassUnit(itemToMerge.getMassUnit());
+        }
+        //if it does have a mass qty...
+        else {
+            //check if itemToMerge actually has something to merge here
+            if(itemToMerge.getMassQty() != 0){
+                //get the mass in grams for both items
+                double keepGrams = convertToGrams(itemToKeep.getMassQty(), itemToKeep.getMassUnit());
+                double mergeGrams = convertToGrams(itemToMerge.getMassQty(), itemToMerge.getMassUnit());
+                double combined = keepGrams + mergeGrams;
+                //convert to kg if over 1000g
+                if (combined >= 1000){
+                    //round to (up to) two decimal places
+                    combined = Double.parseDouble(twodp.format(combined / 1000));
+                    itemToKeep.setMassUnit("kg");
+                }
+                else{
+                    itemToKeep.setMassUnit("g");
+                }
+                itemToKeep.setMassQty(combined);
+            }
+        }
+
+        /* Volume quantities */
+        //if itemToKeep has no volume qty, simply transfer in itemToMerge's
+        if (itemToKeep.getVolumeQty() == 0){
+            itemToKeep.setVolumeQty(itemToMerge.getVolumeQty());
+            itemToKeep.setVolumeUnit(itemToMerge.getVolumeUnit());
+        }
+        //if it does have a volume qty...
+        else {
+            //check if itemToMerge actually has something to merge here
+            if(itemToMerge.getMassQty() != 0){
+                //if the units are the same, simply add the quantities
+                if(itemToKeep.getVolumeUnit().equals(itemToMerge.getVolumeUnit())){
+                    itemToKeep.setVolumeQty(itemToKeep.getVolumeQty() + itemToMerge.getVolumeQty());
+                }
+                //otherwise, convert to mL and combine
+                else{
+                    double keepMl = convertToMl(itemToKeep.getVolumeQty(), itemToKeep.getVolumeUnit());
+                    double mergeMl = convertToMl(itemToMerge.getVolumeQty(), itemToMerge.getVolumeUnit());
+                    double combined = keepMl + mergeMl;
+
+                    //convert to L if > 1000mL
+                    if(combined >= 1000) {
+                        //round to (up to) two decimal places
+                        combined = Double.parseDouble(twodp.format(combined / 1000));
+                        itemToKeep.setVolumeUnit("L");
+                    }
+                    else{
+                        itemToKeep.setVolumeUnit("mL");
+                    }
+                    itemToKeep.setVolumeQty(combined);
+                }
+            }
+        }
+    }
+
+    private static double convertToGrams(double qty, String unit){
+        if ("kg".equals(unit)) {
+            return qty * 1000;
+        }
+        return qty;
+    }
+
+    private static double convertToMl(double qty, String unit){
+        switch (unit){
+            case "L":
+                return qty * 1000;
+            case "cups":
+            case "cup":
+                return qty * 250;
+            case "tbsp":
+                return qty * 15;
+            case "tsp":
+                return qty * 5;
+            default:
+                return qty;
         }
     }
 }
