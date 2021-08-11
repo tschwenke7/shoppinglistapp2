@@ -8,9 +8,7 @@ import androidx.lifecycle.LiveData;
 
 import com.example.shoppinglistapp2.db.SlaRepository;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
-import com.example.shoppinglistapp2.db.tables.Ingredient;
-import com.example.shoppinglistapp2.db.tables.SlItem;
-import com.example.shoppinglistapp2.helpers.SlItemUtils;
+import com.example.shoppinglistapp2.helpers.IngListItemUtils;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -29,9 +27,9 @@ public class ShoppingListViewModel extends AndroidViewModel {
         return slItems;
     }
 
-    private void insertOrMergeItem(int listId, IngListItem newItem){
+    private void insertOrMergeItem(long listId, IngListItem newItem){
         //attempt to find an existing item with the same name
-        IngListItem existingItemWithSameName = slaRepository.findSlItemWithSameName(listId, newItem);
+        IngListItem existingItemWithSameName = slaRepository.findIngListItemWithSameName(listId, newItem);
 
         //if none found, just insert
         if(null == existingItemWithSameName){
@@ -47,21 +45,21 @@ public class ShoppingListViewModel extends AndroidViewModel {
         }
         //if one was found, merge their quantities then persist the change
         else{
-            SlItemUtils.mergeQuantities(existingItemWithSameName, newItem);
-            slaRepository.updateSlItems(existingItemWithSameName);
+            IngListItemUtils.mergeQuantities(existingItemWithSameName, newItem);
+            slaRepository.updateIngListItem(existingItemWithSameName);
         }
     }
 
-    public void updateSlItem(SlItem slItem){
-        slaRepository.updateSlItems(slItem);
+    public void updateIngListItem(IngListItem ingListItem){
+        slaRepository.updateIngListItem(ingListItem);
     }
 
     public void deleteCheckedSlItems(){
-        slaRepository.deleteCheckedSlItems(SlItemUtils.SHOPPING_LIST_ID);
+        slaRepository.deleteCheckedIngListItems(IngListItemUtils.SHOPPING_LIST_ID);
     }
 
-    public void deleteAllSlItems(){
-        slaRepository.deleteAllSlItems(SlItemUtils.SHOPPING_LIST_ID);
+    public void clearShoppingList(){
+        slaRepository.deleteAllIngListItems(IngListItemUtils.SHOPPING_LIST_ID);
     }
 
     /**
@@ -69,9 +67,9 @@ public class ShoppingListViewModel extends AndroidViewModel {
      * @param position - the position of the item to toggle
      */
     public void toggleChecked(int position) {
-        SlItem item = slItems.getValue().get(position);
+        IngListItem item = slItems.getValue().get(position);
         item.setChecked(!item.isChecked());
-        slaRepository.deleteSlItems(item);
+        slaRepository.deleteIngListItem(item);
         insertOrMergeItem(item.getListId(), item);
     }
 
@@ -82,54 +80,45 @@ public class ShoppingListViewModel extends AndroidViewModel {
         //convert each line to an item
         //and either add it or merge it with an existing item of same name
         for (String item : items){
-            insertOrMergeItem(SlItemUtils.SHOPPING_LIST_ID, SlItemUtils.toSlItem(item.trim()));
+            insertOrMergeItem(IngListItemUtils.SHOPPING_LIST_ID, IngListItemUtils.toIngListItem(item.trim()));
         }
     }
 
-    public void addIngredientsToShoppingList(List<Ingredient> ingredients){
-        //for each ingredient, convert it to an SLItem
-        //either add that item if it's new, or merge qtys if it already existed
-        for (Ingredient ingredient : ingredients){
-            SlItem item = SlItemUtils.toSlItem(ingredient);
-            insertOrMergeItem(SlItemUtils.SHOPPING_LIST_ID, item);
+    public void addItemsToShoppingList(List<IngListItem> ingListItems) {
+        for (IngListItem item : ingListItems){
+            insertOrMergeItem(IngListItemUtils.SHOPPING_LIST_ID, item);
         }
     }
 
-    public void addItemsToShoppingList(List<SlItem> slItems) {
-        for (SlItem item : slItems){
-            insertOrMergeItem(SlItemUtils.SHOPPING_LIST_ID, new SlItem(item));
-        }
-    }
-
-    public void editItem(SlItem oldItem, String newItemString) {
+    public void editItem(IngListItem oldItem, String newItemString) {
         //convert user's string to a new item
-        SlItem newItem = SlItemUtils.toSlItem(newItemString);
-
-        //copy values across
-        oldItem.setQty1(newItem.getQty1());
-        oldItem.setUnit1(newItem.getUnit1());
-        oldItem.setName(newItem.getName());
+        IngListItem newItem = IngListItemUtils.toIngListItem(newItemString);
 
         //if name of ingredient has been changed to one which already exists,
         //we need to merge it with an existing item.
         //therefore, we delete the old item and then merge the modified one in.
-        SlItem existingItemWithSameName = slaRepository.findSlItemWithSameName(oldItem.getListId(), oldItem);
+        IngListItem existingItemWithSameName = slaRepository.findIngListItemWithSameName(oldItem.getListId(), oldItem);
         if (null != existingItemWithSameName){
-            slaRepository.deleteSlItems(oldItem);
-            SlItemUtils.mergeQuantities(existingItemWithSameName, newItem);
-            slaRepository.updateSlItems(existingItemWithSameName);
+            slaRepository.deleteIngListItem(oldItem);
+            IngListItemUtils.mergeQuantities(existingItemWithSameName, newItem);
+            slaRepository.updateIngListItem(existingItemWithSameName);
         }
 
-        //if it wasn't changed to an existing item, simply update this item in the db
+        //if it wasn't changed to an existing item, simply update the original item in the db
         else{
-            slaRepository.updateSlItems(oldItem);
+            //copy identifying values over from oldItem to new item, then update it in the db
+            //to overwrite all other values of oldItem
+            newItem.setId(oldItem.getId());
+            newItem.setListId(oldItem.getListId());
+            newItem.setChecked(oldItem.isChecked());
+            slaRepository.updateIngListItem(oldItem);
         }
     }
 
-    public String  getAllItemsAsString() {
+    public String getAllItemsAsString() {
         try{
             StringBuilder builder = new StringBuilder();
-            for (SlItem item : slItems.getValue()){
+            for (IngListItem item : slItems.getValue()){
                 builder.append(item.toString());
                 builder.append("\n");
             }

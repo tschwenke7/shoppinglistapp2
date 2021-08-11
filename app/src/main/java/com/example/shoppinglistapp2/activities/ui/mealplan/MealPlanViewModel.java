@@ -9,18 +9,18 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import com.example.shoppinglistapp2.db.SlaRepository;
+import com.example.shoppinglistapp2.db.tables.IngListItem;
+import com.example.shoppinglistapp2.db.tables.Meal;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
-import com.example.shoppinglistapp2.db.tables.SlItem;
-import com.example.shoppinglistapp2.helpers.SlItemUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MealPlanViewModel extends AndroidViewModel {
     /** Mealplans with recipes populated (when possible) */
-    private final MutableLiveData<List<MealPlan>> allMealPlans = new MutableLiveData<>();
-    private final LiveData<List<SlItem>> allMealPlanSlItems;
+    private final MutableLiveData<List<Meal>> allMealPlans = new MutableLiveData<>();
+    private final LiveData<List<IngListItem>> allMealPlanSlItems;
     private final SlaRepository slaRepository;
 
     private Observer<List<MealPlan>> mealPlanObserver = mealPlans -> {
@@ -47,7 +47,7 @@ public class MealPlanViewModel extends AndroidViewModel {
         return allMealPlans;
     }
 
-    public LiveData<List<SlItem>> getAllMealPlanSlItems() {
+    public LiveData<List<IngListItem>> getAllMealPlanSlItems() {
         return allMealPlanSlItems;
     }
 
@@ -60,7 +60,7 @@ public class MealPlanViewModel extends AndroidViewModel {
         Integer recipeId = mealPlan.getRecipeId();
         if (null != recipeId){
             Recipe recipe = slaRepository.getRecipeById(recipeId);
-            recipe.setIngredients(slaRepository.getIngredientsByRecipeIdNonLive(recipeId));
+            recipe.setIngredients(slaRepository.getIngListItemsByRecipeIdNonLive(recipeId));
             mealPlan.setRecipe(recipe);
         }
 
@@ -99,7 +99,7 @@ public class MealPlanViewModel extends AndroidViewModel {
 
     public void resetMealPlan(){
         //delete all days of this meal plan
-        slaRepository.deleteAllMealPlans(1);
+        slaRepository.deleteAllMeals(1);
         //clear ingredient list
         slaRepository.deleteAllSlItems(SlItemUtils.MEALPLAN_LIST_ID);
     }

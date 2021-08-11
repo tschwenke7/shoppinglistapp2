@@ -30,4 +30,7 @@ public interface MealDao extends BaseDao<Meal> {
 
     @Query("SELECT * FROM meals WHERE id = :id")
     Meal getById(int id);
+
+    @Query("DELETE FROM meals WHERE plan_id = :planId")
+    void deleteAllWithPlanId(int planId);
 }

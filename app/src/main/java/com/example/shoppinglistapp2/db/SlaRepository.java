@@ -10,10 +10,11 @@ import com.example.shoppinglistapp2.db.dao.MealPlanDao;
 import com.example.shoppinglistapp2.db.dao.RecipeDao;
 import com.example.shoppinglistapp2.db.dao.TagDao;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
+import com.example.shoppinglistapp2.db.tables.Meal;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;
-import com.example.shoppinglistapp2.helpers.SlItemUtils;
+import com.example.shoppinglistapp2.helpers.IngListItemUtils;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.List;
@@ -41,7 +42,7 @@ public class SlaRepository {
         mealPlanDao = db.mealPlanDao();
         allRecipes = recipeDao.getAllAlphabetical();
 //        allMealPlanSlItems = slItemDao.getAll(SlItemUtils.MEALPLAN_LIST_ID);
-        shoppingListItems = ingListItemDao.getAllFromMealPlan(SlItemUtils.SHOPPING_LIST_ID);
+        shoppingListItems = ingListItemDao.getAllFromMealPlan(IngListItemUtils.SHOPPING_LIST_ID);
     }
 
     public LiveData<List<Recipe>> getAllRecipes(){
@@ -65,24 +66,17 @@ public class SlaRepository {
         return rowId;
     }
 
-    public void insertIngredient(final Ingredient... ingredients){
-        SlaDatabase.databaseWriteExecutor.execute(() -> {
-            ingredientDao.insertAll(ingredients);
-        });
+    public void insertIngListItems(List<IngListItem> ingListItems) {
+        SlaDatabase.databaseWriteExecutor.execute(() -> ingListItemDao.insertAll(ingListItems));
     }
 
-    public void insertIngredients(List<Ingredient> ingredients) {
-        SlaDatabase.databaseWriteExecutor.execute(() -> ingredientDao.insertAll(ingredients));
+    public LiveData<List<IngListItem>> getIngredientsByRecipeId(int id){
+        return ingListItemDao.getAllFromRecipe(id);
     }
 
-    public LiveData<List<Ingredient>> getIngredientsByRecipeId(int id){
-        return ingredientDao.getIngredientsByRecipeId(id);
-    }
-
-    public List<Ingredient> getIngredientsByRecipeIdNonLive(int id){
-        Callable<List<Ingredient>> insertCallable = () -> ingredientDao.getIngredientsByRecipeIdNonLive(id);
-
-        Future<List<Ingredient>> future = SlaDatabase.databaseWriteExecutor.submit(insertCallable);
+    public List<IngListItem> getIngListItemsByRecipeIdNonLive(int id){
+        Callable<List<IngListItem>> insertCallable = () -> ingListItemDao.getIngredientsByListIdNonLive(id);
+        Future<List<IngListItem>> future = SlaDatabase.databaseWriteExecutor.submit(insertCallable);
 
         try{
             return future.get();
@@ -93,7 +87,7 @@ public class SlaRepository {
         }
     }
 
-    public void deleteRecipe(Recipe... recipes){
+    public void deleteRecipe(List<Recipe> recipes){
         SlaDatabase.databaseWriteExecutor.execute(() -> {
             recipeDao.deleteAll(recipes);
         });
@@ -127,7 +121,7 @@ public class SlaRepository {
     }
 
     public void updateRecipe(Recipe recipe) {
-        SlaDatabase.databaseWriteExecutor.execute(() -> recipeDao.updateRecipe(recipe));
+        SlaDatabase.databaseWriteExecutor.execute(() -> recipeDao.update(recipe));
     }
 
     public Recipe getRecipeById(int id) {
@@ -149,12 +143,12 @@ public class SlaRepository {
         return recipeDao.getByIdLive(id);
     }
 
-    public void deleteIngredients(Ingredient... ingredients) {
-        SlaDatabase.databaseWriteExecutor.execute(() -> ingredientDao.deleteAll(ingredients));
+    public Future<Integer> deleteIngListItem(IngListItem item){
+        return SlaDatabase.databaseWriteExecutor.submit(() -> ingListItemDao.delete(item));
     }
 
-    public Future<Integer> deleteIngredients(List<Ingredient> ingredients) {
-        return SlaDatabase.databaseWriteExecutor.submit(() -> ingredientDao.deleteAll(ingredients));
+    public Future<Integer> deleteIngListItems(List<IngListItem> ingListItems) {
+        return SlaDatabase.databaseWriteExecutor.submit(() -> ingListItemDao.deleteAll(ingListItems));
     }
 
     public LiveData<List<IngListItem>> getSlItems(){
@@ -169,7 +163,7 @@ public class SlaRepository {
      * @return an item other than itemToMatch with the same name and checked status,
      * or null if none exist.
      */
-    public IngListItem findSlItemWithSameName(int listId, IngListItem itemToMatch){
+    public IngListItem findIngListItemWithSameName(long listId, IngListItem itemToMatch){
         Callable<IngListItem> queryCallable = () -> ingListItemDao.getAnotherByName(listId, itemToMatch.getName(), itemToMatch.isChecked(), itemToMatch.getId());
 
         Future<IngListItem> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
@@ -182,25 +176,21 @@ public class SlaRepository {
         }
     }
 
-    public void deleteSlItems(SlItem... slItems){
-        SlaDatabase.databaseWriteExecutor.execute(() -> slItemDao.deleteAll(slItems));
-    }
-
     public ListenableFuture<Long> insertIngListItem(IngListItem slItem){
         Callable<Long> queryCallable = () -> ingListItemDao.insert(slItem);
         return SlaDatabase.databaseWriteExecutor.submit(queryCallable);
     }
 
-    public void updateSlItems(SlItem... slItems){
-        SlaDatabase.databaseWriteExecutor.execute(() -> slItemDao.update(slItems));
+    public void updateIngListItem(IngListItem item){
+        SlaDatabase.databaseWriteExecutor.execute(() -> ingListItemDao.update(item));
     }
 
-    public void deleteCheckedSlItems(int listId){
-        SlaDatabase.databaseWriteExecutor.execute(() -> slItemDao.clearAllChecked(listId));
+    public void deleteCheckedIngListItems(int listId){
+        SlaDatabase.databaseWriteExecutor.execute(() -> ingListItemDao.clearAllChecked(listId));
     }
 
-    public void deleteAllSlItems(int listId){
-        SlaDatabase.databaseWriteExecutor.execute(() -> slItemDao.clearAll(listId));
+    public void deleteAllIngListItems(int listId){
+        SlaDatabase.databaseWriteExecutor.execute(() -> ingListItemDao.clearAll(listId));
     }
 
     /* "Tag" functions */
@@ -253,9 +243,6 @@ public class SlaRepository {
     }
 
     /* Meal plans */
-    public LiveData<List<MealPlan>> getAllMealPlans(int planId){
-        return mealPlanDao.getAll(planId);
-    }
 
     public void insertMealPlan(MealPlan mealPlan){
         SlaDatabase.databaseWriteExecutor.execute(()-> mealPlanDao.insert(mealPlan));
@@ -265,10 +252,10 @@ public class SlaRepository {
         SlaDatabase.databaseWriteExecutor.execute(()-> mealPlanDao.update(mealPlan));
     }
 
-    public MealPlan getMealPlanById(int id){
-        Callable<MealPlan> queryCallable = () -> mealPlanDao.getById(id);
+    public Meal getMealById(int id){
+        Callable<Meal> queryCallable = () -> mealDao.getById(id);
 
-        Future<MealPlan> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
+        Future<Meal> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
         try {
             return future.get();
         } catch (InterruptedException | ExecutionException e1) {
@@ -277,36 +264,25 @@ public class SlaRepository {
         }
     }
 
-    public LiveData<List<SlItem>> getAllMealPlanSlItems() {
-        return allMealPlanSlItems;
+    public LiveData<List<IngListItem>> getAllMealPlanIngListItems(int mealPlanId) {
+        return ingListItemDao.getAllFromMealPlan(mealPlanId);
     }
 
-    public void deleteAllMealPlans(int planId){
-        SlaDatabase.databaseWriteExecutor.execute(() -> mealPlanDao.deleteAll(planId));
+    public void deleteAllMeals(int planId){
+        SlaDatabase.databaseWriteExecutor.execute(() -> mealDao.deleteAllWithPlanId(planId));
     }
 
     public void clearAllDays(int planId) {
-        SlaDatabase.databaseWriteExecutor.execute(() -> mealPlanDao.clearAllDays(planId));
+        SlaDatabase.databaseWriteExecutor.execute(() -> mealDao.clearAllDays(planId));
     }
 
-    public List<SlItem> getAllUncheckedListItems(int listId) {
-        Callable<List<SlItem>> queryCallable = () -> slItemDao.getAllUncheckedNonLive(listId);
-
-        Future<List<SlItem>> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
-        try {
-            return future.get();
-        } catch (InterruptedException | ExecutionException e1) {
-            e1.printStackTrace();
-            return null;
-        }
+    public ListenableFuture<List<IngListItem>> getAllUncheckedListItems(int listId) {
+        return SlaDatabase.databaseWriteExecutor.submit(
+                () -> ingListItemDao.getAllUncheckedNonLive(listId));
     }
 
-    public void deleteMealPlan(MealPlan mealPlan) {
-        SlaDatabase.databaseWriteExecutor.execute(() -> mealPlanDao.delete(mealPlan));
-    }
-
-    public void updateIngredient(Ingredient ingredient) {
-        SlaDatabase.databaseWriteExecutor.execute(() -> ingredientDao.update(ingredient));
+    public void deleteMeal(Meal meal) {
+        SlaDatabase.databaseWriteExecutor.execute(() -> mealDao.delete(meal));
     }
 
     public Future<List<Long>> insertTags(List<Tag> tags) {

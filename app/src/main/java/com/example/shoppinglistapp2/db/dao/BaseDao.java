@@ -17,11 +17,11 @@ public interface BaseDao<T> {
     int update(T row);
 
     @Update
-    List<Integer> updateAll(List<T> row);
+    int updateAll(List<T> row);
 
     @Delete
     int delete(T row);
 
     @Delete
-    List<Integer> deleteAll(List<T> row);
+    int deleteAll(List<T> row);
 }

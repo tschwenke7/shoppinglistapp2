@@ -27,6 +27,7 @@ import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListAdapter;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListViewModel;
+import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 
@@ -293,7 +294,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     }
 
     @Override
-    public void onSlItemEditConfirm(SlItem oldItem, String newItem) {
+    public void onSlItemEditConfirm(IngListItem oldItem, String newItem) {
 
     }
 

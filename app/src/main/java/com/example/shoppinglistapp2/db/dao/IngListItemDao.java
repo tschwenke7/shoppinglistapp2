@@ -20,7 +20,7 @@ public interface IngListItemDao extends BaseDao<IngListItem> {
     List<IngListItem> getAllUncheckedNonLive(int listId);
 
     @Query("SELECT * FROM ing_list_items WHERE listId = :listId AND name = :name AND checked = :checked AND id != :id")
-    IngListItem getAnotherByName(int listId, String name, boolean checked, int id);
+    IngListItem getAnotherByName(long listId, String name, boolean checked, int id);
 
     @Query("DELETE FROM ing_list_items WHERE listId = :listId AND checked = 1")
     void clearAllChecked(int listId);
@@ -30,4 +30,7 @@ public interface IngListItemDao extends BaseDao<IngListItem> {
 
     @Query("SELECT ing_list_items.id, name,listId, checked, mass_unit, mass_qty, other_qty, other_unit, other_qty, volume_qty, volume_unit, whole_item_qty FROM ing_list INNER JOIN ing_list_items ON ing_list.id = ing_list_items.listId WHERE ing_list.meal_plan_id = :mealPlanId")
     LiveData<List<IngListItem>> getAllFromMealPlan(int mealPlanId);
+
+    @Query("SELECT ing_list_items.id, name,listId, checked, mass_unit, mass_qty, other_qty, other_unit, other_qty, volume_qty, volume_unit, whole_item_qty FROM ing_list INNER JOIN ing_list_items ON ing_list.id = ing_list_items.listId WHERE ing_list.recipe_id = :recipeId")
+    LiveData<List<IngListItem>> getAllFromRecipe(int recipeId);
 }

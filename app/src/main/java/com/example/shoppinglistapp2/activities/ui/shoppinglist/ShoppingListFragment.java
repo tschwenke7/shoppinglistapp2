@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
-import com.example.shoppinglistapp2.db.tables.SlItem;
+import com.example.shoppinglistapp2.db.tables.IngListItem;
 
 public class ShoppingListFragment extends Fragment implements ShoppingListAdapter.SlItemClickListener {
     private ShoppingListViewModel shoppingListViewModel;
@@ -102,7 +102,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                         .setMessage(R.string.clear_list_warning_message)
                         .setPositiveButton(R.string.clear_list_positive_button, (dialogInterface, i) -> {
                             //delete all items from the shopping list
-                            shoppingListViewModel.deleteAllSlItems();
+                            shoppingListViewModel.clearShoppingList();
                         })
                         //otherwise don't do anything
                         .setNegativeButton(R.string.clear_list_negative_button, null)
@@ -140,7 +140,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
     }
 
     @Override
-    public void onSlItemEditConfirm(SlItem oldItem, String newItemString) {
+    public void onSlItemEditConfirm(IngListItem oldItem, String newItemString) {
         shoppingListViewModel.editItem(oldItem, newItemString);
     }
 }
