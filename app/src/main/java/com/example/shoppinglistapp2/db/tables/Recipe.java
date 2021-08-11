@@ -13,15 +13,7 @@ import java.util.Objects;
 
 @Entity(
         tableName = "recipes",
-        indices = {@Index(value = {"name"}, unique = true)},//the recipe name must be unique
-        foreignKeys = {
-            @ForeignKey(
-                    entity = IngList.class,
-                    parentColumns = "id",
-                    childColumns = "list_id",
-                    onDelete = ForeignKey.CASCADE
-            )
-        }
+        indices = {@Index(value = {"name"}, unique = true)}//the recipe name must be unique
 )
 public class Recipe {
 
@@ -46,9 +38,6 @@ public class Recipe {
 
     private int tom_rating;
     private int tier_rating;
-
-    @ColumnInfo(name = "list_id")
-    private int listId;
 
     @Ignore
     private List<String> tags;
@@ -132,14 +121,6 @@ public class Recipe {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
-    }
-
-    public int getListId() {
-        return listId;
-    }
-
-    public void setListId(int listId) {
-        this.listId = listId;
     }
 
     @Ignore

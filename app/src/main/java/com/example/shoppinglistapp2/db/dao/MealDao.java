@@ -13,7 +13,7 @@ import com.example.shoppinglistapp2.db.tables.MealPlan;
 import java.util.List;
 
 @Dao
-public interface MealDao {
+public interface MealDao extends BaseDao<Meal> {
     @Query("DELETE FROM meals WHERE plan_id = :planId")
     void deleteAllFromPlan(int planId);
 
@@ -21,9 +21,6 @@ public interface MealDao {
             "SET recipe_id = NULL, notes = NULL " +
             "WHERE plan_id = :planId")
     void clearAllDays(int planId);
-
-    @Update
-    void update(Meal meal);
 
     @Query("SELECT * FROM meals WHERE plan_id = :planId")
     LiveData<List<Meal>> getAllFromPlan(int planId);
@@ -33,10 +30,4 @@ public interface MealDao {
 
     @Query("SELECT * FROM meals WHERE id = :id")
     Meal getById(int id);
-
-    @Insert
-    long insert(Meal meal);
-
-    @Delete
-    void delete(Meal meal);
 }

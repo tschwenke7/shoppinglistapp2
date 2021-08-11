@@ -23,7 +23,7 @@ public class Tag {
     private String name;
 
     @NonNull
-    @ColumnInfo(name = "recipe_id")
+    @ColumnInfo(name = "recipe_id", index = true)
     private int recipeId;
 
     public Tag(){};

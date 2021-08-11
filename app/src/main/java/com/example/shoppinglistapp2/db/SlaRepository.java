@@ -4,45 +4,43 @@ import android.content.Context;
 
 import androidx.lifecycle.LiveData;
 
-import com.example.shoppinglistapp2.db.dao.IngredientDao;
+import com.example.shoppinglistapp2.db.dao.IngListItemDao;
+import com.example.shoppinglistapp2.db.dao.MealDao;
 import com.example.shoppinglistapp2.db.dao.MealPlanDao;
 import com.example.shoppinglistapp2.db.dao.RecipeDao;
-import com.example.shoppinglistapp2.db.dao.SlItemDao;
 import com.example.shoppinglistapp2.db.dao.TagDao;
-import com.example.shoppinglistapp2.db.tables.Ingredient;
+import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
-import com.example.shoppinglistapp2.db.tables.SlItem;
 import com.example.shoppinglistapp2.db.tables.Tag;
 import com.example.shoppinglistapp2.helpers.SlItemUtils;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class SlaRepository {
-    private final IngredientDao ingredientDao;
+    private final IngListItemDao ingListItemDao;
     private final RecipeDao recipeDao;
-    private final SlItemDao slItemDao;
     private final TagDao tagDao;
     private final MealPlanDao mealPlanDao;
+    private final MealDao mealDao;
 
     private final LiveData<List<Recipe>> allRecipes;
-    private final LiveData<List<SlItem>> allSlItems;
-    private final LiveData<List<SlItem>> allMealPlanSlItems;
+    private final LiveData<List<IngListItem>> shoppingListItems;
+    private final LiveData<List<IngListItem>> allMealPlanSlItems;
 
     public SlaRepository(Context context){
         SlaDatabase db = SlaDatabase.getDatabase(context);
-        ingredientDao = db.ingredientDao();
+        ingListItemDao = db.ingListItemDao();
         recipeDao = db.recipeDao();
-        slItemDao = db.slItemDao();
+        mealDao = db.mealDao();
         tagDao = db.tagDao();
         mealPlanDao = db.mealPlanDao();
         allRecipes = recipeDao.getAllAlphabetical();
         allMealPlanSlItems = slItemDao.getAll(SlItemUtils.MEALPLAN_LIST_ID);
-        allSlItems = slItemDao.getAll(SlItemUtils.SHOPPING_LIST_ID);
+        shoppingListItems = ingListItemDao.getAllFromMealPlan(SlItemUtils.SHOPPING_LIST_ID);
     }
 
     public LiveData<List<Recipe>> getAllRecipes(){
@@ -159,7 +157,7 @@ public class SlaRepository {
     }
 
     public LiveData<List<SlItem>> getSlItems(){
-        return allSlItems;
+        return shoppingListItems;
     }
 
     /**

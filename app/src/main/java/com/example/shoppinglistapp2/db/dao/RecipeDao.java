@@ -2,17 +2,16 @@ package com.example.shoppinglistapp2.db.dao;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.Update;
+import androidx.room.Transaction;
 
 import com.example.shoppinglistapp2.db.tables.Recipe;
+import com.example.shoppinglistapp2.db.tables.relations.RecipeWithIngredients;
 
 import java.util.List;
 
 @Dao
-public interface RecipeDao {
+public interface RecipeDao extends BaseDao<Recipe> {
 
     @Query("SELECT * FROM recipes ORDER BY name ASC")
     LiveData<List<Recipe>> getAllAlphabetical();
@@ -26,15 +25,18 @@ public interface RecipeDao {
     @Query("SELECT * FROM recipes WHERE name = :name LIMIT 1")
     Recipe getByName(String name);
 
-    @Insert
-    long insert(Recipe recipe);
-
-    @Delete
-    void deleteAll(Recipe... recipes);
-
-    @Update
-    void updateRecipe(Recipe recipe);
-
     @Query("DELETE FROM recipes")
     void deleteEverything();
+
+    @Transaction
+    @Query("SELECT * FROM recipes ORDER BY name ASC")
+    LiveData<List<RecipeWithIngredients>> getAllWithIngLists();
+
+    @Transaction
+    @Query("SELECT * FROM recipes WHERE id = :id")
+    LiveData<RecipeWithIngredients> getByIdLiveWithIngList(int id);
+
+    @Transaction
+    @Query("SELECT * FROM recipes WHERE id = :id")
+    RecipeWithIngredients getByIdWithIngList(int id);
 }

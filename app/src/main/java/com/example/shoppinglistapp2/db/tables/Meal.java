@@ -23,12 +23,13 @@ import java.util.Objects;
                 onDelete = ForeignKey.CASCADE
             )
         }
+
 )
 public class Meal {
     @PrimaryKey(autoGenerate = true)
     private int id;
 
-    @ColumnInfo(name = "plan_id")
+    @ColumnInfo(name = "plan_id", index = true)
     private int planId;
 
     @ColumnInfo(name = "day_id")
@@ -37,7 +38,7 @@ public class Meal {
     @ColumnInfo(name = "day_title")
     private String dayTitle;
 
-    @ColumnInfo(name = "recipe_id")
+    @ColumnInfo(name = "recipe_id", index = true)
     private Integer recipeId;
 
     private String notes;
