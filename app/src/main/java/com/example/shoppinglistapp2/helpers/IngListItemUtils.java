@@ -224,6 +224,7 @@ public class IngListItemUtils {
         }
 
         ingListItem.setName(name.toString().trim());
+        //converts any units added by "add amounts" to a normalised form
         normaliseUnits(ingListItem);
         return ingListItem;
     }
@@ -329,39 +330,35 @@ public class IngListItemUtils {
     private static void normaliseUnits(IngListItem ingredient){
         //Normalise volume unit */
         String volumeUnit = ingredient.getVolumeUnit().toLowerCase();
+        //remove trailing "s" for plural unit if present to reduce number of comparisons necessary
+        if (volumeUnit.endsWith("s")) {
+            volumeUnit = volumeUnit.substring(0,volumeUnit.length()-1);
+        }
 
         switch (volumeUnit) {
             //L
             case "l":
-            case "ls":
             case "liter":
-            case "liters":
             case "litre":
-            case "litres":
                 ingredient.setVolumeUnit("L");
                 break;
 
             //mL
             case "ml":
             case "milliliter":
-            case "milliliters":
             case "millilitre":
-            case "millilitres":
-            case "mls":
                 ingredient.setVolumeUnit("mL");
                 break;
 
             //tsp
             case "teaspoon":
-            case "teaspoons":
-            case "tsps":
+            case "tsp":
                 ingredient.setVolumeUnit("tsp");
                 break;
 
             //tbsp
             case "tablespoon":
-            case "tablespoons":
-            case "tbsps":
+            case "tbsp":
                 ingredient.setVolumeUnit("tbsp");
                 break;
 
@@ -373,28 +370,29 @@ public class IngListItemUtils {
 
         /* Normalise mass unit */
         String massUnit = ingredient.getMassUnit().toLowerCase();
+        //remove trailing "s" for plural unit if present to reduce number of comparisons necessary
+        if (massUnit.endsWith("s")) {
+            massUnit = massUnit.substring(0,massUnit.length()-1);
+        }
         double grams;
 
         switch (massUnit) {
             //g
             case "gram":
-            case "grams":
+            case "g":
                 ingredient.setMassUnit("g");
                 break;
 
             //kg
             case "kilogram":
-            case "kilograms":
-            case "kgs":
+            case "kg":
                 ingredient.setMassUnit("kg");
                 break;
 
             /* convert any imperial units to an appropriate metric one */
             //convert pounds to g/kg
             case "lb":
-            case "lbs":
             case "pound":
-            case "pounds":
                 //~454.592 grams per lb
                 grams = ingredient.getMassQty() * 453.592;
                 //write as kg if >= 1000g
@@ -410,7 +408,6 @@ public class IngListItemUtils {
                 break;
             case "oz":
             case "ounce":
-            case "ounces":
                 //~28.3495g per oz.
                 grams = ingredient.getMassQty() * 28.3495;
                 if (grams >= 1000) {
