@@ -224,6 +224,7 @@ public class IngListItemUtils {
         }
 
         ingListItem.setName(name.toString().trim());
+        normaliseUnits(ingListItem);
         return ingListItem;
     }
 
