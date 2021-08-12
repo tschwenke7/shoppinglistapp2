@@ -10,10 +10,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class IngListItemUtils {
-    private static DecimalFormat twodp = new DecimalFormat("#.##");
+    public static final CharSequence SEPERATOR = "+";
     private static DecimalFormat zerodp = new DecimalFormat("#");
 
-    public static final int MEALPLAN_LIST_ID = 1;
+//    public static final int MEALPLAN_LIST_ID = 1;
     public static final int SHOPPING_LIST_ID = 0;
 
     private static final List<String> unitsOfMeasurement = Arrays.asList(
@@ -121,7 +121,8 @@ public class IngListItemUtils {
         WHOLE_ITEM,
         MASS,
         VOLUME,
-        OTHER
+        OTHER,
+        INVALID
     }
 
     public static UnitType getUnitType(String unit) {
@@ -140,7 +141,7 @@ public class IngListItemUtils {
         if(volumeUnits.contains(unit)){
             return UnitType.VOLUME;
         }
-        return UnitType.OTHER;
+        return UnitType.INVALID;
     }
 
     public static IngListItem toIngListItem(String ingText) {
@@ -161,10 +162,10 @@ public class IngListItemUtils {
          */
 
         //first, split multiple quantities if present by splitting on any "+" characters
-        String[] amounts = ingText.split(" \\+");
+        String[] amounts = ingText.split("\\+");
         //the name of the item will be in the last "amount",
         //so lets first analyse any guaranteed "amount-only" components
-        for (int i = 0; i < amounts.length - 2; i++){
+        for (int i = 0; i < amounts.length - 1; i++){
             addAmount(ingListItem, amounts[i]);
         }
 
@@ -202,7 +203,7 @@ public class IngListItemUtils {
             do {
                 amount.append(words[i]).append(" ");
                 i++;
-            } while (words[i].matches(".*\\d.*") || unitsOfMeasurement.contains(words[i]));
+            } while (words[i].matches(".*\\d.*") || getUnitType(words[i]) != UnitType.INVALID);
 
             //read remainder of words as ingredient name
             for(int j = i; j < words.length; j++){
@@ -219,17 +220,37 @@ public class IngListItemUtils {
         //else just assume the quantity is 1 if there are no numbers
         else{
             ingListItem.setWholeItemQty(1);
-
-            //read all of ingText as the name of ingredient
+            //read all words as the name of ingredient
             for (int i = 0; i < words.length; i++){
                 name.append(words[i]).append(" ");
             }
         }
 
-        ingListItem.setName(name.toString().trim());
+        //normalise ingredient name to make it easier to find matching name ingredients later
+        ingListItem.setName(normaliseIngredientName(name.toString()));
+
         //converts any units added by "add amounts" to a normalised form
         normaliseUnits(ingListItem);
         return ingListItem;
+    }
+
+    /**
+     * Normalises the name of an ingredient to make it easier to match with other entries.
+     * Converts to lower case, trims whitespace, and removes "of " prefix if found.
+     * @param name the ingredient name to be normalised.
+     * @return name in a more normalised form.
+     */
+    private static String normaliseIngredientName(String name){
+        //trim whitespace and convert to lowercase
+        name = name.toLowerCase().trim();
+
+        //remove "of " from start of ingredient name,
+        // for cases like "50g of butter" or "2 cups of flour"
+        if(name.startsWith("of ")){
+            name = name.substring(3);
+        }
+
+        return name;
     }
 
     /**
@@ -255,10 +276,13 @@ public class IngListItemUtils {
         String qtyStr = (amount.substring(0, splitIndex + 1) + " ").trim();
         String unit = amount.substring(splitIndex+1).trim().toLowerCase();
 
-
-
         //convert the amount string into a "double" amount, handling fractions/mixed numerals
         double qty = qtyAsDouble(qtyStr);
+
+        //if no unit followed the amount, assume it is whole unit
+        if(unit.isEmpty()){
+            ingListItem.setWholeItemQty(qty);
+        }
 
         //determine which type of amount this is by checking the unit
         switch (getUnitType(unit)){
@@ -332,95 +356,103 @@ public class IngListItemUtils {
      */
     private static void normaliseUnits(IngListItem ingredient){
         //Normalise volume unit */
-        String volumeUnit = ingredient.getVolumeUnit().toLowerCase();
-        //remove trailing "s" for plural unit if present to reduce number of comparisons necessary
-        if (volumeUnit.endsWith("s")) {
-            volumeUnit = volumeUnit.substring(0,volumeUnit.length()-1);
-        }
+        if(null != ingredient.getVolumeUnit()){
+            String volumeUnit = ingredient.getVolumeUnit().toLowerCase();
+            //remove trailing "s" for plural unit if present to reduce number of comparisons necessary
+            if (volumeUnit.endsWith("s")) {
+                volumeUnit = volumeUnit.substring(0,volumeUnit.length()-1);
+            }
 
-        switch (volumeUnit) {
-            //L
-            case "l":
-            case "liter":
-            case "litre":
-                ingredient.setVolumeUnit("L");
-                break;
+            switch (volumeUnit) {
+                //L
+                case "l":
+                case "liter":
+                case "litre":
+                    ingredient.setVolumeUnit("L");
+                    break;
 
-            //mL
-            case "ml":
-            case "milliliter":
-            case "millilitre":
-                ingredient.setVolumeUnit("mL");
-                break;
+                //mL
+                case "ml":
+                case "milliliter":
+                case "millilitre":
+                    ingredient.setVolumeUnit("mL");
+                    break;
 
-            //tsp
-            case "teaspoon":
-            case "tsp":
-                ingredient.setVolumeUnit("tsp");
-                break;
+                //tsp
+                case "teaspoon":
+                case "tsp":
+                    ingredient.setVolumeUnit("tsp");
+                    break;
 
-            //tbsp
-            case "tablespoon":
-            case "tbsp":
-                ingredient.setVolumeUnit("tbsp");
-                break;
+                //tbsp
+                case "tablespoon":
+                case "tbsp":
+                    ingredient.setVolumeUnit("tbsp");
+                    break;
 
-            //cups
-            case "cup":
-                ingredient.setVolumeUnit("cups");
-                break;
+                //cups
+                case "cup":
+                    ingredient.setVolumeUnit("cups");
+                    break;
+            }
         }
 
         /* Normalise mass unit */
-        String massUnit = ingredient.getMassUnit().toLowerCase();
-        //remove trailing "s" for plural unit if present to reduce number of comparisons necessary
-        if (massUnit.endsWith("s")) {
-            massUnit = massUnit.substring(0,massUnit.length()-1);
-        }
-        double grams;
+        if (null != ingredient.getMassUnit()){
+            String massUnit = ingredient.getMassUnit().toLowerCase();
+            //remove trailing "s" for plural unit if present to reduce number of comparisons necessary
+            if (massUnit.endsWith("s")) {
+                massUnit = massUnit.substring(0,massUnit.length()-1);
+            }
+            double grams;
 
-        switch (massUnit) {
-            //g
-            case "gram":
-            case "g":
-                ingredient.setMassUnit("g");
-                break;
-
-            //kg
-            case "kilogram":
-            case "kg":
-                ingredient.setMassUnit("kg");
-                break;
-
-            /* convert any imperial units to an appropriate metric one */
-            //convert pounds to g/kg
-            case "lb":
-            case "pound":
-                //~454.592 grams per lb
-                grams = ingredient.getMassQty() * 453.592;
-                //write as kg if >= 1000g
-                if (grams >= 1000) {
-                    //round to two dp
-                    ingredient.setMassQty(Double.parseDouble(twodp.format(grams / 1000)));
-                    ingredient.setMassUnit("kg");
-                } else {
-                    ingredient.setMassQty(Double.parseDouble(zerodp.format(grams)));
+            switch (massUnit) {
+                //g
+                case "gram":
+                case "g":
                     ingredient.setMassUnit("g");
-                }
+                    break;
 
-                break;
-            case "oz":
-            case "ounce":
-                //~28.3495g per oz.
-                grams = ingredient.getMassQty() * 28.3495;
-                if (grams >= 1000) {
-                    ingredient.setMassQty(Double.parseDouble(twodp.format(grams / 1000)));
+                //kg
+                case "kilogram":
+                case "kg":
                     ingredient.setMassUnit("kg");
-                } else {
-                    ingredient.setMassQty(Double.parseDouble(zerodp.format(grams)));
-                    ingredient.setMassUnit("g");
-                }
-                break;
+                    break;
+
+                /* convert any imperial units to an appropriate metric one */
+                //convert pounds to g/kg
+                case "lb":
+                case "pound":
+                    //~454.592 grams per lb
+                    grams = ingredient.getMassQty() * 453.592;
+                    //round to nearest gram
+                    grams = Double.parseDouble(zerodp.format(grams));
+                    //write as kg if >= 1000g
+                    if (grams >= 1000) {
+                        //round to two dp
+                        ingredient.setMassQty(grams / 1000);
+                        ingredient.setMassUnit("kg");
+                    } else {
+                        //round to nearest gram
+                        ingredient.setMassQty(grams);
+                        ingredient.setMassUnit("g");
+                    }
+                    break;
+                case "oz":
+                case "ounce":
+                    //~28.3495g per oz.
+                    grams = ingredient.getMassQty() * 28.3495;
+                    //round to nearest gram
+                    grams = Double.parseDouble(zerodp.format(grams));
+                    if (grams >= 1000) {
+                        ingredient.setMassQty((grams / 1000));
+                        ingredient.setMassUnit("kg");
+                    } else {
+                        ingredient.setMassQty(grams);
+                        ingredient.setMassUnit("g");
+                    }
+                    break;
+            }
         }
     }
 
@@ -431,7 +463,7 @@ public class IngListItemUtils {
      */
     public static void mergeQuantities(IngListItem itemToKeep, IngListItem itemToMerge){
         /* whole unit quantities */
-        itemToKeep.setWholeItemQty(itemToKeep.getWholeItemQty() + itemToKeep.getWholeItemQty());
+        itemToKeep.setWholeItemQty(itemToKeep.getWholeItemQty() + itemToMerge.getWholeItemQty());
 
         /* mass quantities */
         //if itemToKeep has no mass qty, simply transfer in itemToMerge's
@@ -450,7 +482,7 @@ public class IngListItemUtils {
                 //convert to kg if over 1000g
                 if (combined >= 1000){
                     //round to (up to) two decimal places
-                    combined = Double.parseDouble(twodp.format(combined / 1000));
+                    combined = combined / 1000;
                     itemToKeep.setMassUnit("kg");
                 }
                 else{
@@ -469,7 +501,7 @@ public class IngListItemUtils {
         //if it does have a volume qty...
         else {
             //check if itemToMerge actually has something to merge here
-            if(itemToMerge.getMassQty() != 0){
+            if(itemToMerge.getVolumeQty() != 0){
                 //if the units are the same, simply add the quantities
                 if(itemToKeep.getVolumeUnit().equals(itemToMerge.getVolumeUnit())){
                     itemToKeep.setVolumeQty(itemToKeep.getVolumeQty() + itemToMerge.getVolumeQty());
@@ -482,8 +514,7 @@ public class IngListItemUtils {
 
                     //convert to L if > 1000mL
                     if(combined >= 1000) {
-                        //round to (up to) two decimal places
-                        combined = Double.parseDouble(twodp.format(combined / 1000));
+                        combined = (combined / 1000);
                         itemToKeep.setVolumeUnit("L");
                     }
                     else{

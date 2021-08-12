@@ -19,26 +19,37 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
+import com.example.shoppinglistapp2.helpers.IngListItemUtils;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListeningExecutorService;
+
+import java.util.concurrent.Executor;
 
 public class ShoppingListFragment extends Fragment implements ShoppingListAdapter.SlItemClickListener {
     private ShoppingListViewModel shoppingListViewModel;
+    private ListeningExecutorService backgroundExecutor;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         //get viewModel
         shoppingListViewModel =
-                new ViewModelProvider(getActivity()).get(ShoppingListViewModel.class);
+                new ViewModelProvider(requireActivity()).get(ShoppingListViewModel.class);
 
         //inflate fragment
         View root = inflater.inflate(R.layout.fragment_shopping_list, container, false);
 
+        backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
         return root;
     }
 
@@ -62,24 +73,36 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
         });
 
         //listen to add item button
-        ((Button) root.findViewById(R.id.button_new_list_item)).setOnClickListener(view -> {
-            addItems(view);
-        });
+        ((Button) root.findViewById(R.id.button_new_list_item)).setOnClickListener(this::addItems);
     }
 
     private void addItems(View view){
         EditText input = view.getRootView().findViewById(R.id.edit_text_new_list_item);
         String inputText = input.getText().toString();
 
-        if(!inputText.isEmpty()){
-            shoppingListViewModel.addItems(inputText);
+        if(inputText.isEmpty()){
+            Toast.makeText(this.getContext(), R.string.error_no_list_item_entered, Toast.LENGTH_LONG).show();
         }
         else{
-            Toast.makeText(this.getContext(), getContext().getString(R.string.error_no_list_item_entered), Toast.LENGTH_LONG).show();
-        }
+            Futures.addCallback(backgroundExecutor.submit(() -> shoppingListViewModel.addItems(inputText)),
+                    new FutureCallback<Object>() {
+                        @Override
+                        public void onSuccess(@Nullable Object result) {
+                            //clear input box
+                            input.setText("");
+                        }
 
-        //clear input box
-        input.setText("");
+                        @Override
+                        public void onFailure(Throwable t) {
+                            new AlertDialog.Builder(requireContext())
+                                    .setTitle(R.string.error_title)
+                                    .setMessage(R.string.error_could_not_add_items)
+                                    .setPositiveButton(R.string.ok, null)
+                                    .show();
+                        }
+                    },
+                    ContextCompat.getMainExecutor(requireContext()));
+        }
     }
 
     @Override
@@ -97,7 +120,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                 break;
             case R.id.action_clear_all_list_items:
                 //prompt for confirmation first
-                new AlertDialog.Builder(getContext())
+                new AlertDialog.Builder(requireContext())
                         .setTitle(R.string.clear_list_warning_title)
                         .setMessage(R.string.clear_list_warning_message)
                         .setPositiveButton(R.string.clear_list_positive_button, (dialogInterface, i) -> {
@@ -109,12 +132,29 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                         .show();
                 break;
             case R.id.action_copy_list_to_clipboard:
-                ClipboardManager clipboard = (ClipboardManager) requireActivity()
-                        .getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("shopping_list",
-                        shoppingListViewModel.getAllItemsAsString());
-                clipboard.setPrimaryClip(clip);
-                Toast.makeText(requireContext(), R.string.export_ingredients_toast, Toast.LENGTH_LONG).show();
+                //ask whether to include crossed off items
+                new AlertDialog.Builder(requireContext())
+                        .setTitle(R.string.copy_to_clipboard_dialog_title)
+                        .setMessage(R.string.copy_to_clipboard_dialog_message)
+                        //include crossed off items
+                        .setPositiveButton(R.string.copy_to_clipboard_dialog_positive_button, (dialogInterface, i) -> {
+                            ClipboardManager clipboard = (ClipboardManager) requireActivity()
+                                    .getSystemService(Context.CLIPBOARD_SERVICE);
+                            ClipData clip = ClipData.newPlainText("shopping_list",
+                                    shoppingListViewModel.getAllItemsAsString(true));
+                            clipboard.setPrimaryClip(clip);
+                            Toast.makeText(requireContext(), R.string.export_ingredients_toast, Toast.LENGTH_LONG).show();
+                        })
+                        //negative button corresponds to "don't include"
+                        .setNegativeButton(R.string.copy_to_clipboard_dialog_negative_button, ((dialog, which) -> {
+                            ClipboardManager clipboard = (ClipboardManager) requireActivity()
+                                    .getSystemService(Context.CLIPBOARD_SERVICE);
+                            ClipData clip = ClipData.newPlainText("shopping_list",
+                                    shoppingListViewModel.getAllItemsAsString(false));
+                            clipboard.setPrimaryClip(clip);
+                            Toast.makeText(requireContext(), R.string.export_ingredients_toast, Toast.LENGTH_LONG).show();
+                        }))
+                        .show();
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -131,16 +171,32 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
         mainActivity.hideUpButton();
 
         //set title
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_shopping_list);
+        ((AppCompatActivity) requireActivity()).getSupportActionBar().setTitle(R.string.title_shopping_list);
     }
 
     @Override
     public void onSlItemClick(int position) {
-        shoppingListViewModel.toggleChecked(position);
+        backgroundExecutor.execute(() -> shoppingListViewModel.toggleChecked(position));
     }
 
     @Override
     public void onSlItemEditConfirm(IngListItem oldItem, String newItemString) {
-        shoppingListViewModel.editItem(oldItem, newItemString);
+        Futures.addCallback(backgroundExecutor.submit(() -> shoppingListViewModel.editItem(oldItem, newItemString)),
+                new FutureCallback<Object>() {
+                    @Override
+                    public void onSuccess(@Nullable Object result) {
+
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        new AlertDialog.Builder(requireContext())
+                                .setTitle(R.string.error_title)
+                                .setMessage(R.string.error_could_not_add_items)
+                                .setPositiveButton(R.string.ok, null)
+                                .show();
+                    }
+                },
+                ContextCompat.getMainExecutor(requireContext()));
     }
 }

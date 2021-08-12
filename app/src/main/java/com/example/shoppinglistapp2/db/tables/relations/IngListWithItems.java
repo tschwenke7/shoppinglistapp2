@@ -1,6 +1,7 @@
 package com.example.shoppinglistapp2.db.tables.relations;
 
 import androidx.room.Embedded;
+import androidx.room.Entity;
 import androidx.room.Relation;
 
 import com.example.shoppinglistapp2.db.tables.IngList;

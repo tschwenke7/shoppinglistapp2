@@ -7,7 +7,7 @@ import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "ing_list",
+@Entity(tableName = "ing_lists",
     foreignKeys = {
         @ForeignKey(
                 entity = Recipe.class,
@@ -40,6 +40,9 @@ public class IngList {
     @ColumnInfo(name = "meal_plan_id")
     private Long mealPlanId;
 
+    public IngList(){}
+
+    @Ignore
     public IngList(long refId, int listType){
         if (listType == 1){
             recipeId = refId;

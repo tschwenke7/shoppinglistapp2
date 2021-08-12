@@ -17,9 +17,7 @@ import com.example.shoppinglistapp2.db.SlaRepository;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;
-import com.example.shoppinglistapp2.helpers.IngredientUtils;
 import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
-import com.example.shoppinglistapp2.helpers.SlItemUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

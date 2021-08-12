@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -57,7 +58,16 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
     public void setItems(List<IngListItem> newItems) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SlItemDiff(newItems, items));
         diffResult.dispatchUpdatesTo(this);
-        this.items = newItems;
+        if(items != null){
+            items.clear();
+            if(newItems != null){
+                items.addAll(newItems);
+            }
+        }
+        else if(newItems != null){
+            items = new ArrayList<>();
+            items.addAll(newItems);
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -148,7 +158,9 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
             IngListItem newItem = newList.get(newItemPosition);
             IngListItem oldItem = oldList.get(oldItemPosition);
 
-            return newItem.equals(oldItem);
+            boolean boo = newItem.equals(oldItem);
+
+            return boo;
         }
     }
 

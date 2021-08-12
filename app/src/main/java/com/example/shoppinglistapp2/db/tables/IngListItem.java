@@ -7,6 +7,8 @@ import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Objects;
 
 @Entity(
@@ -19,7 +21,7 @@ import java.util.Objects;
                 onDelete = ForeignKey.CASCADE
         )
     },
-    indices = {@Index(value = "list_id, name")}
+    indices = {@Index(value = "name")}
 )
 public class IngListItem {
     @PrimaryKey(autoGenerate = true)
@@ -27,6 +29,7 @@ public class IngListItem {
 
     private String name;
 
+    @ColumnInfo(name = "list_id", index = true)
     private long listId;
 
     @ColumnInfo(name = "volume_unit")
@@ -159,43 +162,69 @@ public class IngListItem {
         this.listId = listId;
     }
 
+    @Ignore
+    public IngListItem deepCopy() {
+        IngListItem copy = new IngListItem();
+        copy.setId(this.getId());
+        copy.setListId(this.getListId());
+        copy.setMassQty(this.getMassQty());
+        copy.setMassUnit(this.getMassUnit());
+        copy.setVolumeUnit(this.getVolumeUnit());
+        copy.setVolumeQty(this.getVolumeQty());
+        copy.setWholeItemQty(this.getWholeItemQty());
+        copy.setOtherQty(this.getOtherQty());
+        copy.setChecked(this.isChecked());
+        copy.setName(this.getName());
+        return copy;
+    }
+
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         IngListItem that = (IngListItem) o;
-        return id == that.id && Double.compare(that.volumeQty, volumeQty) == 0 && Double.compare(that.massQty, massQty) == 0 && Double.compare(that.wholeItemQty, wholeItemQty) == 0 && Double.compare(that.otherQty, otherQty) == 0 && Objects.equals(name, that.name) && Objects.equals(volumeUnit, that.volumeUnit) && Objects.equals(massUnit, that.massUnit) && Objects.equals(otherUnit, that.otherUnit);
+        return id == that.id && listId == that.listId && Double.compare(that.volumeQty, volumeQty) == 0 && Double.compare(that.massQty, massQty) == 0 && Double.compare(that.wholeItemQty, wholeItemQty) == 0 && Double.compare(that.otherQty, otherQty) == 0 && checked == that.checked && Objects.equals(name, that.name) && Objects.equals(volumeUnit, that.volumeUnit) && Objects.equals(massUnit, that.massUnit) && Objects.equals(otherUnit, that.otherUnit);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, volumeUnit, volumeQty, massUnit, massQty, wholeItemQty, otherUnit, otherQty);
+        return Objects.hash(id, name, listId, volumeUnit, volumeQty, massUnit, massQty, wholeItemQty, otherUnit, otherQty, checked);
+    }
+
+    @Ignore
+    public boolean isEmpty(){
+        return wholeItemQty == 0 && massQty == 0 && volumeQty == 0 && otherQty == 0;
     }
 
     @Override
     public String toString() {
+        DecimalFormat twodp = new DecimalFormat("#.##");
+        twodp.setRoundingMode(RoundingMode.CEILING);
+
         //concatenate different parts of amount that may or may not be present
         String str = "";
-        if (wholeItemQty != 0) {
-            str += wholeItemQty + " ";
-        }
         if(volumeQty != 0) {
-            if (!str.isEmpty()){
-                str += "+ ";
-            }
-            str += volumeQty + " " + volumeUnit + " ";
+            str += twodp.format(volumeQty) + " " + volumeUnit + " ";
         }
         if(massQty != 0) {
             if (!str.isEmpty()){
                 str += "+ ";
             }
-            str += massQty + " " + massUnit + " ";
+            str += twodp.format(massQty) + " " + massUnit + " ";
         }
         if(otherQty != 0) {
             if (!str.isEmpty()){
                 str += "+ ";
             }
-            str += otherQty + " " + otherUnit + " ";
+            str += twodp.format(otherQty) + " " + otherUnit + " ";
+        }
+        if (wholeItemQty != 0) {
+            if (!str.isEmpty()){
+                str += "+ ";
+            }
+            str += twodp.format(wholeItemQty) + " ";
         }
 
         //hide amount entirely if it's just "1" (1 whole unit)

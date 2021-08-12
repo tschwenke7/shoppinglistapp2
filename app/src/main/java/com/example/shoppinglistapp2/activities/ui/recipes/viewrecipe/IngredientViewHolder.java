@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
-import com.example.shoppinglistapp2.db.tables.Ingredient;
+import com.example.shoppinglistapp2.db.tables.IngListItem;
 
 public class IngredientViewHolder extends RecyclerView.ViewHolder {
     private final TextView ingredientNameView;
@@ -19,7 +19,7 @@ public class IngredientViewHolder extends RecyclerView.ViewHolder {
         ingredientNameView = itemView.findViewById(R.id.ingredient_name);
     }
 
-    public void bind (Ingredient ingredient){
+    public void bind (IngListItem ingredient){
         ingredientNameView.setText(ingredient.toString());
     }
 

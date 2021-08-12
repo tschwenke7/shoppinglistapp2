@@ -15,14 +15,14 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
-import com.example.shoppinglistapp2.db.tables.Ingredient;
+import com.example.shoppinglistapp2.db.tables.IngListItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAdapter.ViewHolder> {
 
-    private List<Ingredient> ingredients;
+    private List<IngListItem> ingredients;
     private IngredientClickListener ingredientClickListener;
     private boolean editMode = false;
     private List<Integer> deselectedPositions;
@@ -54,7 +54,7 @@ public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAd
         return ingredients.size();
     }
 
-    public void setList(List<Ingredient> newList){
+    public void setList(List<IngListItem> newList){
         //clear any selection/deselection info, as the list may have changed
         // and invalidated the recorded positions
         resetSelections();
@@ -78,8 +78,8 @@ public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAd
      * recipe's ingredients list by the user.
      * @return all Ingredients which remain selected within this adapter
      */
-    public List<Ingredient> getSelectedIngredients(){
-        List<Ingredient> selected = new ArrayList<>();
+    public List<IngListItem> getSelectedIngredients(){
+        List<IngListItem> selected = new ArrayList<>();
 
         //add all ingredients which haven't been deselected by the user
         for (int i = 0; i < ingredients.size(); i++){
@@ -101,7 +101,7 @@ public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAd
             this.ingredientClickListener = ingredientClickListener;
         }
 
-        public void bind(Ingredient ingredient){
+        public void bind(IngListItem ingredient){
             //fill ingredient name
             CheckBox checkBoxView = itemView.findViewById(R.id.ingredient_name);
             checkBoxView.setText(ingredient.toString());
@@ -181,10 +181,10 @@ public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAd
     }
 
     private class IngredientDiff extends DiffUtil.Callback {
-        List<Ingredient> newList;
-        List<Ingredient> oldList;
+        List<IngListItem> newList;
+        List<IngListItem> oldList;
 
-        public IngredientDiff(List<Ingredient> newList, List<Ingredient> oldList) {
+        public IngredientDiff(List<IngListItem> newList, List<IngListItem> oldList) {
             this.newList = newList;
             this.oldList = oldList;
         }

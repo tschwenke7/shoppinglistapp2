@@ -137,6 +137,13 @@
     <string name="remove_recipes_warning">Are you sure? All recipes, notes and ingListItems will be removed from your plan, but the meal slots will be kept.</string>
     <string name="remove_recipes_positive_button">Clear</string>
     <string name="clear_meal_plans_option">Reset entire meal plan</string>
-    <string name="clear_meal_plans_warning">This will delete all meal slots, recipes and ingListItems. You will need to add days/meals before adding more recipes again. \nAre you sure?</string>
+    <string name="clear_meal_plans_warning">This will delete all meal slots, recipes and ingListItems. You will need to add days/meals before adding more recipes again.\nAre you sure?</string>
     <string name="clear_meal_plans_positive_button">Reset all</string>
+    <string name="copy_to_clipboard_dialog_title">Include crossed off items?</string>
+    <string name="copy_to_clipboard_dialog_message">Do you want to include crossed-off items?</string>
+    <string name="copy_to_clipboard_dialog_positive_button">Yes</string>
+    <string name="copy_to_clipboard_dialog_negative_button">Don\'t Include</string>
+    <string name="error_could_not_add_items">There item you tried to enter was invalid.\nPlease enter the item\'s quantity and unit of measurement (optional) followed by its name.\ne.g. \"500g butter\", \"6 carrots\", or \"avocado\"</string>
+    <string name="error_title">Error</string>
+    <string name="ok">Ok</string>
 </resources>

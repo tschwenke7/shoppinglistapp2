@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey;
 
 import java.util.Objects;
 
-@Entity
+@Entity(tableName = "meal_plans")
 public class MealPlan {
     @PrimaryKey(autoGenerate = true)
     private int id;

@@ -1,6 +1,7 @@
 package com.example.shoppinglistapp2.db;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -9,6 +10,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.example.shoppinglistapp2.db.dao.IngListDao;
 import com.example.shoppinglistapp2.db.dao.IngListItemDao;
 import com.example.shoppinglistapp2.db.dao.MealDao;
 import com.example.shoppinglistapp2.db.dao.MealPlanDao;
@@ -26,13 +28,15 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Recipe.class, IngList.class, IngListItem.class, Tag.class, MealPlan.class, Meal.class}, version = 13, exportSchema = false)
+@Database(entities = {Recipe.class, IngList.class, IngListItem.class, Tag.class, MealPlan.class, Meal.class},
+        version = 15, exportSchema = true)
 public abstract class SlaDatabase extends RoomDatabase {
     public abstract RecipeDao recipeDao();
     public abstract IngListItemDao ingListItemDao();
     public abstract MealDao mealDao();
     public abstract TagDao tagDao();
     public abstract MealPlanDao mealPlanDao();
+    public abstract IngListDao ingListDao();
 
     private static volatile SlaDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;
@@ -55,15 +59,21 @@ public abstract class SlaDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
-    //do stuff before startup if desired
+    //ensure the shopping list IngList (id = 0) exists
     private static RoomDatabase.Callback sRoomDatabaseCallback = new RoomDatabase.Callback(){
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
             db.beginTransaction();
             try {
-                db.execSQL("INSERT OR IGNORE INTO ing_lists(id) VALUES(0)");
-            } finally {
+                db.execSQL("DROP TABLE IF EXISTS slitems");
+                db.execSQL("DROP TABLE IF EXISTS ingredients");
+                db.execSQL("DROP TABLE IF EXISTS MealPlan");
+                db.execSQL("INSERT OR IGNORE INTO ing_lists DEFAULT VALUES");
+            } catch(Exception e){
+                Log.d("TOM_TEST", e.toString());;
+            }
+            finally {
                 db.endTransaction();
             }
         }

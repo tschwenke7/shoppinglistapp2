@@ -3,7 +3,7 @@ package com.example.shoppinglistapp2.helpers;
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.recipes.creator.InvalidRecipeUrlExeception;
-import com.example.shoppinglistapp2.db.tables.Ingredient;
+import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 
 import org.apache.commons.validator.routines.UrlValidator;
@@ -177,7 +177,7 @@ public class RecipeWebsiteUtils {
         recipe.setTags(tags);
 
         /* get ingredients */
-        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        ArrayList<IngListItem> ingredients = new ArrayList<>();
         Elements ingredientsRows = doc.getElementsByClass("wprm-recipe-ingredient");
 
         for(Element ingredientRow: ingredientsRows){
@@ -199,7 +199,7 @@ public class RecipeWebsiteUtils {
 
                 //check if the first part uses an imperial measurement
                 boolean firstGood = true;
-                for(String unit : IngredientUtils.foreignUnitsOfMeasurement){
+                for(String unit : IngListItemUtils.foreignUnitsOfMeasurement){
                     if(ingAmountComponents[0].contains(unit)){
                         //if it does, we will take the second part instead.
                         ingAmount = ingAmountComponents[1].trim();
@@ -224,7 +224,7 @@ public class RecipeWebsiteUtils {
 
                         //take the alternative which doesn't use imperial measurement
                         ingAmount = ingAmountComponents[0].trim();
-                        for(String unit : IngredientUtils.foreignUnitsOfMeasurement){
+                        for(String unit : IngListItemUtils.foreignUnitsOfMeasurement){
                             if(ingAmountComponents[0].contains(unit)){
                                 ingAmount = ingAmountComponents[1].trim();
                             }
@@ -240,7 +240,7 @@ public class RecipeWebsiteUtils {
                     };
                     //take the part which doesn't use imperial measurements
                     ingAmount = ingAmountComponents[0].trim();
-                    for(String unit : IngredientUtils.foreignUnitsOfMeasurement){
+                    for(String unit : IngListItemUtils.foreignUnitsOfMeasurement){
                         if(ingAmountComponents[0].contains(unit)){
                             ingAmount = ingAmountComponents[1].trim();
                         }
@@ -264,8 +264,8 @@ public class RecipeWebsiteUtils {
                     //concatenate the resulting amount/name and delegate to IngredientsUtil to convert
                     //it to an actual Ingredient object
                     String ingText = String.format("%s %s", ingAmount, name);
-                    Ingredient ingredient = IngredientUtils.toIngredient(ingText);
-                    if (!IngredientUtils.pointlessIngredients.contains(ingredient.getName())){
+                    IngListItem ingredient = IngListItemUtils.toIngListItem(ingText);
+                    if (!IngListItemUtils.pointlessIngredients.contains(ingredient.getName())){
                         ingredients.add(ingredient);
                     }
                 }
@@ -275,14 +275,14 @@ public class RecipeWebsiteUtils {
                 //concatenate the resulting amount/name and delegate to IngredientsUtil to convert
                 //it to an actual Ingredient object
                 String ingText = String.format("%s %s", ingAmount, ingName);
-                Ingredient ingredient = IngredientUtils.toIngredient(ingText);
-                if (!IngredientUtils.pointlessIngredients.contains(ingredient.getName())){
+                IngListItem ingredient = IngListItemUtils.toIngListItem(ingText);
+                if (!IngListItemUtils.pointlessIngredients.contains(ingredient.getName())){
                     ingredients.add(ingredient);
                 }
             }
         }
 
-        recipe.setIngredients(ingredients);
+//todo        recipe.setIngredients(ingredients);
 
         return recipe;
     }
@@ -306,7 +306,7 @@ public class RecipeWebsiteUtils {
         recipe.setName(title);
 
         /* get ingredients */
-        List<Ingredient> ingredients = new ArrayList<>();
+        List<IngListItem> ingredients = new ArrayList<>();
         //get from main ingredient list
         Elements ingredientsElements = doc.selectFirst("div.fela-_g6xips").child(0).children();
         //get from "Not included in your delivery" section
@@ -320,12 +320,12 @@ public class RecipeWebsiteUtils {
             String amount = ingDetails.child(0).text().trim();
             amount = amount.replaceFirst(" unit","");
 
-            Ingredient ingredient = IngredientUtils.toIngredient(amount + " " + ingDetails.child(1).text().trim());
-            if (!IngredientUtils.pointlessIngredients.contains(ingredient.getName())){
+            IngListItem ingredient = IngListItemUtils.toIngListItem(amount + " " + ingDetails.child(1).text().trim());
+            if (!IngListItemUtils.pointlessIngredients.contains(ingredient.getName())){
                 ingredients.add(ingredient);
             }
         }
-        recipe.setIngredients(ingredients);
+//todo        recipe.setIngredients(ingredients);
 
         /* get tags */
         List<String> tags = new ArrayList<>();

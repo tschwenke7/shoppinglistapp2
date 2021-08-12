@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.lifecycle.LiveData;
 
+import com.example.shoppinglistapp2.db.dao.IngListDao;
 import com.example.shoppinglistapp2.db.dao.IngListItemDao;
 import com.example.shoppinglistapp2.db.dao.MealDao;
 import com.example.shoppinglistapp2.db.dao.MealPlanDao;
@@ -28,6 +29,7 @@ public class SlaRepository {
     private final TagDao tagDao;
     private final MealPlanDao mealPlanDao;
     private final MealDao mealDao;
+    private final IngListDao ingListDao;
 
     private final LiveData<List<Recipe>> allRecipes;
     private final LiveData<List<IngListItem>> shoppingListItems;
@@ -40,9 +42,10 @@ public class SlaRepository {
         mealDao = db.mealDao();
         tagDao = db.tagDao();
         mealPlanDao = db.mealPlanDao();
+        ingListDao = db.ingListDao();
         allRecipes = recipeDao.getAllAlphabetical();
 //        allMealPlanSlItems = slItemDao.getAll(SlItemUtils.MEALPLAN_LIST_ID);
-        shoppingListItems = ingListItemDao.getAllFromMealPlan(IngListItemUtils.SHOPPING_LIST_ID);
+        shoppingListItems = ingListItemDao.getAllFromShoppingList(IngListItemUtils.SHOPPING_LIST_ID);
     }
 
     public LiveData<List<Recipe>> getAllRecipes(){
@@ -159,12 +162,15 @@ public class SlaRepository {
      * Returns, if found, an SlItem from the given list which has the same name and checked status,
      * but not the same id (i.e. a potential merge candidate).
      * @param listId list to search within.
-     * @param itemToMatch an SlItem to find a match for.
+     * @param idToExclude the id of the item you're searching with to be excluded from search, so we don't
+     *               match an item with itself.
+     * @param nameToMatch the name to match
+     * @param checkedToMatch the checked status to match
      * @return an item other than itemToMatch with the same name and checked status,
      * or null if none exist.
      */
-    public IngListItem findIngListItemWithSameName(long listId, IngListItem itemToMatch){
-        Callable<IngListItem> queryCallable = () -> ingListItemDao.getAnotherByName(listId, itemToMatch.getName(), itemToMatch.isChecked(), itemToMatch.getId());
+    public IngListItem findIngListItemWithSameName(long listId, int idToExclude, String nameToMatch, boolean checkedToMatch){
+        Callable<IngListItem> queryCallable = () -> ingListItemDao.getAnotherByName(listId, nameToMatch, checkedToMatch, idToExclude);
 
         Future<IngListItem> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
 
@@ -181,8 +187,14 @@ public class SlaRepository {
         return SlaDatabase.databaseWriteExecutor.submit(queryCallable);
     }
 
-    public void updateIngListItem(IngListItem item){
-        SlaDatabase.databaseWriteExecutor.execute(() -> ingListItemDao.update(item));
+    public void updateOrDeleteIfEmptyIngListItem(IngListItem item){
+        //if all quantities have been reduced to zero, delete the item instead
+        if(item.isEmpty()){
+            SlaDatabase.databaseWriteExecutor.execute(() -> ingListItemDao.delete(item));
+        }
+        else{
+            SlaDatabase.databaseWriteExecutor.execute(() -> ingListItemDao.update(item));
+        }
     }
 
     public void deleteCheckedIngListItems(int listId){
@@ -291,5 +303,10 @@ public class SlaRepository {
 
     public Future<Integer> deleteAllTagsForRecipe(int recipeId) {
         return SlaDatabase.databaseWriteExecutor.submit(() -> tagDao.deleteAllByRecipeId(recipeId));
+    }
+
+    public void insertOrIgnoreShoppingList() {
+        SlaDatabase.databaseWriteExecutor.submit(
+                () -> ingListDao.insertShoppingList(IngListItemUtils.SHOPPING_LIST_ID));
     }
 }

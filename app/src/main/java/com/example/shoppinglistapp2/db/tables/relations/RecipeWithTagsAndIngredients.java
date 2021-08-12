@@ -3,6 +3,7 @@ package com.example.shoppinglistapp2.db.tables.relations;
 import androidx.room.Embedded;
 import androidx.room.Relation;
 
+import com.example.shoppinglistapp2.db.tables.IngList;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;
 
@@ -12,7 +13,7 @@ public class RecipeWithTagsAndIngredients {
     @Embedded
     public Recipe recipe;
 
-    @Relation(entity = IngListWithItems.class,
+    @Relation(entity = IngList.class,
             parentColumn = "id",
             entityColumn = "recipe_id")
     public IngListWithItems ingredients;
