@@ -15,6 +15,7 @@ import com.example.shoppinglistapp2.db.tables.Meal;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;
+import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
 import com.example.shoppinglistapp2.helpers.IngListItemUtils;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -31,7 +32,7 @@ public class SlaRepository {
     private final MealDao mealDao;
     private final IngListDao ingListDao;
 
-    private final LiveData<List<Recipe>> allRecipes;
+    private final LiveData<List<RecipeWithTagsAndIngredients>> allRecipesPopulated;
     private final LiveData<List<IngListItem>> shoppingListItems;
 //    private final LiveData<List<IngListItem>> allMealPlanSlItems;
 
@@ -43,13 +44,14 @@ public class SlaRepository {
         tagDao = db.tagDao();
         mealPlanDao = db.mealPlanDao();
         ingListDao = db.ingListDao();
-        allRecipes = recipeDao.getAllAlphabetical();
+        allRecipesPopulated = recipeDao.getAllPopulatedAlphabetical();
 //        allMealPlanSlItems = slItemDao.getAll(SlItemUtils.MEALPLAN_LIST_ID);
         shoppingListItems = ingListItemDao.getAllFromShoppingList(IngListItemUtils.SHOPPING_LIST_ID);
+
     }
 
-    public LiveData<List<Recipe>> getAllRecipes(){
-        return allRecipes;
+    public LiveData<List<RecipeWithTagsAndIngredients>> getAllRecipesPopulated(){
+        return allRecipesPopulated;
     }
 
     public long insertRecipe(final Recipe recipe){

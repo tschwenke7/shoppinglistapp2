@@ -17,6 +17,9 @@ public interface RecipeDao extends BaseDao<Recipe> {
     @Query("SELECT * FROM recipes ORDER BY name ASC")
     LiveData<List<Recipe>> getAllAlphabetical();
 
+    @Query("SELECT * FROM recipes ORDER BY name ASC")
+    LiveData<List<RecipeWithTagsAndIngredients>> getAllPopulatedAlphabetical();
+
     @Query("SELECT * FROM recipes WHERE id = :id")
     Recipe getById(int id);
 

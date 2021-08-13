@@ -39,9 +39,6 @@ public class Recipe {
     private int tom_rating;
     private int tier_rating;
 
-    @Ignore
-    private List<String> tags;
-
     public int getId() {
         return id;
     }
@@ -115,13 +112,6 @@ public class Recipe {
         this.serves = serves;
     }
 
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<String> tags) {
-        this.tags = tags;
-    }
 
     @Ignore
     @Override

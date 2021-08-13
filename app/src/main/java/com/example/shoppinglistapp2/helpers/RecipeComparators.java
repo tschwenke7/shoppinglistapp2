@@ -1,49 +1,50 @@
 package com.example.shoppinglistapp2.helpers;
 
-import com.example.shoppinglistapp2.db.tables.Recipe;
+import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
 
 import java.util.Comparator;
 
 public class RecipeComparators {
-    public static class CompareRecipeName implements Comparator<Recipe> {
+    public static class CompareRecipeName implements Comparator<RecipeWithTagsAndIngredients> {
         @Override
-        public int compare(Recipe r1, Recipe r2) {
-            return (r1.getName().compareTo(r2.getName()));
+        public int compare(RecipeWithTagsAndIngredients r1, RecipeWithTagsAndIngredients r2) {
+            return (r1.getRecipe().getName().compareTo(r2.getRecipe().getName()));
         }
     }
 
-    public static class ComparePrepTime implements Comparator<Recipe> {
+    public static class ComparePrepTime implements Comparator<RecipeWithTagsAndIngredients> {
         @Override
-        public int compare(Recipe r1, Recipe r2) {
-            return r1.getPrepTime() - r2.getPrepTime();
+        public int compare(RecipeWithTagsAndIngredients r1, RecipeWithTagsAndIngredients r2) {
+            return r1.getRecipe().getPrepTime() - r2.getRecipe().getPrepTime();
         }
     }
 
-    public static class CompareTotalTime implements Comparator<Recipe> {
+    public static class CompareTotalTime implements Comparator<RecipeWithTagsAndIngredients> {
         @Override
-        public int compare(Recipe r1, Recipe r2) {
-            return (r1.getPrepTime() + r1.getCookTime()) - (r2.getPrepTime() + r2.getCookTime());
+        public int compare(RecipeWithTagsAndIngredients r1, RecipeWithTagsAndIngredients r2) {
+            return (r1.getRecipe().getPrepTime() + r1.getRecipe().getCookTime())
+                    - (r2.getRecipe().getPrepTime() + r2.getRecipe().getCookTime());
         }
     }
 
-    public static class CompareTomRating implements Comparator<Recipe> {
+    public static class CompareTomRating implements Comparator<RecipeWithTagsAndIngredients> {
         @Override
-        public int compare(Recipe r1, Recipe r2) {
-            return r2.getTom_rating() - r1.getTom_rating();
+        public int compare(RecipeWithTagsAndIngredients r1, RecipeWithTagsAndIngredients r2) {
+            return r2.getRecipe().getTom_rating() - r1.getRecipe().getTom_rating();
         }
     }
 
-    public static class CompareTiernanRating implements Comparator<Recipe> {
+    public static class CompareTiernanRating implements Comparator<RecipeWithTagsAndIngredients> {
         @Override
-        public int compare(Recipe r1, Recipe r2) {
-            return r2.getTier_rating() - r1.getTier_rating();
+        public int compare(RecipeWithTagsAndIngredients r1, RecipeWithTagsAndIngredients r2) {
+            return r2.getRecipe().getTier_rating() - r1.getRecipe().getTier_rating();
         }
     }
 
-    public static class CompareCombinedRating implements Comparator<Recipe> {
+    public static class CompareCombinedRating implements Comparator<RecipeWithTagsAndIngredients> {
         @Override
-        public int compare(Recipe r1, Recipe r2) {
-            return (r2.getTom_rating() + r2.getTier_rating()) - (r1.getTom_rating() + r1.getTier_rating());
+        public int compare(RecipeWithTagsAndIngredients r1, RecipeWithTagsAndIngredients r2) {
+            return (r2.getRecipe().getTom_rating() + r2.getRecipe().getTier_rating()) - (r1.getRecipe().getTom_rating() + r1.getRecipe().getTier_rating());
         }
     }
 }
