@@ -102,9 +102,9 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
 
                     @Override
                     public void onFailure(Throwable t) {
-                        Log.e(TAG, "adding items to shoppping list: ", t);
-                        if (t instanceof ExecutionException || t instanceof InterruptedException){
+                        if (t instanceof InterruptedException){
                             Log.e(TAG, "adding items to shoppping list: ", t);
+                            Toast.makeText(requireContext(), R.string.error_could_not_access_database, Toast.LENGTH_LONG).show();
                         }
                         else{
                             new AlertDialog.Builder(requireContext())
@@ -220,11 +220,17 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
 
                 @Override
                 public void onFailure(Throwable t) {
-                    new AlertDialog.Builder(requireContext())
-                            .setTitle(R.string.error_title)
-                            .setMessage(R.string.error_could_not_add_items)
-                            .setPositiveButton(R.string.ok, null)
-                            .show();
+                    if (t instanceof InterruptedException){
+                        Log.e(TAG, "adding items to shoppping list: ", t);
+                        Toast.makeText(requireContext(), R.string.error_could_not_access_database, Toast.LENGTH_LONG).show();
+                    }
+                    else{
+                        new AlertDialog.Builder(requireContext())
+                                .setTitle(R.string.error_title)
+                                .setMessage(R.string.error_could_not_add_items)
+                                .setPositiveButton(R.string.ok, null)
+                                .show();
+                    }
                 }
             },
             uiExecutor
