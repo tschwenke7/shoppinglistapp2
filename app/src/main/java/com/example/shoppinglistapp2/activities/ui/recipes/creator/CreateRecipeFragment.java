@@ -30,10 +30,11 @@ import android.widget.Toast;
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
-import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
+import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,9 +44,12 @@ import java.util.concurrent.ExecutionException;
  * A simple {@link Fragment} subclass.
  */
 public class CreateRecipeFragment extends Fragment {
-    private RecipesViewModel recipesViewModel;
+    private CreateRecipeViewModel viewModel;
+    private SharedViewModel sharedViewModel;
+    private ListeningExecutorService backgroundExecutor;
     private View root;
-//    private ExecutorService websiteExecutor = Executors.newSingleThreadExecutor();
+    private ProgressBar progressBar;
+    private View mainContent;
 
     public CreateRecipeFragment() {
         // Required empty public constructor
@@ -57,8 +61,12 @@ public class CreateRecipeFragment extends Fragment {
         // Inflate the layout for this fragment
         root = inflater.inflate(R.layout.fragment_create_recipe, container, false);
 
-        recipesViewModel =
-                new ViewModelProvider(getActivity()).get(RecipesViewModel.class);
+        viewModel =
+                new ViewModelProvider(requireActivity()).get(CreateRecipeViewModel.class);
+        sharedViewModel =
+                new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+
+        backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
 
         return root;
     }
@@ -66,12 +74,17 @@ public class CreateRecipeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setupUi(root);
+        setupUi();
     }
 
-    private void setupUi(View root){
+    private void setupUi(){
+
         //setup action bar to allow back button
         this.setHasOptionsMenu(true);
+
+        progressBar = root.findViewById(R.id.progressBar);
+        mainContent = root.findViewById(R.id.main_content_container);
+
         TextView supportedSitesText = root.findViewById(R.id.text_view_supported_websites);
         supportedSitesText.setText(Html.fromHtml(getString(R.string.supported_recipes)));
         supportedSitesText.setMovementMethod(LinkMovementMethod.getInstance());
@@ -83,13 +96,7 @@ public class CreateRecipeFragment extends Fragment {
         //setup manual recipe creation button to get a new recipe id for an empty recipe and navigate
         //to editor
         Button manualButton = root.findViewById(R.id.create_recipe_manually_button);
-        manualButton.setOnClickListener(view -> {
-            //create new empty recipe and navigate to recipe editor screen when "+" icon clicked
-            CreateRecipeFragmentDirections.ActionCreateRecipeToViewRecipe action =
-                    CreateRecipeFragmentDirections.actionCreateRecipeToViewRecipe();
-            //todo action.setRecipeId(recipesViewModel.generateNewRecipeId());
-            Navigation.findNavController(root).navigate(action);
-        });
+        manualButton.setOnClickListener(view -> onManualButtonClicked());
 
 
 
@@ -105,66 +112,88 @@ public class CreateRecipeFragment extends Fragment {
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
     }
 
+    //create new empty recipe and navigate to recipe editor screen
+    private void onManualButtonClicked() {
+        //show progress bar and fade everything else
+        showProgressBar();
+
+        //attempt to generate new recipe id, and navigate to editor page on its success
+        Futures.addCallback(backgroundExecutor.submit(() -> viewModel.generateNewRecipeId()),
+            new FutureCallback<Integer>() {
+
+                @Override
+                public void onSuccess(@Nullable Integer result) {
+                    CreateRecipeFragmentDirections.ActionCreateRecipeToViewRecipe action =
+                            CreateRecipeFragmentDirections.actionCreateRecipeToViewRecipe();
+                    //pass id of newly created website as parameter of navigation
+                    action.setRecipeId(result);
+                    Navigation.findNavController(root).navigate(action);
+
+                    //hide progress bar and reset opacity of everything else
+                    hideProgressBar();
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    //hide progress bar and reset opacity of everything else
+                    hideProgressBar();
+                }
+            },
+            ContextCompat.getMainExecutor(requireContext()));
+    }
+
     private void onWebsiteButtonClicked(View view){
         //show progress bar and fade everything else
-        ProgressBar progressBar = root.findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.VISIBLE);
-        View mainContent = root.findViewById(R.id.main_content_container);
-        mainContent.setAlpha(0.2f);
+        showProgressBar();
 
         String url = ((EditText) root.findViewById(R.id.edit_text_recipe_website)).getText().toString().trim();
+        //attempt to create a Recipe from the website//attempt to load the website
+        ListenableFuture<Integer> recipeId = backgroundExecutor.submit(
+               () -> viewModel.generateRecipeIdFromUrl(url));
 
+        Futures.addCallback(recipeId, new FutureCallback<Integer>() {
+            @Override
+            public void onSuccess(@Nullable Integer recipeId) {
+                //if recipe loading failed, display error message
+                if(recipeId == null || recipeId == -1){
+                    Toast.makeText(getContext(), requireContext().getString(R.string.recipe_url_error),Toast.LENGTH_LONG).show();
+                }
+                //otherwise, navigate to editor for the new recipe
+                else{
+                    CreateRecipeFragmentDirections.ActionCreateRecipeToViewRecipe action =
+                            CreateRecipeFragmentDirections.actionCreateRecipeToViewRecipe();
 
+                    //pass id of newly created recipe
+                    action.setRecipeId(recipeId);
 
-        //attempt to create a Recipe from the website
-        //attempt to load the website
-//       todo ListenableFuture<Integer> recipeId = ((App) getActivity().getApplication())
-//                .backgroundExecutorService.submit(() -> recipesViewModel.generateRecipeIdFromUrl(url));
-
-//        Futures.addCallback(recipeId, new FutureCallback<Integer>() {
-//            @Override
-//            public void onSuccess(@Nullable Integer recipeId) {
-//                //if recipe loading failed, display error message
-//                if(recipeId == null || recipeId == -1){
-//                    Toast.makeText(getContext(), requireContext().getString(R.string.recipe_url_error),Toast.LENGTH_LONG).show();
-//                }
-//                //otherwise, navigate to editor for the new recipe
-//                else{
-//                    CreateRecipeFragmentDirections.ActionCreateRecipeToViewRecipe action =
-//                            CreateRecipeFragmentDirections.actionCreateRecipeToViewRecipe();
-//
-//                    //pass id of newly created recipe
-//                    action.setRecipeId(recipeId);
-//
-//                    //navigate
-//                    Navigation.findNavController(root).navigate(action);
-//                    //hide progress bar and reset opacity of everything else
-//                    progressBar.setVisibility(View.GONE);
-//                    mainContent.setAlpha(1.0f);
-//                }
-//            }
-//            //respond to differenct potential errors
-//            @Override
-//            public void onFailure(Throwable t) {
-//                //the url entered was not valid for some reason
-//                if (t instanceof InvalidRecipeUrlExeception){
-//                    Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_LONG).show();
-//                }
-//                //the thread processing this was interrupted
-//                else if (t instanceof ExecutionException) {
-//                    t.printStackTrace();
-//                    Toast.makeText(getContext(), R.string.recipe_url_timeout_error, Toast.LENGTH_LONG).show();
-//                }
-//                //another error I wasn't expecting
-//                else{
-//                    t.printStackTrace();
-//                    Toast.makeText(getContext(), R.string.unknown_error + t.getMessage(), Toast.LENGTH_LONG).show();
-//                }
-//                //hide progress bar and reset opacity of everything else
-//                progressBar.setVisibility(View.GONE);
-//                mainContent.setAlpha(1.0f);
-//            }
-//        }, ContextCompat.getMainExecutor(this.requireContext()));
+                    //navigate
+                    Navigation.findNavController(root).navigate(action);
+                    //hide progress bar and reset opacity of everything else
+                    progressBar.setVisibility(View.GONE);
+                    mainContent.setAlpha(1.0f);
+                }
+            }
+            //respond to differenct potential errors
+            @Override
+            public void onFailure(Throwable t) {
+                //the url entered was not valid for some reason
+                if (t instanceof InvalidRecipeUrlExeception){
+                    Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+                //the thread processing this was interrupted
+                else if (t instanceof ExecutionException) {
+                    t.printStackTrace();
+                    Toast.makeText(getContext(), R.string.recipe_url_timeout_error, Toast.LENGTH_LONG).show();
+                }
+                //another error I wasn't expecting
+                else{
+                    t.printStackTrace();
+                    Toast.makeText(getContext(), R.string.unknown_error + t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+                //hide progress bar and reset opacity of everything else
+                hideProgressBar();
+            }
+        }, ContextCompat.getMainExecutor(this.requireContext()));
     }
 
     @Override
@@ -173,7 +202,7 @@ public class CreateRecipeFragment extends Fragment {
         switch (item.getItemId()) {
             //back button pressed
             case android.R.id.home:
-                ((MainActivity) getParentFragment().getActivity()).onBackPressed();
+                ((MainActivity) requireParentFragment().requireActivity()).onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -186,24 +215,36 @@ public class CreateRecipeFragment extends Fragment {
         super.onResume();
 
         //show back button
-        MainActivity activity = (MainActivity) getParentFragment().getActivity();
+        MainActivity activity = (MainActivity) requireParentFragment().requireActivity();
         if (activity != null) {
             activity.showUpButton();
 
             //check if we need to redirect to a recipe, and if so, go back to recipe list so we
             //can navigate to the desired recipe
-//    todo        if(null != recipesViewModel.getNavigateToRecipeId()){
-//                activity.onBackPressed();
-//                activity.onBackPressed();
-//            }
+            if(null != sharedViewModel.getNavigateToRecipeId()){
+                activity.onBackPressed();
+                activity.onBackPressed();
+            }
         }
 
         //set title of page
-        ((AppCompatActivity) getParentFragment().getActivity()).getSupportActionBar().setTitle(R.string.create_recipe_title);
+        ((AppCompatActivity) requireParentFragment().requireActivity()).getSupportActionBar().setTitle(R.string.create_recipe_title);
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull @NotNull Menu menu, @NonNull @NotNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    /** hide progress bar and reset opacity of everything else */
+    private void showProgressBar(){
+        progressBar.setVisibility(View.VISIBLE);
+        mainContent.setAlpha(0.2f);
+    }
+
+    /** fade main content and display loading spinner over the top */
+    private void hideProgressBar() {
+        progressBar.setVisibility(View.GONE);
+        mainContent.setAlpha(1.0f);
     }
 }

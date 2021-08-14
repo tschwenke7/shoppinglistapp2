@@ -14,10 +14,10 @@ public interface TagDao extends BaseDao<Tag> {
     void delete(int recipeId, String tagName);
 
     @Query("SELECT DISTINCT name FROM tags")
-    String[] getAllTags();
+    String[] getAllTagNames();
 
-    @Query("SELECT name FROM tags WHERE recipe_id = :recipeId")
-    List<String> getTagsByRecipe(int recipeId);
+    @Query("SELECT * FROM tags WHERE recipe_id = :recipeId")
+    List<Tag> getTagsByRecipe(int recipeId);
 
     @Insert
     List<Long> insertAll(List<Tag> tags);

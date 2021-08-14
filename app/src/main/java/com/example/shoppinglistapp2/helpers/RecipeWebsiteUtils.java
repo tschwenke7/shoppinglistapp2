@@ -5,6 +5,8 @@ import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.recipes.creator.InvalidRecipeUrlExeception;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Recipe;
+import com.example.shoppinglistapp2.db.tables.Tag;
+import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.jsoup.Jsoup;
@@ -78,7 +80,7 @@ public class RecipeWebsiteUtils {
      * @param url - the website for a recipe
      * @return - A Recipe object populated with the website's data.
      */
-    public static Recipe getRecipeFromWebsite(String url) throws InvalidRecipeUrlExeception {
+    public static RecipeWithTagsAndIngredients getRecipeFromWebsite(String url) throws InvalidRecipeUrlExeception {
         //validate url before attempting to convert
         //throws InvalidRecipeUrlException if not valid
         validateUrl(url);
@@ -101,9 +103,11 @@ public class RecipeWebsiteUtils {
         }
     }
 
-    private static Recipe convertRecipeTinEats(String url) throws IOException {
+    private static RecipeWithTagsAndIngredients convertRecipeTinEats(String url) throws IOException {
         //open webpage
         Document doc = Jsoup.connect(url).get();
+
+        RecipeWithTagsAndIngredients populatedRecipe = new RecipeWithTagsAndIngredients();
 
         Recipe recipe = new Recipe();
 
@@ -156,25 +160,23 @@ public class RecipeWebsiteUtils {
         }
 
         /* Read "course" and "cuisine" as tags if present */
-        List<String> tags = new ArrayList<>();
-
-        Elements course = doc.getElementsByClass("wprm-recipe-course");
-        if(course.size() > 0){
-            String[] courses = course.text().split(",");
-            for(int i = 0; i < courses.length; i++){
-                tags.add(courses[i].trim());
+        List<Tag> tags = new ArrayList<>();
+        Elements courseElements = doc.getElementsByClass("wprm-recipe-course");
+        if(courseElements.size() > 0){
+            String[] courses = courseElements.text().split(",");
+            for (String course : courses) {
+                tags.add(new Tag(course.trim()));
             }
         }
 
-        Elements cuisine = doc.getElementsByClass("wprm-recipe-cuisine");
-        if(cuisine.size() > 0){
-            String[] cuisines = cuisine.text().split(",");
-            for(int i = 0; i < cuisines.length; i++){
-                tags.add(cuisines[i].trim());
+        Elements cuisineElements = doc.getElementsByClass("wprm-recipe-cuisine");
+        if(cuisineElements.size() > 0){
+            String[] cuisines = cuisineElements.text().split(",");
+            for (String cuisine : cuisines) {
+                tags.add(new Tag(cuisine.trim()));
             }
         }
-
-        recipe.setTags(tags);
+        tags.add(new Tag("RecipeTin Eats"));
 
         /* get ingredients */
         ArrayList<IngListItem> ingredients = new ArrayList<>();
@@ -282,14 +284,19 @@ public class RecipeWebsiteUtils {
             }
         }
 
-//todo        recipe.setIngredients(ingredients);
+        //combine all components into populated recipe to return
+        populatedRecipe.setRecipe(recipe);
+        populatedRecipe.setTags(tags);
+        populatedRecipe.setIngredients(ingredients);
 
-        return recipe;
+        return populatedRecipe;
     }
 
-    private static Recipe convertHelloFresh(String url) throws IOException {
+    private static RecipeWithTagsAndIngredients convertHelloFresh(String url) throws IOException {
         //open webpage
         Document doc = Jsoup.connect(url).get();
+
+        RecipeWithTagsAndIngredients populatedRecipe = new RecipeWithTagsAndIngredients();
 
         Recipe recipe = new Recipe();
 
@@ -325,20 +332,21 @@ public class RecipeWebsiteUtils {
                 ingredients.add(ingredient);
             }
         }
-//todo        recipe.setIngredients(ingredients);
+
 
         /* get tags */
-        List<String> tags = new ArrayList<>();
-        tags.add("HelloFresh");
+        List<Tag> tags = new ArrayList<>();
         try {
             Element tagHeadingSpan = doc.selectFirst("span[data-translation-id=recipe-detail.tags]");
             Element tagsContainerSpan = selectNthElementAfter(tagHeadingSpan.parent(), "span", 1);
-            tags.addAll(Arrays.asList(tagsContainerSpan.text().split("•")));
+            for(String tagName: tagsContainerSpan.text().split("•")){
+                tags.add(new Tag(tagName));
+            }
         }
         catch (Exception e){
             //if there was no tags section, we'll just leave it at "HelloFresh"
         }
-        recipe.setTags(tags);
+        tags.add(new Tag("HelloFresh"));
 
         /* get prep time */
         //prep time located by going to next span after prep time heading, identified by the attribute
@@ -357,7 +365,12 @@ public class RecipeWebsiteUtils {
         //currently it is impossible to change the number of serves by clicking a button using JSoup
         recipe.setServes(2);
 
-        return recipe;
+        //combine all components into populated recipe to return
+        populatedRecipe.setRecipe(recipe);
+        populatedRecipe.setTags(tags);
+        populatedRecipe.setIngredients(ingredients);
+
+        return populatedRecipe;
     }
 
     /**

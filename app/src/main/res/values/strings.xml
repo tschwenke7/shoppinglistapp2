@@ -146,4 +146,12 @@
     <string name="error_could_not_add_items">There item you tried to enter was invalid.\nPlease enter the item\'s quantity and unit of measurement (optional) followed by its name.\ne.g. \"500g butter\", \"6 carrots\", or \"avocado\"</string>
     <string name="error_title">Error</string>
     <string name="ok">Ok</string>
+    <string name="error_deleting_recipes">Error - something went wrong when trying to delete recipes.\nPlease try again in a few minutes.</string>
+    <string name="error_adding_recipe_to_meal">Something went wrong trying to add the recipe to this meal - please try again later.</string>
+    <string name="default_recipe_name">Untitled Recipe</string>
+    <string name="error_loading_tags">Error- unable to load tags for recipe.</string>
+    <string name="error_recipe_name_already_used">This recipe name is already in use - please choose another.</string>
+    <string name="error_could_not_access_database">Error - could not connect to database. Please try again later.</string>
+    <string name="error_no_recipe_name_entered">Please enter a name for this recipe</string>
+    <string name="error_sending_ingredients_to_shopping_list">Something went wrong while trying to add these ingredients to the shopping list. Please try again later and report this bug if it continues.</string>
 </resources>

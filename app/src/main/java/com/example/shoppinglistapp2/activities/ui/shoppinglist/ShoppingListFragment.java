@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,13 +33,18 @@ import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.helpers.IngListItemUtils;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 public class ShoppingListFragment extends Fragment implements ShoppingListAdapter.SlItemClickListener {
     private ShoppingListViewModel shoppingListViewModel;
     private ListeningExecutorService backgroundExecutor;
+    private Executor uiExecutor;
+
+    private final String TAG = "T_DBG_SL_FRAG";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -50,6 +56,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
         View root = inflater.inflate(R.layout.fragment_shopping_list, container, false);
 
         backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
+        uiExecutor = ContextCompat.getMainExecutor(requireContext());
         return root;
     }
 
@@ -84,24 +91,32 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
             Toast.makeText(this.getContext(), R.string.error_no_list_item_entered, Toast.LENGTH_LONG).show();
         }
         else{
-            Futures.addCallback(backgroundExecutor.submit(() -> shoppingListViewModel.addItems(inputText)),
-                    new FutureCallback<Object>() {
-                        @Override
-                        public void onSuccess(@Nullable Object result) {
-                            //clear input box
-                            input.setText("");
-                        }
+            Futures.addCallback(
+                backgroundExecutor.submit(() -> shoppingListViewModel.addItems(inputText)),
+                new FutureCallback<Object>() {
+                    @Override
+                    public void onSuccess(@Nullable Object result) {
+                        //clear input box
+                        input.setText("");
+                    }
 
-                        @Override
-                        public void onFailure(Throwable t) {
+                    @Override
+                    public void onFailure(Throwable t) {
+                        Log.e(TAG, "adding items to shoppping list: ", t);
+                        if (t instanceof ExecutionException || t instanceof InterruptedException){
+                            Log.e(TAG, "adding items to shoppping list: ", t);
+                        }
+                        else{
                             new AlertDialog.Builder(requireContext())
                                     .setTitle(R.string.error_title)
                                     .setMessage(R.string.error_could_not_add_items)
                                     .setPositiveButton(R.string.ok, null)
                                     .show();
                         }
-                    },
-                    ContextCompat.getMainExecutor(requireContext()));
+                    }
+                },
+                uiExecutor
+            );
         }
     }
 
@@ -176,27 +191,43 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
 
     @Override
     public void onSlItemClick(int position) {
-        backgroundExecutor.execute(() -> shoppingListViewModel.toggleChecked(position));
+        Futures.addCallback(
+            backgroundExecutor.submit(() -> shoppingListViewModel.toggleChecked(position)),
+            new FutureCallback<Object>() {
+                @Override
+                public void onSuccess(@Nullable Object result) {
+                    //do nothing
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.e(TAG, "while crossing off item: ", t);
+                    Toast.makeText(requireContext(), R.string.error_could_not_access_database, Toast.LENGTH_LONG).show();
+                }
+            },
+            uiExecutor
+        );
     }
 
     @Override
     public void onSlItemEditConfirm(IngListItem oldItem, String newItemString) {
         Futures.addCallback(backgroundExecutor.submit(() -> shoppingListViewModel.editItem(oldItem, newItemString)),
-                new FutureCallback<Object>() {
-                    @Override
-                    public void onSuccess(@Nullable Object result) {
+            new FutureCallback<Object>() {
+                @Override
+                public void onSuccess(@Nullable Object result) {
 
-                    }
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        new AlertDialog.Builder(requireContext())
-                                .setTitle(R.string.error_title)
-                                .setMessage(R.string.error_could_not_add_items)
-                                .setPositiveButton(R.string.ok, null)
-                                .show();
-                    }
-                },
-                ContextCompat.getMainExecutor(requireContext()));
+                @Override
+                public void onFailure(Throwable t) {
+                    new AlertDialog.Builder(requireContext())
+                            .setTitle(R.string.error_title)
+                            .setMessage(R.string.error_could_not_add_items)
+                            .setPositiveButton(R.string.ok, null)
+                            .show();
+                }
+            },
+            uiExecutor
+        );
     }
 }

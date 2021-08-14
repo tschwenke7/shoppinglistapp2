@@ -12,6 +12,7 @@ import java.util.Objects;
 
 public class IngListWithItems {
     @Embedded private IngList ingList;
+
     @Relation(parentColumn = "id", entityColumn = "list_id")
     private List<IngListItem> items;
 

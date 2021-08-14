@@ -52,7 +52,14 @@ public abstract class BaseRecyclerViewAdapter<Item> extends RecyclerView.Adapter
     }
 
     protected void updateListInternal(List<Item> newItems) {
-        final List<Item> oldItems = new ArrayList<>(items);
+        final List<Item> oldItems;
+        if(null != items){
+            oldItems = new ArrayList<>(items);
+        }
+        else{
+            oldItems = null;
+        }
+
         final Handler handler = new Handler();
         new Thread(() -> {
             final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(createDiffCallback(newItems, oldItems));

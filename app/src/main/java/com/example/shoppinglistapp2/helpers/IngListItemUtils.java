@@ -144,7 +144,7 @@ public class IngListItemUtils {
         return UnitType.INVALID;
     }
 
-    public static IngListItem toIngListItem(String ingText) {
+    public static IngListItem toIngListItem(String ingText) throws InvalidIngredientStringException {
         IngListItem ingListItem = new IngListItem();
         StringBuilder name = new StringBuilder();
         StringBuilder amount = new StringBuilder();
@@ -170,7 +170,7 @@ public class IngListItemUtils {
         }
 
         /*now we need to break down the last component, which contains the name and potentially an amount */
-        String[] words = amounts[amounts.length-1].split(" ");
+        String[] words = amounts[amounts.length-1].trim().split(" ");
 
         //if first word is "[num]x", interpret this as qty [num]
         if (words[0].matches("\\d+x$")){
@@ -262,7 +262,7 @@ public class IngListItemUtils {
      *               Where <number> = integer, decimal, fraction (in format integer/integer)
      *               or mixed numeral (in format <integer>_<integer>/<integer>)
      */
-    private static void addAmount(IngListItem ingListItem, String amount) {
+    private static void addAmount(IngListItem ingListItem, String amount) throws InvalidIngredientStringException {
         /* Separate the qty and unit (if applicable) from the amount String */
 
         //find last occurrence of a digit to split qty/unit at
@@ -296,6 +296,9 @@ public class IngListItemUtils {
             case MASS:
                 ingListItem.setMassQty(qty);
                 ingListItem.setMassUnit(unit);
+                break;
+            case INVALID:
+                throw new InvalidIngredientStringException();
         }
     }
 
@@ -548,4 +551,5 @@ public class IngListItemUtils {
                 return qty;
         }
     }
+
 }

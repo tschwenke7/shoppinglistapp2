@@ -122,12 +122,12 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         this.recipesFull = sortedListFull;
     }
 
-    public RecipeWithTagsAndIngredients[] getSelectedItems(){
+    public List<RecipeWithTagsAndIngredients> getSelectedItems(){
         List<RecipeWithTagsAndIngredients> selectedItems = new ArrayList<>();
         for(Integer position : selectedPositions){
             selectedItems.add(recipes.get(position));
         }
-        return selectedItems.toArray(new RecipeWithTagsAndIngredients[selectedItems.size()]);
+        return selectedItems;
     }
 
     public int getSelectedItemCount(){
@@ -360,6 +360,7 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
     public class ViewHolder extends BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients>.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         private final View itemView;
         private OnRecipeClickListener onRecipeClickListener;
+        private int recipeId;
 
         public ViewHolder(@NonNull View itemView, OnRecipeClickListener onRecipeClickListener) {
             super(itemView);
@@ -374,6 +375,7 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         @Override
         public void bind (RecipeWithTagsAndIngredients recipeWithTagsAndIngredients){
             Recipe recipe = recipeWithTagsAndIngredients.getRecipe();
+            recipeId = recipe.getId();
 
             //set name
             TextView recipeNameView = itemView.findViewById(R.id.recipe_name);
@@ -429,8 +431,9 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         }
 
         @Override
+        /** Returns the recipeId of the recipe bound to this viewholder*/
         public void onClick(View view) {
-            onRecipeClickListener.onRecipeClick(getAdapterPosition());
+            onRecipeClickListener.onRecipeClick(recipeId);
         }
         @Override
         public boolean onLongClick(View view) {

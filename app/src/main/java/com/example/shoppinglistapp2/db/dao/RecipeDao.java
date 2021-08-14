@@ -17,6 +17,7 @@ public interface RecipeDao extends BaseDao<Recipe> {
     @Query("SELECT * FROM recipes ORDER BY name ASC")
     LiveData<List<Recipe>> getAllAlphabetical();
 
+    @Transaction
     @Query("SELECT * FROM recipes ORDER BY name ASC")
     LiveData<List<RecipeWithTagsAndIngredients>> getAllPopulatedAlphabetical();
 
@@ -39,6 +40,10 @@ public interface RecipeDao extends BaseDao<Recipe> {
     @Transaction
     @Query("SELECT * FROM recipes ORDER BY recipes.name ASC")
     LiveData<List<RecipeWithTagsAndIngredients>> getAllWithTagsAndIngLists();
+
+    @Transaction
+    @Query("SELECT * FROM recipes WHERE id = :id")
+    RecipeWithTagsAndIngredients getPopulatedByIdNonLive(int id);
 
     @Transaction
     @Query("SELECT * FROM recipes WHERE id = :id")

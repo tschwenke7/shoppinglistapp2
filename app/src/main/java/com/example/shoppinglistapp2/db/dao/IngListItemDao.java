@@ -11,7 +11,7 @@ import java.util.List;
 @Dao
 public interface IngListItemDao extends BaseDao<IngListItem> {
     @Query("SELECT * FROM ing_list_items WHERE list_id = :id ORDER BY checked")
-    public LiveData<List<IngListItem>> getIngredientsByListId(int id);
+    LiveData<List<IngListItem>> getIngredientsByListId(int id);
 
     @Query("SELECT * FROM ing_list_items WHERE list_id = :id")
     List<IngListItem> getIngredientsByListIdNonLive(int id);
@@ -33,6 +33,9 @@ public interface IngListItemDao extends BaseDao<IngListItem> {
 
     @Query("SELECT ing_list_items.id, name, list_id, checked, mass_unit, mass_qty, other_qty, other_unit, other_qty, volume_qty, volume_unit, whole_item_qty FROM ing_lists INNER JOIN ing_list_items ON ing_lists.id = ing_list_items.list_id WHERE ing_lists.recipe_id = :recipeId")
     LiveData<List<IngListItem>> getAllFromRecipe(int recipeId);
+
+    @Query("SELECT ing_list_items.id, name, list_id, checked, mass_unit, mass_qty, other_qty, other_unit, other_qty, volume_qty, volume_unit, whole_item_qty FROM ing_lists INNER JOIN ing_list_items ON ing_lists.id = ing_list_items.list_id WHERE ing_lists.recipe_id = :recipeId")
+    List<IngListItem> getAllFromRecipeNonLive(int recipeId);
 
     @Query("SELECT * FROM ing_list_items WHERE list_id = :shoppingListId ORDER BY checked ASC, id DESC")
     LiveData<List<IngListItem>> getAllFromShoppingList(int shoppingListId);

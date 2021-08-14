@@ -10,6 +10,7 @@ import com.example.shoppinglistapp2.db.dao.MealDao;
 import com.example.shoppinglistapp2.db.dao.MealPlanDao;
 import com.example.shoppinglistapp2.db.dao.RecipeDao;
 import com.example.shoppinglistapp2.db.dao.TagDao;
+import com.example.shoppinglistapp2.db.tables.IngList;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Meal;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
@@ -54,29 +55,102 @@ public class SlaRepository {
         return allRecipesPopulated;
     }
 
-    public long insertRecipe(final Recipe recipe){
-        Callable<Long> insertCallable = () -> recipeDao.insert(recipe);
-        long rowId = 0;
-
-        Future<Long> future = SlaDatabase.databaseWriteExecutor.submit(insertCallable);
-        try {
-            rowId = future.get();
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-            return -1;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            return -1;
-        }
-        return rowId;
+    public ListenableFuture<Integer> insertRecipe(final Recipe recipe){
+        return SlaDatabase.databaseWriteExecutor.submit(() -> (int) recipeDao.insert(recipe));
     }
 
     public void insertIngListItems(List<IngListItem> ingListItems) {
         SlaDatabase.databaseWriteExecutor.execute(() -> ingListItemDao.insertAll(ingListItems));
     }
 
+    public void insertOrMergeItem(long listId, IngListItem newItem) {
+        IngListItem existingItemWithSameName = findItemWithMatchingName(listId, newItem);
+
+        //if there's still no match, just insert
+        if(null == existingItemWithSameName){
+
+            //calling "get()" forces the insert to have completed before this function completes.
+            //This helps in cases where multiple ingredients are added in a row, preventing duplicates
+            //merging being a race condition with the database's inserting happening slower than its
+            //next "findIngListItemWithSameName" call.
+            newItem.setListId(listId);
+            insertIngListItem(newItem);
+        }
+        //if one was found, merge their quantities then persist the change
+        else{
+            IngListItemUtils.mergeQuantities(existingItemWithSameName, newItem);
+            updateOrDeleteIfEmptyIngListItem(existingItemWithSameName);
+        }
+    }
+
+    /**
+     * Attempts to find an IngListItem in the database other than this one with a matching name
+     * and checked flag value. Also checks for plurals, e.g. potato matches potatoes,
+     * by attempting to match name without trailing "s" or "es", or by adding those suffixes,
+     * if the original name is not found.
+     * @param listId the id of the list to search within.
+     * @param newItem the item to find a match for.
+     * @return an existing item within the list with the same or the de/pluralised form, or null
+     * if no match.
+     */
+    public IngListItem findItemWithMatchingName(long listId, IngListItem newItem){
+        //attempt to find an existing item with the same name
+        IngListItem existingItemWithSameName =
+                findIngListItemWithSameName(listId, newItem.getId(), newItem.getName(), newItem.isChecked());
+
+        //if none found, try some variations of plura/non plural for the name
+        if(null == existingItemWithSameName){
+            String name = newItem.getName();
+            //try accounting for plural variation in name
+            //remove "s" from the end if applicable
+            if(name.endsWith("s")){
+                existingItemWithSameName =
+                       findIngListItemWithSameName(listId, newItem.getId(),
+                                name.substring(0, newItem.getName().length() - 1),
+                                newItem.isChecked());
+                //if still no match, try removing an "es" suffix if applicable
+                if(null == existingItemWithSameName){
+                    if (name.endsWith("es")){
+                        existingItemWithSameName =
+                                findIngListItemWithSameName(listId, newItem.getId(),
+                                        name.substring(0, newItem.getName().length() - 2),
+                                        newItem.isChecked());
+                    }
+                }
+                //if we found a matching item by de-pluralising the name, convert its name to the
+                //plural form since we're about to merge newItem's qty into it and newItem is already
+                //plural
+                if (null != existingItemWithSameName){
+                    existingItemWithSameName.setName(newItem.getName());
+                }
+            }
+            //otherwise try turning the name into a plural
+            else{
+                existingItemWithSameName =
+                        findIngListItemWithSameName(listId, newItem.getId(),
+                                name + "s",
+                                newItem.isChecked());
+
+                //try adding an "es" to the end if that still hasn't worked
+                if(null == existingItemWithSameName){
+                    existingItemWithSameName =
+                            findIngListItemWithSameName(listId, newItem.getId(),
+                                    name + "es",
+                                    newItem.isChecked());
+                }
+            }
+        }
+        return existingItemWithSameName;
+    }
+
     public LiveData<List<IngListItem>> getIngredientsByRecipeId(int id){
         return ingListItemDao.getAllFromRecipe(id);
+    }
+
+    public ListenableFuture<List<IngListItem>> getIngredientsByRecipeIdNonLive(int id){
+        return SlaDatabase.databaseWriteExecutor.submit(
+                () -> ingListItemDao.getAllFromRecipeNonLive(id)
+        );
     }
 
     public List<IngListItem> getIngListItemsByRecipeIdNonLive(int id){
@@ -92,10 +166,12 @@ public class SlaRepository {
         }
     }
 
-    public void deleteRecipe(List<Recipe> recipes){
-        SlaDatabase.databaseWriteExecutor.execute(() -> {
-            recipeDao.deleteAll(recipes);
-        });
+    public ListenableFuture<Integer> deleteRecipes(List<Recipe> recipe){
+        return SlaDatabase.databaseWriteExecutor.submit(() -> recipeDao.deleteAll(recipe));
+    }
+
+    public ListenableFuture<Integer> deleteRecipe(Recipe recipe){
+        return SlaDatabase.databaseWriteExecutor.submit(() -> recipeDao.delete(recipe));
     }
 
     public Recipe getRecipeByName(String name){
@@ -110,19 +186,8 @@ public class SlaRepository {
         }
     }
 
-    public boolean recipeNameIsUnique(String name){
-        Callable<Recipe> queryCallable = () -> recipeDao.getByName(name);
-
-        Future<Recipe> future = SlaDatabase.databaseWriteExecutor.submit(queryCallable);
-        try {
-            return null == future.get();
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-            return false;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public boolean recipeNameIsUnique(String name) throws ExecutionException, InterruptedException {
+        return SlaDatabase.databaseWriteExecutor.submit(() -> recipeDao.getByName(name) == null).get();
     }
 
     public void updateRecipe(Recipe recipe) {
@@ -184,9 +249,10 @@ public class SlaRepository {
         }
     }
 
-    public ListenableFuture<Long> insertIngListItem(IngListItem slItem){
-        Callable<Long> queryCallable = () -> ingListItemDao.insert(slItem);
-        return SlaDatabase.databaseWriteExecutor.submit(queryCallable);
+    public long insertIngListItem(IngListItem ingListItem){
+        return ingListItemDao.insert(ingListItem);
+//        Callable<Long> queryCallable = () -> ingListItemDao.insert(ingListItem);
+//        return SlaDatabase.databaseWriteExecutor.submit(queryCallable);
     }
 
     public void updateOrDeleteIfEmptyIngListItem(IngListItem item){
@@ -212,40 +278,20 @@ public class SlaRepository {
         SlaDatabase.databaseWriteExecutor.execute(() -> tagDao.insert(tag));
     }
 
-    public void deleteTag(Tag tag){
-        SlaDatabase.databaseWriteExecutor.execute(() -> tagDao.delete(tag));
+    public ListenableFuture<Integer> deleteTag(Tag tag){
+        return SlaDatabase.databaseWriteExecutor.submit(() -> tagDao.delete(tag));
     }
 
     public void deleteTag(int recipeId, String tag) {
         SlaDatabase.databaseWriteExecutor.execute(() -> tagDao.delete(recipeId, tag));
     }
 
-    public String[] getAllTags(){
-        Future<String[]> future = SlaDatabase.databaseWriteExecutor.submit(
-                () -> tagDao.getAllTags());
-        try {
-            return future.get();
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-            return null;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public ListenableFuture<String[]> getAllTagNames(){
+        return SlaDatabase.databaseWriteExecutor.submit(tagDao::getAllTagNames);
     }
 
-    public List<String> getTagsByRecipe(int recipeId){
-        Future<List<String>> future = SlaDatabase.databaseWriteExecutor.submit(
-                () -> tagDao.getTagsByRecipe(recipeId));
-        try {
-            return future.get();
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-            return null;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public ListenableFuture<List<Tag>> getTagsByRecipe(int recipeId){
+        return SlaDatabase.databaseWriteExecutor.submit(() -> tagDao.getTagsByRecipe(recipeId));
     }
 
     public void insertTag(int recipeId, String tagName) {
@@ -262,8 +308,8 @@ public class SlaRepository {
         SlaDatabase.databaseWriteExecutor.execute(()-> mealPlanDao.insert(mealPlan));
     }
 
-    public void updateMealPlan(MealPlan mealPlan) {
-        SlaDatabase.databaseWriteExecutor.execute(()-> mealPlanDao.update(mealPlan));
+    public ListenableFuture<Integer> updateMeal(Meal meal) {
+        return SlaDatabase.databaseWriteExecutor.submit(()-> mealDao.update(meal));
     }
 
     public Meal getMealById(int id){
@@ -310,5 +356,16 @@ public class SlaRepository {
     public void insertOrIgnoreShoppingList() {
         SlaDatabase.databaseWriteExecutor.submit(
                 () -> ingListDao.insertShoppingList(IngListItemUtils.SHOPPING_LIST_ID));
+    }
+
+    public ListenableFuture<Long> insertIngList(long recipeId) {
+        IngList ingList = new IngList();
+        ingList.setRecipeId(recipeId);
+
+        return SlaDatabase.databaseWriteExecutor.submit(() -> ingListDao.insert(ingList));
+    }
+
+    public ListenableFuture<RecipeWithTagsAndIngredients> getPopulatedRecipeById(int id) {
+        return SlaDatabase.databaseWriteExecutor.submit(() -> recipeDao.getPopulatedByIdNonLive(id));
     }
 }

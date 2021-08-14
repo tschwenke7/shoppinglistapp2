@@ -51,6 +51,13 @@ public class RecipeWithTagsAndIngredients {
         return ingListWithItems.getItems();
     }
 
+    public void setIngredients(List<IngListItem> ingredients){
+        if(null == ingListWithItems){
+            ingListWithItems = new IngListWithItems();
+            ingListWithItems.setItems(ingredients);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

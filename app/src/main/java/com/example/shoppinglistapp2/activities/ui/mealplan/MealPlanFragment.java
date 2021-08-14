@@ -24,7 +24,7 @@ import android.widget.Toast;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
-import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
+
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListAdapter;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListViewModel;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
@@ -36,7 +36,6 @@ import org.jetbrains.annotations.NotNull;
 public class MealPlanFragment extends Fragment implements MealPlanListAdapter.MealPlanClickListener, ShoppingListAdapter.SlItemClickListener {
 
     private MealPlanViewModel mealPlanViewModel;
-    private RecipesViewModel recipesViewModel;
     private ShoppingListViewModel shoppingListViewModel;
     private Callback callback;
 
@@ -58,8 +57,8 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
         //get viewModels
         mealPlanViewModel =
                 new ViewModelProvider(getActivity()).get(MealPlanViewModel.class);
-        recipesViewModel =
-                new ViewModelProvider(getActivity()).get(RecipesViewModel.class);
+//        recipesViewModel =
+//                new ViewModelProvider(getActivity()).get(RecipesViewModel.class);
         shoppingListViewModel =
                 new ViewModelProvider(getActivity()).get(ShoppingListViewModel.class);
 

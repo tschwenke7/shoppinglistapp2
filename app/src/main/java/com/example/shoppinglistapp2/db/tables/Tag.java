@@ -7,6 +7,8 @@ import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.util.Objects;
+
 @Entity(tableName = "tags",
         foreignKeys = @ForeignKey(
                 entity = Recipe.class,
@@ -34,6 +36,11 @@ public class Tag {
         this.name = tagName;
     }
 
+    @Ignore
+    public Tag(@NonNull String name) {
+        this.name = name;
+    }
+
     public int getId() {
         return id;
     }
@@ -56,6 +63,19 @@ public class Tag {
 
     public void setRecipeId(int recipeId) {
         this.recipeId = recipeId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tag tag = (Tag) o;
+        return name.equals(tag.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }
 

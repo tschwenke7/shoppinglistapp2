@@ -3,7 +3,6 @@ package com.example.shoppinglistapp2.activities.ui.recipes.recipelist;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,33 +22,44 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
+import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
 import com.example.shoppinglistapp2.activities.ui.ViewPagerNavigationCallback;
-import com.example.shoppinglistapp2.activities.ui.recipes.RecipesViewModel;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListeningExecutorService;
 
 public class RecipeListFragment extends Fragment implements RecipeListAdapter.OnRecipeClickListener, AdapterView.OnItemSelectedListener {
 
-    private RecipesViewModel recipesViewModel;
+    private RecipeListViewModel viewModel;
+    private SharedViewModel sharedViewModel;
     private ActionMode actionMode;
-//    private ActionMode.Callback multiSelectActionModeCallback = new ActionModeCallback(1);
-//    private ActionMode.Callback chooseMealPlanItemActionModeCallback = new ActionModeCallback(2);
+    private ActionMode.Callback multiSelectActionModeCallback = new ActionModeCallback(1);
+    private ActionMode.Callback chooseMealPlanItemActionModeCallback = new ActionModeCallback(2);
     private RecipeListAdapter adapter;
     private boolean advancedSearchVisible;
     private ViewPagerNavigationCallback callback;
+    private ListeningExecutorService executor;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        recipesViewModel =
-                new ViewModelProvider(requireActivity()).get(RecipesViewModel.class);
+        viewModel =
+                new ViewModelProvider(requireActivity()).get(RecipeListViewModel.class);
+        sharedViewModel =
+                new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
         callback = (ViewPagerNavigationCallback) getActivity();
+
+        executor = ((App) requireActivity().getApplication()).backgroundExecutorService;
 
         //this will delete ALL recipes and load recipetineats websites from the spreadsheet in res/raw/<name>.csv
 //        recipesViewModel.loadFromBackup(this);
@@ -76,7 +86,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
         //set observer to update recipe list if it changes
-        recipesViewModel.getAllRecipes().observe(getViewLifecycleOwner(),
+        viewModel.getAllRecipes().observe(getViewLifecycleOwner(),
                 recipes -> adapter.updateList(recipes));
 
         //populate advanced search spinners
@@ -113,7 +123,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             @Override
             public boolean onQueryTextChange(String newText) {
                 //end mutli-select if user changes search, as list weill change
-                if(actionMode != null && recipesViewModel.getSelectingForMeal() == null){
+                if(actionMode != null && sharedViewModel.getSelectingForMeal() == null){
                     actionMode.finish();
                 }
                 adapter.getFilter().filter(newText);
@@ -151,13 +161,13 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     public void onResume() {
         super.onResume();
         //check if we need to redirect to a recipe
-        Integer recipeId = recipesViewModel.getNavigateToRecipeId();
+        Integer recipeId = sharedViewModel.getNavigateToRecipeId();
         if(null != recipeId){
             //navigate to view recipe, passing id of clicked recipe along
             RecipeListFragmentDirections.ActionRecipeListToViewRecipe action = RecipeListFragmentDirections.actionRecipeListToViewRecipe();
             action.setRecipeId(recipeId);
             //clear value, so we don't redirect again next time
-            recipesViewModel.setNavigateToRecipeId(null);
+            sharedViewModel.setNavigateToRecipeId(null);
             Navigation.findNavController(requireView()).navigate(action);
         }
 
@@ -171,12 +181,12 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar().setTitle(R.string.title_recipes);
 
         //if we've arrived at this page to select a recipe for a meal plan,
-        if(recipesViewModel.getSelectingForMeal() != null){
+        if(sharedViewModel.getSelectingForMeal() != null){
             //activate the appropriate action mode
             actionMode = ((AppCompatActivity) requireActivity()).startSupportActionMode(chooseMealPlanItemActionModeCallback);
 
             //change title accordingly
-            actionMode.setTitle(String.format("Choose a recipe for %s", recipesViewModel.getSelectingForMeal().getDayTitle()));
+            actionMode.setTitle(String.format("Choose a recipe for %s", sharedViewModel.getSelectingForMeal().getDayTitle()));
             actionMode.invalidate();
         }
     }
@@ -193,7 +203,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         switch (item.getItemId()) {
             case R.id.action_add_recipe:  {
                 //navigate to recipe creation hub
-                Navigation.findNavController(root).navigate(R.id.action_recipe_list_to_create_recipe);
+                Navigation.findNavController(requireView()).navigate(R.id.action_recipe_list_to_create_recipe);
                 return true;
             }
             default:
@@ -202,13 +212,24 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     }
 
     @Override
-    public void onRecipeClick(int position) {
-        Log.d("TOM_TEST", "onRecipeClick triggered for item " + position);
-
+    public void onRecipeClick(int recipeId) {
         //if we are currently in select for mealplan mode, click should instead save this recipe as a mealplan
-        if(recipesViewModel.getSelectingForMeal() != null){
+        if(sharedViewModel.getSelectingForMeal() != null){
             //update db with this recipe in the specified meal plan slot
-            recipesViewModel.saveToMealPlan(position);
+            Futures.addCallback(executor.submit(() -> sharedViewModel.saveToMealPlan(recipeId)),
+                    new FutureCallback<Object>() {
+                        @Override
+                        public void onSuccess(@Nullable Object result) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Throwable t) {
+                            Toast.makeText(requireContext(), R.string.error_adding_recipe_to_meal, Toast.LENGTH_LONG).show();
+                            t.printStackTrace();
+                        }
+                    },
+                    ContextCompat.getMainExecutor(requireContext()));
 
             //navigate back to meal plan tab
             actionMode.finish();
@@ -218,15 +239,15 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         else{
             //navigate to view recipe, passing id of clicked recipe along
             RecipeListFragmentDirections.ActionRecipeListToViewRecipe action = RecipeListFragmentDirections.actionRecipeListToViewRecipe();
-            action.setRecipeId(recipesViewModel.getRecipeIdAtPosition(position));
-            Navigation.findNavController(root).navigate(action);
+            action.setRecipeId(recipeId);
+            Navigation.findNavController(requireView()).navigate(action);
         }
     }
 
     @Override
     public boolean onRecipeLongPress(View view, int position) {
         if (actionMode == null){
-            actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(multiSelectActionModeCallback);
+            actionMode = ((AppCompatActivity) requireActivity()).startSupportActionMode(multiSelectActionModeCallback);
         }
 
         //check if all items have been deselected to close actionMode
@@ -254,7 +275,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                 //respond to option selection here
                 adapter.setSearchCriteria(pos);
                 //show appropriate hint
-                TextView hintTextView = root.findViewById(R.id.search_hint);
+                TextView hintTextView = requireView().findViewById(R.id.search_hint);
                 switch (pos){
                     case 0:
                         hintTextView.setVisibility(View.GONE);
@@ -289,7 +310,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     private class ActionModeCallback implements ActionMode.Callback{
         /** 1 - multi select for deletion or bulk adding ingredients to shopping list
          *  2 - select a recipe to add to meal plan slot */
-        private int actionCode;
+        private final int actionCode;
 
         public int getActionCode() {
             return actionCode;
@@ -327,19 +348,30 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                 //Handle clicking of delete button
                 case R.id.action_delete_recipe:
                     //prompt for confirmation first
-                    new AlertDialog.Builder(root.getContext())
+                    new AlertDialog.Builder(requireContext())
                             .setTitle(R.string.delete_recipes_warning_title)
-                            .setMessage(String.format("%s %d %s",
-                                    root.getContext().getString(R.string.delete_warning_prompt1),
+                            .setMessage(String.format("%s %d %s", R.string.delete_warning_prompt1,
                                     adapter.getSelectedItemCount(),
-                                    root.getContext().getString(R.string.delete_warning_prompt2)))
+                                    R.string.delete_warning_prompt2))
                             .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                                 //actually delete selected recipes if confirmed
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    Toast.makeText(root.getContext(), String.format("Deleted %d recipes", adapter.getSelectedItemCount()), Toast.LENGTH_LONG).show();
-                                    recipesViewModel.deleteRecipes(adapter.getSelectedItems());
-                                    actionMode.finish();//remove action bar
+                                    Toast.makeText(requireContext(), String.format("Deleted %d recipes", adapter.getSelectedItemCount()), Toast.LENGTH_LONG).show();
+                                    Futures.addCallback(viewModel.deleteRecipes(adapter.getSelectedItems()),
+                                        new FutureCallback<Integer>() {
+                                            @Override
+                                            public void onSuccess(@Nullable Integer result) {
+                                                actionMode.finish();//remove action bar
+                                            }
+
+                                            @Override
+                                            public void onFailure(Throwable t) {
+                                                Toast.makeText(requireContext(), R.string.error_deleting_recipes, Toast.LENGTH_LONG).show();
+                                                t.printStackTrace();
+                                            }
+                                        },
+                                        ContextCompat.getMainExecutor(requireContext()));
                                 }
                             })
                             //otherwise don't do anything
@@ -364,7 +396,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             adapter.clearSelections();
-            recipesViewModel.clearSelectingForMeal();
+            sharedViewModel.clearSelectingForMeal();
             actionMode = null;
         }
     }
