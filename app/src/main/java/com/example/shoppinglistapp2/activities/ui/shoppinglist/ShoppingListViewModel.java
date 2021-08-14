@@ -73,29 +73,7 @@ public class ShoppingListViewModel extends AndroidViewModel {
     }
 
     public void editItem(IngListItem oldItem, String newItemString) throws InvalidIngredientStringException {
-        //convert user's string to a new item
-        IngListItem newItem = IngListItemUtils.toIngListItem(newItemString);
-
-        //copy identifying values over from oldItem to new item
-        newItem.setId(oldItem.getId());
-        newItem.setListId(oldItem.getListId());
-        newItem.setChecked(oldItem.isChecked());
-
-        //if name of ingredient has been changed to one which already exists,
-        //we need to merge it with an existing item.
-        //therefore, we delete the old item and then merge the modified one in.
-        IngListItem existingItemWithSameName = slaRepository.findItemWithMatchingName(oldItem.getListId(), newItem);
-        if (null != existingItemWithSameName){
-            slaRepository.deleteIngListItem(oldItem);
-            IngListItemUtils.mergeQuantities(existingItemWithSameName, newItem);
-            slaRepository.updateOrDeleteIfEmptyIngListItem(existingItemWithSameName);
-        }
-
-        //if it wasn't changed to an existing item, simply update the original item in the db
-        else{
-            //since newItem has the same "id" as oldItem, it will overwrite the database entry
-            slaRepository.updateOrDeleteIfEmptyIngListItem(newItem);
-        }
+        slaRepository.editItem(oldItem, newItemString);
     }
 
     public String getAllItemsAsString(boolean includeChecked) {

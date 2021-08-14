@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.BaseRecyclerViewAdapter;
@@ -28,10 +27,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients> implements Filterable {
-    private List<RecipeWithTagsAndIngredients> recipes;
-    private List<RecipeWithTagsAndIngredients> recipesFull;
+    private List<RecipeWithTagsAndIngredients> itemsFull;
     private Deque<List<RecipeWithTagsAndIngredients>> pendingUpdates =
             new ArrayDeque<>();
 
@@ -44,9 +43,10 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         NAME,
         INGREDIENT,
         TAG
-    };
+    }
 
-    public RecipeListAdapter(OnRecipeClickListener onRecipeClickListener){
+    public RecipeListAdapter(Executor listUpdateExecutor, OnRecipeClickListener onRecipeClickListener){
+        super(listUpdateExecutor);
         this.onRecipeClickListener = onRecipeClickListener;
         searchCriteria = SearchCriteria.NAME;
     }
@@ -78,7 +78,6 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         }
     }
 
-    //todo update this
     public void sort(int orderingCriteria){
         //choose a comparator depending on which option was selected by the user
         Comparator<RecipeWithTagsAndIngredients> comparator = null;
@@ -110,22 +109,22 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         }
 
         //now sort both the filtered and full lists using this comparator
-        List<RecipeWithTagsAndIngredients> sortedList = new ArrayList<>(recipes);
-        List<RecipeWithTagsAndIngredients> sortedListFull = new ArrayList<>(recipesFull);
+        List<RecipeWithTagsAndIngredients> sortedList = new ArrayList<>(items);
+        List<RecipeWithTagsAndIngredients> sortedListFull = new ArrayList<>(itemsFull);
         Collections.sort(sortedList, comparator);
         Collections.sort(sortedListFull, comparator);
 
         //calculate DiffUtil
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new RecipeDiff(sortedList, recipes));
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new RecipeDiff(sortedList, items));
         diffResult.dispatchUpdatesTo(this);
-        this.recipes = sortedList;
-        this.recipesFull = sortedListFull;
+        this.items = sortedList;
+        this.itemsFull = sortedListFull;
     }
 
     public List<RecipeWithTagsAndIngredients> getSelectedItems(){
         List<RecipeWithTagsAndIngredients> selectedItems = new ArrayList<>();
         for(Integer position : selectedPositions){
-            selectedItems.add(recipes.get(position));
+            selectedItems.add(items.get(position));
         }
         return selectedItems;
     }
@@ -161,20 +160,20 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
 
             if(constraint == null || constraint.length() == 0){
                 //if recipes haven't finished loading yet, wait until they have
-                while (recipesFull == null){
+                while (itemsFull == null){
                     try {
                         Thread.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-                filteredList.addAll(recipesFull);
+                filteredList.addAll(itemsFull);
             }
             else{
                 String filterPattern = constraint.toString().toLowerCase().trim();
 
                 //find all recipes whose name contains the query string
-                for (RecipeWithTagsAndIngredients recipe : recipesFull){
+                for (RecipeWithTagsAndIngredients recipe : itemsFull){
                     if(recipe.getRecipe().getName().toLowerCase().contains(filterPattern)) {
                         filteredList.add(recipe);
                     }
@@ -189,9 +188,9 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
 
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            recipes.clear();
+            items.clear();
             if(filterResults.values != null){
-                recipes.addAll((List) filterResults.values);
+                items.addAll((List) filterResults.values);
             }
             notifyDataSetChanged();
         }
@@ -205,14 +204,14 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
 
             if (constraint == null || constraint.length() == 0) {
                 //if recipes haven't finished loading yet, wait until they have
-                while (recipesFull == null) {
+                while (itemsFull == null) {
                     try {
                         Thread.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-                filteredList.addAll(recipesFull);
+                filteredList.addAll(itemsFull);
             } else {
                 String filterPattern = constraint.toString().toLowerCase().trim();
                 String[] ingredientsToMatch = filterPattern.split(",");
@@ -223,7 +222,7 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
                 }
 
                 //find all recipes who have ingredients matching each of these
-                for (RecipeWithTagsAndIngredients recipe : recipesFull) {
+                for (RecipeWithTagsAndIngredients recipe : itemsFull) {
                     //this array maintains which ingredients have been matched
                     // as we iterate through the list of ingredients
                     boolean[] found = new boolean[ingredientsToMatch.length];
@@ -254,9 +253,9 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
 
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            recipes.clear();
+            items.clear();
             if (filterResults.values != null) {
-                recipes.addAll((List) filterResults.values);
+                items.addAll((List) filterResults.values);
             }
             notifyDataSetChanged();
         }
@@ -270,14 +269,14 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
 
             if (constraint == null || constraint.length() == 0) {
                 //if recipes haven't finished loading yet, wait until they have
-                while (recipesFull == null) {
+                while (itemsFull == null) {
                     try {
                         Thread.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-                filteredList.addAll(recipesFull);
+                filteredList.addAll(itemsFull);
             } else {
                 String filterPattern = constraint.toString().toLowerCase().trim();
                 String[] tagsToMatch = filterPattern.split(",");
@@ -288,7 +287,7 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
                 }
 
                 //find all recipes who have ingredients matching each of these
-                for (RecipeWithTagsAndIngredients recipe : recipesFull) {
+                for (RecipeWithTagsAndIngredients recipe : itemsFull) {
                     //this array maintains which ingredients have been matched
                     // as we iterate through the list of ingredients
                     boolean[] found = new boolean[tagsToMatch.length];
@@ -319,9 +318,9 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
 
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            recipes.clear();
+            items.clear();
             if (filterResults.values != null) {
-                recipes.addAll((List) filterResults.values);
+                items.addAll((List) filterResults.values);
             }
             notifyDataSetChanged();
         }
@@ -357,7 +356,7 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         return new RecipeDiff(newList, oldList);
     }
 
-    public class ViewHolder extends BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients>.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    public class ViewHolder extends BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients>.ViewHolder {
         private final View itemView;
         private OnRecipeClickListener onRecipeClickListener;
         private int recipeId;
@@ -368,8 +367,6 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
 
             //set click listeners
             this.onRecipeClickListener = onRecipeClickListener;
-            itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
         }
 
         @Override
@@ -428,28 +425,32 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
 
                 chipGroup.addView(chip);
             }
+
+            //attach click listeners to both parent, and to tags scrollview (which annoyingly
+            //intercepts the click events otherwise)
+            itemView.setOnLongClickListener(this::handleLongClick);
+            itemView.setOnClickListener(this::handleClick);
         }
 
-        @Override
         /** Returns the recipeId of the recipe bound to this viewholder*/
-        public void onClick(View view) {
+        public void handleClick(View ignored) {
             onRecipeClickListener.onRecipeClick(recipeId);
         }
-        @Override
-        public boolean onLongClick(View view) {
+
+        public boolean handleLongClick(View ignored) {
             //if this item was already selected, deselect
             if(selectedPositions.contains(getAdapterPosition())){
                 selectedPositions.remove((Integer) getAdapterPosition());
-                view.setSelected(false);
+                itemView.setSelected(false);
             }
             //otherwise select this item
             else{
                 selectedPositions.add(getAdapterPosition());
-                view.setSelected(true);
+                itemView.setSelected(true);
             }
 
             //call owner's click handler
-            onRecipeClickListener.onRecipeLongPress(view, getAdapterPosition());
+            onRecipeClickListener.onRecipeLongPress(itemView, getAdapterPosition());
             return true;
         }
     }

@@ -18,6 +18,7 @@ import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;
 import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
 import com.example.shoppinglistapp2.helpers.IngListItemUtils;
+import com.example.shoppinglistapp2.helpers.InvalidIngredientStringException;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.List;
@@ -63,94 +64,13 @@ public class SlaRepository {
         SlaDatabase.databaseWriteExecutor.execute(() -> ingListItemDao.insertAll(ingListItems));
     }
 
-    public void insertOrMergeItem(long listId, IngListItem newItem) {
-        IngListItem existingItemWithSameName = findItemWithMatchingName(listId, newItem);
-
-        //if there's still no match, just insert
-        if(null == existingItemWithSameName){
-
-            //calling "get()" forces the insert to have completed before this function completes.
-            //This helps in cases where multiple ingredients are added in a row, preventing duplicates
-            //merging being a race condition with the database's inserting happening slower than its
-            //next "findIngListItemWithSameName" call.
-            newItem.setListId(listId);
-            insertIngListItem(newItem);
-        }
-        //if one was found, merge their quantities then persist the change
-        else{
-            IngListItemUtils.mergeQuantities(existingItemWithSameName, newItem);
-            updateOrDeleteIfEmptyIngListItem(existingItemWithSameName);
-        }
-    }
-
-    /**
-     * Attempts to find an IngListItem in the database other than this one with a matching name
-     * and checked flag value. Also checks for plurals, e.g. potato matches potatoes,
-     * by attempting to match name without trailing "s" or "es", or by adding those suffixes,
-     * if the original name is not found.
-     * @param listId the id of the list to search within.
-     * @param newItem the item to find a match for.
-     * @return an existing item within the list with the same or the de/pluralised form, or null
-     * if no match.
-     */
-    public IngListItem findItemWithMatchingName(long listId, IngListItem newItem){
-        //attempt to find an existing item with the same name
-        IngListItem existingItemWithSameName =
-                findIngListItemWithSameName(listId, newItem.getId(), newItem.getName(), newItem.isChecked());
-
-        //if none found, try some variations of plura/non plural for the name
-        if(null == existingItemWithSameName){
-            String name = newItem.getName();
-            //try accounting for plural variation in name
-            //remove "s" from the end if applicable
-            if(name.endsWith("s")){
-                existingItemWithSameName =
-                       findIngListItemWithSameName(listId, newItem.getId(),
-                                name.substring(0, newItem.getName().length() - 1),
-                                newItem.isChecked());
-                //if still no match, try removing an "es" suffix if applicable
-                if(null == existingItemWithSameName){
-                    if (name.endsWith("es")){
-                        existingItemWithSameName =
-                                findIngListItemWithSameName(listId, newItem.getId(),
-                                        name.substring(0, newItem.getName().length() - 2),
-                                        newItem.isChecked());
-                    }
-                }
-                //if we found a matching item by de-pluralising the name, convert its name to the
-                //plural form since we're about to merge newItem's qty into it and newItem is already
-                //plural
-                if (null != existingItemWithSameName){
-                    existingItemWithSameName.setName(newItem.getName());
-                }
-            }
-            //otherwise try turning the name into a plural
-            else{
-                existingItemWithSameName =
-                        findIngListItemWithSameName(listId, newItem.getId(),
-                                name + "s",
-                                newItem.isChecked());
-
-                //try adding an "es" to the end if that still hasn't worked
-                if(null == existingItemWithSameName){
-                    existingItemWithSameName =
-                            findIngListItemWithSameName(listId, newItem.getId(),
-                                    name + "es",
-                                    newItem.isChecked());
-                }
-            }
-        }
-        return existingItemWithSameName;
-    }
 
     public LiveData<List<IngListItem>> getIngredientsByRecipeId(int id){
         return ingListItemDao.getAllFromRecipe(id);
     }
 
-    public ListenableFuture<List<IngListItem>> getIngredientsByRecipeIdNonLive(int id){
-        return SlaDatabase.databaseWriteExecutor.submit(
-                () -> ingListItemDao.getAllFromRecipeNonLive(id)
-        );
+    public List<IngListItem> getIngredientsByRecipeIdNonLive(int id){
+        return ingListItemDao.getAllFromRecipeNonLive(id);
     }
 
     public List<IngListItem> getIngListItemsByRecipeIdNonLive(int id){
@@ -290,8 +210,8 @@ public class SlaRepository {
         return SlaDatabase.databaseWriteExecutor.submit(tagDao::getAllTagNames);
     }
 
-    public ListenableFuture<List<Tag>> getTagsByRecipe(int recipeId){
-        return SlaDatabase.databaseWriteExecutor.submit(() -> tagDao.getTagsByRecipe(recipeId));
+    public List<Tag> getTagsByRecipe(int recipeId){
+        return tagDao.getTagsByRecipe(recipeId);
     }
 
     public void insertTag(int recipeId, String tagName) {
@@ -365,7 +285,117 @@ public class SlaRepository {
         return SlaDatabase.databaseWriteExecutor.submit(() -> ingListDao.insert(ingList));
     }
 
-    public ListenableFuture<RecipeWithTagsAndIngredients> getPopulatedRecipeById(int id) {
-        return SlaDatabase.databaseWriteExecutor.submit(() -> recipeDao.getPopulatedByIdNonLive(id));
+    public RecipeWithTagsAndIngredients getPopulatedRecipeById(int id) {
+        return recipeDao.getPopulatedByIdNonLive(id);
+    }
+
+    public ListenableFuture<Integer> deleteRecipeWithId(int recipeId) {
+        return SlaDatabase.databaseWriteExecutor.submit(() -> recipeDao.deleteById(recipeId));
+    }
+
+    public void editItem(IngListItem oldItem, String newItemString) throws InvalidIngredientStringException {
+        //convert user's string to a new item
+        IngListItem newItem = IngListItemUtils.toIngListItem(newItemString);
+
+        //copy identifying values over from oldItem to new item
+        newItem.setId(oldItem.getId());
+        newItem.setListId(oldItem.getListId());
+        newItem.setChecked(oldItem.isChecked());
+
+        //if name of ingredient has been changed to one which already exists,
+        //we need to merge it with an existing item.
+        //therefore, we delete the old item and then merge the modified one in.
+        IngListItem existingItemWithSameName = findItemWithMatchingName(oldItem.getListId(), newItem);
+        if (null != existingItemWithSameName){
+            deleteIngListItem(oldItem);
+            IngListItemUtils.mergeQuantities(existingItemWithSameName, newItem);
+            updateOrDeleteIfEmptyIngListItem(existingItemWithSameName);
+        }
+
+        //if it wasn't changed to an existing item, simply update the original item in the db
+        else{
+            //since newItem has the same "id" as oldItem, it will overwrite the database entry
+            updateOrDeleteIfEmptyIngListItem(newItem);
+        }
+    }
+
+    public void insertOrMergeItem(long listId, IngListItem newItem) {
+        IngListItem existingItemWithSameName = findItemWithMatchingName(listId, newItem);
+
+        //if there's still no match, just insert
+        if(null == existingItemWithSameName){
+
+            //calling "get()" forces the insert to have completed before this function completes.
+            //This helps in cases where multiple ingredients are added in a row, preventing duplicates
+            //merging being a race condition with the database's inserting happening slower than its
+            //next "findIngListItemWithSameName" call.
+            newItem.setListId(listId);
+            insertIngListItem(newItem);
+        }
+        //if one was found, merge their quantities then persist the change
+        else{
+            IngListItemUtils.mergeQuantities(existingItemWithSameName, newItem);
+            updateOrDeleteIfEmptyIngListItem(existingItemWithSameName);
+        }
+    }
+
+    /**
+     * Attempts to find an IngListItem in the database other than this one with a matching name
+     * and checked flag value. Also checks for plurals, e.g. potato matches potatoes,
+     * by attempting to match name without trailing "s" or "es", or by adding those suffixes,
+     * if the original name is not found.
+     * @param listId the id of the list to search within.
+     * @param newItem the item to find a match for.
+     * @return an existing item within the list with the same or the de/pluralised form, or null
+     * if no match.
+     */
+    public IngListItem findItemWithMatchingName(long listId, IngListItem newItem){
+        //attempt to find an existing item with the same name
+        IngListItem existingItemWithSameName =
+                findIngListItemWithSameName(listId, newItem.getId(), newItem.getName(), newItem.isChecked());
+
+        //if none found, try some variations of plura/non plural for the name
+        if(null == existingItemWithSameName){
+            String name = newItem.getName();
+            //try accounting for plural variation in name
+            //remove "s" from the end if applicable
+            if(name.endsWith("s")){
+                existingItemWithSameName =
+                        findIngListItemWithSameName(listId, newItem.getId(),
+                                name.substring(0, newItem.getName().length() - 1),
+                                newItem.isChecked());
+                //if still no match, try removing an "es" suffix if applicable
+                if(null == existingItemWithSameName){
+                    if (name.endsWith("es")){
+                        existingItemWithSameName =
+                                findIngListItemWithSameName(listId, newItem.getId(),
+                                        name.substring(0, newItem.getName().length() - 2),
+                                        newItem.isChecked());
+                    }
+                }
+                //if we found a matching item by de-pluralising the name, convert its name to the
+                //plural form since we're about to merge newItem's qty into it and newItem is already
+                //plural
+                if (null != existingItemWithSameName){
+                    existingItemWithSameName.setName(newItem.getName());
+                }
+            }
+            //otherwise try turning the name into a plural
+            else{
+                existingItemWithSameName =
+                        findIngListItemWithSameName(listId, newItem.getId(),
+                                name + "s",
+                                newItem.isChecked());
+
+                //try adding an "es" to the end if that still hasn't worked
+                if(null == existingItemWithSameName){
+                    existingItemWithSameName =
+                            findIngListItemWithSameName(listId, newItem.getId(),
+                                    name + "es",
+                                    newItem.isChecked());
+                }
+            }
+        }
+        return existingItemWithSameName;
     }
 }

@@ -48,7 +48,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     private RecipeListAdapter adapter;
     private boolean advancedSearchVisible;
     private ViewPagerNavigationCallback callback;
-    private ListeningExecutorService executor;
+    private ListeningExecutorService backgroundExecutor;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -59,7 +59,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         callback = (ViewPagerNavigationCallback) getActivity();
 
-        executor = ((App) requireActivity().getApplication()).backgroundExecutorService;
+        backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
 
         //this will delete ALL recipes and load recipetineats websites from the spreadsheet in res/raw/<name>.csv
 //        recipesViewModel.loadFromBackup(this);
@@ -81,7 +81,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         //setup recipe list recyclerview
         RecyclerView recipeRecyclerView = root.findViewById(R.id.recipe_recyclerview);
-        adapter = new RecipeListAdapter(this);
+        adapter = new RecipeListAdapter(backgroundExecutor,this);
         recipeRecyclerView.setAdapter(adapter);
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
@@ -216,7 +216,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         //if we are currently in select for mealplan mode, click should instead save this recipe as a mealplan
         if(sharedViewModel.getSelectingForMeal() != null){
             //update db with this recipe in the specified meal plan slot
-            Futures.addCallback(executor.submit(() -> sharedViewModel.saveToMealPlan(recipeId)),
+            Futures.addCallback(backgroundExecutor.submit(() -> sharedViewModel.saveToMealPlan(recipeId)),
                     new FutureCallback<Object>() {
                         @Override
                         public void onSuccess(@Nullable Object result) {
@@ -350,9 +350,9 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                     //prompt for confirmation first
                     new AlertDialog.Builder(requireContext())
                             .setTitle(R.string.delete_recipes_warning_title)
-                            .setMessage(String.format("%s %d %s", R.string.delete_warning_prompt1,
+                            .setMessage(String.format("%s %d %s", getString(R.string.delete_warning_prompt1),
                                     adapter.getSelectedItemCount(),
-                                    R.string.delete_warning_prompt2))
+                                    getString(R.string.delete_warning_prompt2)))
                             .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                                 //actually delete selected recipes if confirmed
                                 @Override

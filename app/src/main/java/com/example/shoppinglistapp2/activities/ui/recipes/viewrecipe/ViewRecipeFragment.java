@@ -42,7 +42,6 @@ import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
 import com.example.shoppinglistapp2.activities.ui.ViewPagerNavigationCallback;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Tag;
-import com.example.shoppinglistapp2.helpers.InvalidIngredientStringException;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.google.android.material.chip.Chip;
@@ -53,7 +52,6 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -96,9 +94,6 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //retrieve navigation args
         //recipe to be viewed
         recipeId = ViewRecipeFragmentArgs.fromBundle(getArguments()).getRecipeId();
-        currentRecipe = viewModel.getRecipeById(recipeId);
-        backgroundExecutor.execute(() -> viewModel.saveBackupOfRecipe(recipeId));
-
 
         //decide whether to start in edit mode or not
         editingFlag = ViewRecipeFragmentArgs.fromBundle(getArguments()).getEditingFlag();
@@ -113,6 +108,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        backgroundExecutor.submit(() -> viewModel.saveBackupOfRecipe(recipeId));
         setupViews(view);
     }
 
@@ -120,8 +116,17 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //setup action bar
         this.setHasOptionsMenu(true);
 
+        currentRecipe = viewModel.getRecipe(recipeId);
+
+
         /* fill in textViews with saved recipe data where available */
-        currentRecipe.observe(getViewLifecycleOwner(),(this::populateRecipeViews));
+        currentRecipe.observe(getViewLifecycleOwner(),
+            ((recipe) -> {
+                if(recipe != null){
+                    populateRecipeViews(recipe);
+                }
+            })
+        );
 
         //setup ingredient list recyclerview
         ingredientRecyclerView = root.findViewById(R.id.recipe_ingredients_list);
@@ -139,7 +144,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
         //add existing tags
         Futures.addCallback(
-                backgroundExecutor.submit(() -> viewModel.getTagsByRecipe(recipeId)),
+                backgroundExecutor.submit(() -> viewModel.getRecipeTags(recipeId)),
                 new FutureCallback<List<Tag>>() {
                     @Override
                     public void onSuccess(@Nullable List<Tag> result) {
@@ -222,13 +227,14 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         View root = requireView();
         //set name as action bar title
         pageTitle = recipe.getName();
+
         ActionBar actionBar = ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar();
         //don't change the title if we've navigated to another tab of the viewpager
         if (!(null != actionBar.getTitle()
-            && (
+                && (
                 actionBar.getTitle().equals(requireActivity().getResources().getString(R.string.title_shopping_list)) ||
-                actionBar.getTitle().equals(requireActivity().getResources().getString(R.string.title_meal_plan))
-            )
+                        actionBar.getTitle().equals(requireActivity().getResources().getString(R.string.title_meal_plan))
+        )
         )){
             actionBar.setTitle(pageTitle);
         }
@@ -313,7 +319,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
             //send all items to viewModel to be processed/stored
             Futures.addCallback(
-                backgroundExecutor.submit(() -> viewModel.addIngredientsToRecipe(recipeId, items)),
+                backgroundExecutor.submit(() -> viewModel.addIngredientsToRecipe(items)),
                 new FutureCallback<Boolean>() {
                     @Override
                     public void onSuccess(@Nullable Boolean result) {
@@ -764,7 +770,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         if (newRecipeFlag){
             Toast.makeText(this.getContext(), "Recipe draft discarded",Toast.LENGTH_LONG).show();
             //delete the recipe from db
-            viewModel.deleteRecipe(currentRecipe.getValue());
+            viewModel.deleteRecipe(recipeId);
         }
     }
 

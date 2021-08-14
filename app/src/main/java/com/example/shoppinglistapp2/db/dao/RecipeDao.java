@@ -24,7 +24,7 @@ public interface RecipeDao extends BaseDao<Recipe> {
     @Query("SELECT * FROM recipes WHERE id = :id")
     Recipe getById(int id);
 
-    @Query("SELECT * FROM recipes WHERE id = :id")
+    @Query("SELECT * FROM recipes WHERE recipes.id = :id")
     LiveData<Recipe> getByIdLive(int id);
 
     @Query("SELECT * FROM recipes WHERE name = :name LIMIT 1")
@@ -52,4 +52,7 @@ public interface RecipeDao extends BaseDao<Recipe> {
     @Transaction
     @Query("SELECT * FROM recipes WHERE id = :id")
     RecipeWithIngredients getByIdWithIngList(int id);
+
+    @Query("DELETE FROM recipes WHERE id = :recipeId")
+    int deleteById(int recipeId);
 }

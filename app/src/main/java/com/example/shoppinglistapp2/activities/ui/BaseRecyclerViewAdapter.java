@@ -1,6 +1,7 @@
 package com.example.shoppinglistapp2.activities.ui;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -11,11 +12,16 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 public abstract class BaseRecyclerViewAdapter<Item> extends RecyclerView.Adapter<BaseRecyclerViewAdapter<Item>.ViewHolder>{
     protected List<Item> items;
     protected Deque<List<Item>> pendingUpdates = new ArrayDeque<>();
+    protected Executor updateListExecutor;
 
+    public BaseRecyclerViewAdapter(Executor listUpdateExecutor) {
+        this.updateListExecutor = listUpdateExecutor;
+    }
 
     @Override
     /**
@@ -60,8 +66,9 @@ public abstract class BaseRecyclerViewAdapter<Item> extends RecyclerView.Adapter
             oldItems = null;
         }
 
-        final Handler handler = new Handler();
-        new Thread(() -> {
+        final Handler handler = new Handler(Looper.getMainLooper());
+
+        updateListExecutor.execute(() -> {
             final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(createDiffCallback(newItems, oldItems));
             handler.post(() -> applyDiffResult(newItems,diffResult));
         });
@@ -86,8 +93,16 @@ public abstract class BaseRecyclerViewAdapter<Item> extends RecyclerView.Adapter
 
     private void dispatchUpdates(List<Item> newItems, DiffUtil.DiffResult diffResult) {
         diffResult.dispatchUpdatesTo(this);
-        items.clear();
-        items.addAll(newItems);
+        if (items == null){
+            items = new ArrayList<>();
+        }
+        else {
+            items.clear();
+        }
+
+        if(items != null){
+            items.addAll(newItems);
+        }
     }
 
     protected ItemDiff createDiffCallback(List<Item> newList, List<Item> oldList) {
