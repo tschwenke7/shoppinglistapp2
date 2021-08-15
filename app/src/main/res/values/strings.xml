@@ -1,6 +1,10 @@
 <resources>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
+    <string name="error_title">Error</string>
+    <string name="ok">OK</string>
+    <string name="error_could_not_access_database">Error - could not connect to database. Please try again later.</string>
+    <string name="unknown_error">Oops, something went wrong. Please submit a bug report to the app\'s creator letting them know what caused this.</string>
 
 
     <string name="app_name">SLA2</string>
@@ -38,6 +42,14 @@
     <string name="delete_recipes_warning_title">Delete recipes</string>
     <string name="delete_warning_prompt1">Are you sure you want to permanently delete</string>
     <string name="delete_warning_prompt2">recipe/s?</string>
+
+    <string name="no_recipes_message">Your recipe book is empty!\n\nYou can add recipes here to browse through for future meal planning, and easily add all ingredients from a recipe straight to your shopping list.\n\nAdd recipes by clicking the \"+\" icon in the top right of this screen.</string>
+    <string name="content_description_clear_search">Clear search bar</string>
+    <string name="searchbar_name_hint">Recipe name…</string>
+    <string name="searchbar_ingredient_hint">ingredient1,  ingredient2,   …</string>
+    <string name="searchbar_tag_hint">tag1,   tag2,   …</string>
+    <string name="error_deleting_recipes">Error - something went wrong when trying to delete recipes.\nPlease try again in a few minutes.</string>
+
 
     <!-- New recipe page -->
     <string name="create_recipe_title">Create New Recipe</string>
@@ -93,11 +105,16 @@
     <string name="add_ingredient_button">Add</string>
     <string name="save_recipe_button">Save</string>
     <string name="save_recipe_toast">Recipe saved.</string>
-    <string name="unknown_error">Oops, something went wrong. Please submit a bug report to the app\'s creator letting them know what caused this.</string>
+    <string name="default_recipe_name">Untitled Recipe</string>
     <string name="save_recipe_prompt_title">Save changes to recipe?</string>
     <string name="save_recipe_prompt_message">Do you wish to save any changes you may have just made to this recipe?</string>
     <string name="save_recipe_prompt_positive_button">Save changes</string>
     <string name="save_recipe_prompt_negative_button">Discard changes</string>
+    <string name="error_recipe_name_already_used">This recipe name is already in use - please choose another.</string>
+    <string name="error_no_recipe_name_entered">Please enter a name for this recipe</string>
+    <string name="error_adding_recipe_to_meal">Something went wrong trying to add the recipe to this meal - please try again later.</string>
+
+    <string name="error_loading_tags">Error - unable to load tags for recipe.</string>
 
 
     <!-- Shopping list page -->
@@ -119,6 +136,10 @@
     <string name="copy_list_to_clipboard">Copy list to clipboard</string>
     <string name="export_ingredients_toast">Shopping list copied to clipboard.\nYou can now paste wherever you want.</string>
 
+    <string name="copy_to_clipboard_dialog_title">Include crossed off items?</string>
+    <string name="copy_to_clipboard_dialog_message">Do you want to include crossed-off items?</string>
+    <string name="copy_to_clipboard_dialog_positive_button">Yes</string>
+    <string name="copy_to_clipboard_dialog_negative_button">Don\'t Include</string>
 
     <!-- Meal Plan Fragment -->
     <string name="plans_heading">Meals</string>
@@ -139,22 +160,9 @@
     <string name="clear_meal_plans_option">Reset entire meal plan</string>
     <string name="clear_meal_plans_warning">This will delete all meal slots, recipes and ingListItems. You will need to add days/meals before adding more recipes again.\nAre you sure?</string>
     <string name="clear_meal_plans_positive_button">Reset all</string>
-    <string name="copy_to_clipboard_dialog_title">Include crossed off items?</string>
-    <string name="copy_to_clipboard_dialog_message">Do you want to include crossed-off items?</string>
-    <string name="copy_to_clipboard_dialog_positive_button">Yes</string>
-    <string name="copy_to_clipboard_dialog_negative_button">Don\'t Include</string>
-    <string name="error_could_not_add_items">There item you tried to enter was invalid.\nPlease enter the item\'s quantity and unit of measurement (optional) followed by its name.\ne.g. \"500g butter\", \"6 carrots\", or \"avocado\".\n\nNote: for technical reasons, you can\'t use the \"+\" icon in the ingredient\'s name.</string>
-    <string name="error_title">Error</string>
-    <string name="ok">Ok</string>
-    <string name="error_deleting_recipes">Error - something went wrong when trying to delete recipes.\nPlease try again in a few minutes.</string>
-    <string name="error_adding_recipe_to_meal">Something went wrong trying to add the recipe to this meal - please try again later.</string>
-    <string name="default_recipe_name">Untitled Recipe</string>
-    <string name="error_loading_tags">Error- unable to load tags for recipe.</string>
-    <string name="error_recipe_name_already_used">This recipe name is already in use - please choose another.</string>
-    <string name="error_could_not_access_database">Error - could not connect to database. Please try again later.</string>
-    <string name="error_no_recipe_name_entered">Please enter a name for this recipe</string>
+
+    <!-- Multi-location errors -->
     <string name="error_sending_ingredients_to_shopping_list">Something went wrong while trying to add these ingredients to the shopping list. Please try again later and report this bug if it continues.</string>
-    <string name="no_recipes_message">Your recipe book is empty!\n\nYou can add recipes here to browse through for future meal planning, and easily add all ingredients from a recipe straight to your shopping list.\n\nAdd recipes by clicking the \"+\" icon in the top right of this screen.</string>
-    <string name="content_description_clear_search">Clear search bar</string>
-    <string name="name_search_hint">Search for recipes whose name contains this</string>
+    <string name="error_could_not_add_items">There item you tried to enter was invalid.\nPlease enter the item\'s quantity and unit of measurement (optional) followed by its name.\ne.g. \"500g butter\", \"6 carrots\", or \"avocado\".\n\nNote: for technical reasons, you can\'t use the \"+\" icon in the ingredient\'s name.</string>
+
 </resources>

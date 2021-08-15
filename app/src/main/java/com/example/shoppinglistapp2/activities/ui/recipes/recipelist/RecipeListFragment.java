@@ -326,15 +326,17 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                 TextView hintTextView = requireView().findViewById(R.id.search_hint);
                 switch (pos){
                     case 0:
-                        hintTextView.setVisibility(View.VISIBLE);
-                        hintTextView.setText(R.string.name_search_hint);
+                        hintTextView.setVisibility(View.GONE);
+                        searchBar.setHint(R.string.searchbar_name_hint);
                         break;
                     case 1:
                         hintTextView.setText(R.string.ingredient_search_hint);
                         hintTextView.setVisibility(View.VISIBLE);
+                        searchBar.setHint(R.string.searchbar_ingredient_hint);
                         break;
                     case 2:
                         hintTextView.setText(R.string.tag_search_hint);
+                        searchBar.setHint(R.string.searchbar_tag_hint);
                         hintTextView.setVisibility(View.VISIBLE);
                         break;
                 }

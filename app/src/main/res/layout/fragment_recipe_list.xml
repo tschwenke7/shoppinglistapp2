@@ -29,6 +29,7 @@
             android:maxLines="5"
             android:padding="12dp"
             android:paddingEnd="34dp"
+            android:hint="@string/searchbar_name_hint"
             tools:text="fniuewieuhiewrwucfiwehcwencfgwencfgiwecnfgiwucnfiewcniwwnefuwiancf" />
 
         <ImageButton
