@@ -284,21 +284,23 @@ public class IngListItemUtils {
             ingListItem.setWholeItemQty(qty);
         }
 
-        //determine which type of amount this is by checking the unit
-        switch (getUnitType(unit)){
-            case WHOLE_ITEM:
-                ingListItem.setWholeItemQty(qty);
-                break;
-            case VOLUME:
-                ingListItem.setVolumeQty(qty);
-                ingListItem.setVolumeUnit(unit);
-                break;
-            case MASS:
-                ingListItem.setMassQty(qty);
-                ingListItem.setMassUnit(unit);
-                break;
-            case INVALID:
-                throw new InvalidIngredientStringException();
+        else {
+            //determine which type of amount this is by checking the unit
+            switch (getUnitType(unit)){
+                case WHOLE_ITEM:
+                    ingListItem.setWholeItemQty(qty);
+                    break;
+                case VOLUME:
+                    ingListItem.setVolumeQty(qty);
+                    ingListItem.setVolumeUnit(unit);
+                    break;
+                case MASS:
+                    ingListItem.setMassQty(qty);
+                    ingListItem.setMassUnit(unit);
+                    break;
+                case INVALID:
+                    throw new InvalidIngredientStringException();
+            }
         }
     }
 

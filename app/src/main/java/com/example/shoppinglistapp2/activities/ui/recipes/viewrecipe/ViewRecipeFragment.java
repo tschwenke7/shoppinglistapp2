@@ -256,6 +256,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //website link
         Button websiteButton = root.findViewById(R.id.recipe_url_button);
         if (null != recipe.getUrl() && !recipe.getUrl().isEmpty()){
+            websiteButton.setText(R.string.view_recipe_website_button);
             websiteButton.setOnClickListener(view -> {
                 Uri uri = Uri.parse(recipe.getUrl());
                 Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uri);
@@ -264,6 +265,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         }
         else{
             websiteButton.setText(getString(R.string.default_url_button_text));
+            websiteButton.setOnClickListener(null);
         }
 
         //ratings

@@ -39,6 +39,7 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,6 +48,7 @@ public class CreateRecipeFragment extends Fragment {
     private CreateRecipeViewModel viewModel;
     private SharedViewModel sharedViewModel;
     private ListeningExecutorService backgroundExecutor;
+    private Executor uiExecutor;
     private View root;
     private ProgressBar progressBar;
     private View mainContent;
@@ -67,6 +69,7 @@ public class CreateRecipeFragment extends Fragment {
                 new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
         backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
+        uiExecutor = ContextCompat.getMainExecutor(this.requireContext());
 
         return root;
     }
@@ -156,7 +159,7 @@ public class CreateRecipeFragment extends Fragment {
             public void onSuccess(@Nullable Integer recipeId) {
                 //if recipe loading failed, display error message
                 if(recipeId == null || recipeId == -1){
-                    Toast.makeText(getContext(), requireContext().getString(R.string.recipe_url_error),Toast.LENGTH_LONG).show();
+                    Toast.makeText(requireContext(), getString(R.string.recipe_url_error),Toast.LENGTH_LONG).show();
                 }
                 //otherwise, navigate to editor for the new recipe
                 else{
@@ -183,17 +186,17 @@ public class CreateRecipeFragment extends Fragment {
                 //the thread processing this was interrupted
                 else if (t instanceof ExecutionException) {
                     t.printStackTrace();
-                    Toast.makeText(getContext(), R.string.recipe_url_timeout_error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getString(R.string.recipe_url_timeout_error), Toast.LENGTH_LONG).show();
                 }
                 //another error I wasn't expecting
                 else{
                     t.printStackTrace();
-                    Toast.makeText(getContext(), R.string.unknown_error + t.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getString(R.string.unknown_error) + t.getMessage(), Toast.LENGTH_LONG).show();
                 }
                 //hide progress bar and reset opacity of everything else
                 hideProgressBar();
             }
-        }, ContextCompat.getMainExecutor(this.requireContext()));
+        }, uiExecutor);
     }
 
     @Override
