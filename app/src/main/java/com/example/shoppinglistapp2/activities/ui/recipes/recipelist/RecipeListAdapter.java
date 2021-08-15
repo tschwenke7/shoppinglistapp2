@@ -38,6 +38,7 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
     private List<Integer> selectedPositions = new ArrayList<>();
     private DecimalFormat ratingFormat = new DecimalFormat("#.#");
     private SearchCriteria searchCriteria;
+    private String queryText = "";
 
     public enum SearchCriteria {
         NAME,
@@ -64,12 +65,18 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         super.onBindViewHolder(holder,position);
     }
 
+    public void updateList(List<RecipeWithTagsAndIngredients> newItems, String queryText) {
+        super.updateList(newItems);
+        this.queryText = queryText;
+    }
+
     @Override
     protected void dispatchUpdates(List<RecipeWithTagsAndIngredients> newItems, DiffUtil.DiffResult diffResult) {
         super.dispatchUpdates(newItems, diffResult);
         if(newItems != null) {
             itemsFull = new ArrayList<>(newItems);
         }
+        getFilter().filter(queryText);
     }
 
     public void setSearchCriteria(int searchCriteria){
@@ -164,6 +171,7 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
     private Filter nameFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
+            queryText = (String) constraint;
             List<RecipeWithTagsAndIngredients> filteredList = new ArrayList<>();
 
             if(constraint == null || constraint.length() == 0){
@@ -208,6 +216,7 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             List<RecipeWithTagsAndIngredients> filteredList = new ArrayList<>();
+            queryText = (String) constraint;
 
             if (constraint == null || constraint.length() == 0) {
                 //if recipes haven't finished loading yet, wait until they have
@@ -272,6 +281,7 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             List<RecipeWithTagsAndIngredients> filteredList = new ArrayList<>();
+            queryText = (String) constraint;
 
             if (constraint == null || constraint.length() == 0) {
                 //if recipes haven't finished loading yet, wait until they have

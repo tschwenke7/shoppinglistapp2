@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Spinner;
@@ -35,6 +38,7 @@ import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
 import com.example.shoppinglistapp2.activities.ui.ViewPagerNavigationCallback;
+import com.example.shoppinglistapp2.helpers.KeyboardHider;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -50,6 +54,8 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     private boolean advancedSearchVisible;
     private ViewPagerNavigationCallback callback;
     private ListeningExecutorService backgroundExecutor;
+
+    private MultiAutoCompleteTextView searchBar;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -99,7 +105,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                 else {
                     noRecipesMessage.setVisibility(View.GONE);
                 }
-                adapter.updateList(recipes);
+                adapter.updateList(recipes, searchBar.getText().toString());
             });
 
         //populate advanced search spinners
@@ -121,28 +127,57 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         ((TextView) root.findViewById(R.id.advanced_search_prompt)).setOnClickListener((view -> toggleAdvancedSearch()));
 
         //setup search bar
-        SearchView searchView = (SearchView) root.findViewById(R.id.search_bar);
-        //hide default underline style of searchview
-        int searchPlateId = searchView.getContext().getResources().getIdentifier("android:id/search_plate", null, null);
-        View searchPlate = searchView.findViewById(searchPlateId);
-        searchPlate.setBackgroundColor(Color.TRANSPARENT);
+        searchBar = root.findViewById(R.id.search_bar);
+
+        //configure searchbar to not allow newline character entries, but still allow wrapping
+        //over multiple lines
+        searchBar.setSingleLine(true);
+        searchBar.setHorizontallyScrolling(false);
+        searchBar.setMaxLines(20);
+
+        //setup clear search button
+        View clearSearchButton = root.findViewById(R.id.clear_search_button);
+        clearSearchButton.setOnClickListener((v) -> searchBar.setText(""));
+
         //have it listen and update results in realtime as the user types
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchBar.addTextChangedListener(new TextWatcher() {
             @Override
-            public boolean onQueryTextSubmit(String s) {
-                return false;
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                //end mutli-select if user changes search, as list weill change
+            public void onTextChanged(CharSequence newText, int start, int before, int count) {
+                //end mutli-select if user changes search, as list will change
                 if(actionMode != null && sharedViewModel.getSelectingForMeal() == null){
                     actionMode.finish();
                 }
                 adapter.getFilter().filter(newText);
-                return false;
+
+                //show clear search button if there's any text in the search bar
+                if (newText.length() == 0){
+                    clearSearchButton.setVisibility(View.GONE);
+                }
+                else{
+                    clearSearchButton.setVisibility(View.VISIBLE);
+                }
             }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
         });
+
+        //hide keyboard when enter key pressed when using searchbar, so user can see the results
+        searchBar.setOnEditorActionListener((v, actionId, event) -> {
+            KeyboardHider.hideKeyboard(requireActivity());
+            v.clearFocus();
+            return false;
+        });
+
+//        //setup autocomplete on the searchbar
+//        ArrayAdapter<String> searchBarAdapter = new ArrayAdapter<>(getContext(),
+//                android.R.layout.simple_dropdown_item_1line, outfitViewModel.getAllDistinctClothingItems());
+//        searchBar.setAdapter(searchBarAdapter);
+//        //configure autocomplete to consider comma separated phrases as separate tokens
+//        searchBar.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
     }
 
     /**
@@ -291,7 +326,8 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                 TextView hintTextView = requireView().findViewById(R.id.search_hint);
                 switch (pos){
                     case 0:
-                        hintTextView.setVisibility(View.GONE);
+                        hintTextView.setVisibility(View.VISIBLE);
+                        hintTextView.setText(R.string.name_search_hint);
                         break;
                     case 1:
                         hintTextView.setText(R.string.ingredient_search_hint);
