@@ -5,6 +5,7 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 
 import com.example.shoppinglistapp2.db.SlaRepository;
 import com.example.shoppinglistapp2.db.tables.Recipe;
@@ -27,7 +28,7 @@ public class RecipeListViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<RecipeWithTagsAndIngredients>> getAllRecipes(){
-        return allRecipes;
+        return Transformations.distinctUntilChanged(allRecipes);
     }
 
     public ListenableFuture<Integer> deleteRecipes(List<RecipeWithTagsAndIngredients> populatedRecipes){

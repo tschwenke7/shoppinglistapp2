@@ -426,7 +426,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                                 }
                             })
                             //otherwise don't do anything
-                            .setNegativeButton(R.string.delete, null)
+                            .setNegativeButton(R.string.cancel, null)
                             .show();
 
                     return true;

@@ -7,6 +7,8 @@ import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import java.util.Objects;
+
 @Entity(tableName = "ing_lists",
     foreignKeys = {
         @ForeignKey(
@@ -74,5 +76,18 @@ public class IngList {
 
     public void setMealPlanId(Long mealPlanId) {
         this.mealPlanId = mealPlanId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IngList ingList = (IngList) o;
+        return id == ingList.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

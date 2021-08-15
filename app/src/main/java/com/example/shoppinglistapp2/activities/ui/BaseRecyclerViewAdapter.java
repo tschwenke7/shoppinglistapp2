@@ -87,6 +87,21 @@ public abstract class BaseRecyclerViewAdapter<Item> extends RecyclerView.Adapter
         updateListInternal(newItems);
     }
 
+    public void setItems(List<Item> newItems) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(createDiffCallback(newItems, items));
+        diffResult.dispatchUpdatesTo(this);
+        if(items != null){
+            items.clear();
+            if(newItems != null){
+                items.addAll(newItems);
+            }
+        }
+        else if(newItems != null){
+            items = new ArrayList<>();
+            items.addAll(newItems);
+        }
+    }
+
     protected void updateListInternal(List<Item> newItems) {
         final List<Item> oldItems;
         if(null != items){
