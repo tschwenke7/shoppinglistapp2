@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -81,13 +82,25 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         //setup recipe list recyclerview
         RecyclerView recipeRecyclerView = root.findViewById(R.id.recipe_recyclerview);
-        adapter = new RecipeListAdapter(backgroundExecutor,this);
+        ProgressBar recyclerViewLoadingBar = root.findViewById(R.id.progress_bar_recipe_list);
+        adapter = new RecipeListAdapter(backgroundExecutor, recipeRecyclerView, recyclerViewLoadingBar, this);
         recipeRecyclerView.setAdapter(adapter);
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
+        View noRecipesMessage = root.findViewById(R.id.textview_no_recipes);
+
         //set observer to update recipe list if it changes
         viewModel.getAllRecipes().observe(getViewLifecycleOwner(),
-                recipes -> adapter.updateList(recipes));
+            recipes -> {
+            //show or hide placeholder text for when there are no recipes
+                if(recipes.size() == 0){
+                    noRecipesMessage.setVisibility(View.VISIBLE);
+                }
+                else {
+                    noRecipesMessage.setVisibility(View.GONE);
+                }
+                adapter.updateList(recipes);
+            });
 
         //populate advanced search spinners
         Spinner searchCriteriaSpinner = root.findViewById(R.id.search_criteria_spinner);

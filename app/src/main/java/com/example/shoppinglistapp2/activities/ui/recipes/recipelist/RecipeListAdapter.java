@@ -45,8 +45,8 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         TAG
     }
 
-    public RecipeListAdapter(Executor listUpdateExecutor, OnRecipeClickListener onRecipeClickListener){
-        super(listUpdateExecutor);
+    public RecipeListAdapter(Executor listUpdateExecutor, View recyclerView, View progressBar, OnRecipeClickListener onRecipeClickListener){
+        super(listUpdateExecutor, recyclerView, progressBar);
         this.onRecipeClickListener = onRecipeClickListener;
         searchCriteria = SearchCriteria.NAME;
     }
@@ -62,6 +62,14 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
     public void onBindViewHolder(@NonNull BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients>.ViewHolder holder, int position) {
         holder.itemView.setSelected(selectedPositions.contains(position));
         super.onBindViewHolder(holder,position);
+    }
+
+    @Override
+    protected void dispatchUpdates(List<RecipeWithTagsAndIngredients> newItems, DiffUtil.DiffResult diffResult) {
+        super.dispatchUpdates(newItems, diffResult);
+        if(newItems != null) {
+            itemsFull = new ArrayList<>(newItems);
+        }
     }
 
     public void setSearchCriteria(int searchCriteria){
@@ -188,9 +196,8 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
 
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            items.clear();
             if(filterResults.values != null){
-                items.addAll((List) filterResults.values);
+                items = (List) filterResults.values;
             }
             notifyDataSetChanged();
         }
@@ -253,9 +260,8 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
 
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            items.clear();
-            if (filterResults.values != null) {
-                items.addAll((List) filterResults.values);
+            if(filterResults.values != null){
+                items = (List) filterResults.values;
             }
             notifyDataSetChanged();
         }
@@ -318,9 +324,8 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
 
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            items.clear();
-            if (filterResults.values != null) {
-                items.addAll((List) filterResults.values);
+            if(filterResults.values != null){
+                items = (List) filterResults.values;
             }
             notifyDataSetChanged();
         }

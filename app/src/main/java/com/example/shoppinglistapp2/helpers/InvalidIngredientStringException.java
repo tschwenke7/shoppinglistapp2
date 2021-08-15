@@ -8,4 +8,5 @@ public class InvalidIngredientStringException extends RuntimeException {
     public InvalidIngredientStringException() {
         super();
     }
+
 }

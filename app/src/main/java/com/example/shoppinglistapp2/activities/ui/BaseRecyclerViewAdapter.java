@@ -18,9 +18,39 @@ public abstract class BaseRecyclerViewAdapter<Item> extends RecyclerView.Adapter
     protected List<Item> items;
     protected Deque<List<Item>> pendingUpdates = new ArrayDeque<>();
     protected Executor updateListExecutor;
+    protected View recyclerView;
+    protected View progressBar;
 
+    /** Using this constructor will mean there's no progress bar to show/hide while loading, and
+     * all background operations will run on the uiThread. It is recommended to at least specify
+     * a listUpdateExecutor using the single-argument constructor.
+     */
+    public BaseRecyclerViewAdapter() {
+    }
+
+    /** Use this constructor if you do not want to associate a progress bar
+     * which displays instead of recyclerview while loading.
+     * @param listUpdateExecutor the executor to perform diffUtil calculations on
+     */
     public BaseRecyclerViewAdapter(Executor listUpdateExecutor) {
         this.updateListExecutor = listUpdateExecutor;
+        this.recyclerView = null;
+        this.progressBar = null;
+    }
+
+    /**
+     * Constructor which provides both a background thread executor to run listUpdates on,
+     * as well a progressBar. When the list update is complete, the progressBar will have its
+     * visibility set to View.GONE, and the recyclerView will be set to View.VISIBLE.
+     * @param listUpdateExecutor - the executor to perform diffUtil calculations on
+     * @param recyclerView - the recyclerview managed by this adapter, to be shown when list is loaded
+     * @param progressBar - the progress bar associated with this recyclerview, which will be hidden
+     *                    once the list has been updated.
+     */
+    public BaseRecyclerViewAdapter(Executor listUpdateExecutor, View recyclerView, View progressBar) {
+        this.updateListExecutor = listUpdateExecutor;
+        this.recyclerView = recyclerView;
+        this.progressBar = progressBar;
     }
 
     @Override
@@ -68,10 +98,21 @@ public abstract class BaseRecyclerViewAdapter<Item> extends RecyclerView.Adapter
 
         final Handler handler = new Handler(Looper.getMainLooper());
 
-        updateListExecutor.execute(() -> {
-            final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(createDiffCallback(newItems, oldItems));
-            handler.post(() -> applyDiffResult(newItems,diffResult));
-        });
+        if(updateListExecutor != null) {
+            updateListExecutor.execute(() -> {
+                final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(createDiffCallback(newItems, oldItems));
+                handler.post(() -> applyDiffResult(newItems,diffResult));
+                handler.post(this::hideProgressBar);
+            });
+        }
+        //run operations on ui thread if no other executor provided
+        else {
+            handler.post(() -> {
+                final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(createDiffCallback(newItems, oldItems));
+                handler.post(() -> applyDiffResult(newItems,diffResult));
+                handler.post(this::hideProgressBar);
+            });
+        }
     }
 
     protected void applyDiffResult(List<Item> newItems, DiffUtil.DiffResult diffResult){
@@ -91,7 +132,7 @@ public abstract class BaseRecyclerViewAdapter<Item> extends RecyclerView.Adapter
         }
     }
 
-    private void dispatchUpdates(List<Item> newItems, DiffUtil.DiffResult diffResult) {
+    protected void dispatchUpdates(List<Item> newItems, DiffUtil.DiffResult diffResult) {
         diffResult.dispatchUpdatesTo(this);
         if (items == null){
             items = new ArrayList<>();
@@ -102,6 +143,19 @@ public abstract class BaseRecyclerViewAdapter<Item> extends RecyclerView.Adapter
 
         if(items != null){
             items.addAll(newItems);
+        }
+    }
+
+    protected void showProgressBar(){
+        if (progressBar != null && recyclerView != null) {
+            recyclerView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+        }
+    }
+    protected void hideProgressBar(){
+        if (progressBar != null && recyclerView != null) {
+            recyclerView.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
         }
     }
 

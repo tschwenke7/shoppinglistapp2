@@ -144,94 +144,112 @@ public class IngListItemUtils {
         return UnitType.INVALID;
     }
 
-    public static IngListItem toIngListItem(String ingText) throws InvalidIngredientStringException {
+    public static IngListItem toIngListItem(String originalIngText) throws InvalidIngredientStringException {
+
         IngListItem ingListItem = new IngListItem();
         StringBuilder name = new StringBuilder();
         StringBuilder amount = new StringBuilder();
 
         //expand any single-character fractions into <digit>/<digit>
-        ingText = Normalizer.normalize(ingText, Normalizer.Form.NFKD);
+        String ingText = Normalizer.normalize(originalIngText, Normalizer.Form.NFKD);
         ingText = ingText.replaceAll("\u2044","/");
 
         //normalise case
         ingText = ingText.toLowerCase().trim();
-
         /* format of an ingListItem as text is zero or more "amount" pairs of qty and units (or no unit if
-        whole items) separated by "+" characters, followed by the name of the item.
-        [<qty>] [+ <qty> <unit>] [+ <qty> <unit>] <name>
+         * whole items) separated by "+" characters, followed by the name of the item.
+         * [<qty>] [+ <qty> <unit>] [+ <qty> <unit>] <name>
          */
-
-        //first, split multiple quantities if present by splitting on any "+" characters
-        String[] amounts = ingText.split("\\+");
-        //the name of the item will be in the last "amount",
-        //so lets first analyse any guaranteed "amount-only" components
-        for (int i = 0; i < amounts.length - 1; i++){
-            addAmount(ingListItem, amounts[i]);
-        }
-
-        /*now we need to break down the last component, which contains the name and potentially an amount */
-        String[] words = amounts[amounts.length-1].trim().split(" ");
-
-        //if first word is "[num]x", interpret this as qty [num]
-        if (words[0].matches("\\d+x$")){
-            addAmount(ingListItem, words[0].substring(0,words[0].length()-1));
-
-            //read the rest of ingText as the name of ingredient
-            for (int i = 1; i < words.length; i++){
-                name.append(words[i]).append(" ");
-            }
-        }
-
-        //else if final word is "x[num]" interpret this as qty [num]
-        else if (words[words.length-1].matches("^x\\d+")) {
-            //extract the number part as whole unit quantity
-            ingListItem.setWholeItemQty(Double.parseDouble(words[words.length-1].substring(1)));
-
-            //read the rest of ingText as the name of ingredient
-            for (int i = 0; i < words.length-1; i++){
-                name.append(words[i]).append(" ");
-            }
-        }
-
-        //else if the first word contains a number, an amount has been given and we need to separate
-        //it out from the name of the item.
-        // Check each subsequent word for either more of qty number or a unit of measurement
-        else if (words[0].matches(".*\\d.*")) {
-            //keep reading as amount while the word either contains numbers
-            //or is a "unit of measurement" word
-            int i = 0;
-            do {
-                amount.append(words[i]).append(" ");
-                i++;
-            } while (words[i].matches(".*\\d.*") || getUnitType(words[i]) != UnitType.INVALID);
-
-            //read remainder of words as ingredient name
-            for(int j = i; j < words.length; j++){
-                name.append(words[j]).append(" ");
+        try {
+            //first, split multiple quantities if present by splitting on any "+" characters
+            String[] amounts = ingText.split("\\+");
+            //the name of the item will be in the last "amount",
+            //so lets first analyse any guaranteed "amount-only" components
+            for (int i = 0; i < amounts.length - 1; i++){
+                addAmount(ingListItem, amounts[i]);
             }
 
-            //add the amount recorded to this ingredient
-            String amountString = amount.toString().trim();
-            if(!amountString.isEmpty()){
-                addAmount(ingListItem, amountString);
+            /*now we need to break down the last component, which contains the name and potentially an amount */
+            String[] words = amounts[amounts.length-1].trim().split(" ");
+
+            //if first word is "[num]x", interpret this as qty [num]
+            if (words[0].matches("\\d+x$")){
+                addAmount(ingListItem, words[0].substring(0,words[0].length()-1));
+
+                //read the rest of ingText as the name of ingredient
+                for (int i = 1; i < words.length; i++){
+                    name.append(words[i]).append(" ");
+                }
             }
-        }
 
-        //else just assume the quantity is 1 if there are no numbers
-        else{
-            ingListItem.setWholeItemQty(1);
-            //read all words as the name of ingredient
-            for (int i = 0; i < words.length; i++){
-                name.append(words[i]).append(" ");
+            //else if final word is "x[num]" interpret this as qty [num]
+            else if (words[words.length-1].matches("^x\\d+")) {
+                //extract the number part as whole unit quantity
+                ingListItem.setWholeItemQty(Double.parseDouble(words[words.length-1].substring(1)));
+
+                //read the rest of ingText as the name of ingredient
+                for (int i = 0; i < words.length-1; i++){
+                    name.append(words[i]).append(" ");
+                }
             }
+
+            //else if the first word contains a number or unit, an amount has been given and we need to separate
+            //it out from the name of the item.
+            // Check each subsequent word for either more of qty number or a unit of measurement
+            else if (words[0].matches(".*\\d.*") || getUnitType(words[0]) != UnitType.INVALID) {
+                //keep reading as amount while the word either contains numbers
+                int i = 0;
+                while (i < words.length && words[i].matches(".*\\d.*")) {
+                    amount.append(words[i]).append(" ");
+                    i++;
+                }
+
+                //append first word after end of numbers as unit if it is a unit
+                if (getUnitType(words[i]) != UnitType.INVALID){
+                    //if the string starts with a unit, assume quantity 1 of that unit
+                    if(amount.toString().isEmpty()){
+                        amount.append("1 ");
+                    }
+                    amount.append(words[i]);
+                    //increment position through words so we know where to start reading name
+                    i++;
+                }
+
+                //read remainder of words as ingredient name
+                for(int j = i; j < words.length; j++){
+                    name.append(words[j]).append(" ");
+                }
+
+                //add the amount recorded to this ingredient
+                String amountString = amount.toString().trim();
+                if(!amountString.isEmpty()){
+                    addAmount(ingListItem, amountString);
+                }
+            }
+
+            //else just assume the quantity is 1 if there are no numbers
+            else{
+                ingListItem.setWholeItemQty(1);
+                //read all words as the name of ingredient
+                for (int i = 0; i < words.length; i++){
+                    name.append(words[i]).append(" ");
+                }
+            }
+
+            //normalise ingredient name to make it easier to find matching name ingredients later
+            ingListItem.setName(normaliseIngredientName(name.toString()));
+
+            //converts any units added by "add amounts" to a normalised form
+            normaliseUnits(ingListItem);
+            return ingListItem;
         }
-
-        //normalise ingredient name to make it easier to find matching name ingredients later
-        ingListItem.setName(normaliseIngredientName(name.toString()));
-
-        //converts any units added by "add amounts" to a normalised form
-        normaliseUnits(ingListItem);
-        return ingListItem;
+        catch (InvalidIngredientStringException e) {
+            String message = "Offending string: " + originalIngText;
+            if (e.getMessage() != null){
+                message += "\nInvalid unit: " + e.getMessage();
+            }
+            throw new InvalidIngredientStringException(message);
+        }
     }
 
     /**
@@ -299,7 +317,7 @@ public class IngListItemUtils {
                     ingListItem.setMassUnit(unit);
                     break;
                 case INVALID:
-                    throw new InvalidIngredientStringException();
+                    throw new InvalidIngredientStringException(unit);
             }
         }
     }

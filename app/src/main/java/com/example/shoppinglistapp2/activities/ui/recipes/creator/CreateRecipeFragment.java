@@ -78,6 +78,7 @@ public class CreateRecipeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setupUi();
+//        viewModel.loadFromBackup(this,backgroundExecutor);
     }
 
     private void setupUi(){

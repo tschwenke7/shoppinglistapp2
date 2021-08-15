@@ -3,20 +3,27 @@ package com.example.shoppinglistapp2.activities.ui.recipes.creator;
 import android.app.Application;
 import android.util.Log;
 
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.ViewModel;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment;
 import com.example.shoppinglistapp2.db.SlaRepository;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;
 import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
+import com.example.shoppinglistapp2.helpers.InvalidIngredientStringException;
 import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 public class CreateRecipeViewModel extends AndroidViewModel {
     private final SlaRepository slaRepository;
@@ -110,5 +117,65 @@ public class CreateRecipeViewModel extends AndroidViewModel {
         slaRepository.insertIngList(recipeId).get();
 
         return recipeId;
+    }
+
+    public void loadFromBackup(Fragment frag, Executor backgroundExecutor){
+        slaRepository.deleteAllRecipes();
+        Log.d("TOM_TEST", "loadFromBackup started");
+        Thread t1 = new Thread(() -> {
+
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(frag.getResources().openRawResource(R.raw.recipe_backup_2021_03_04p));
+            BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(bufferedInputStream));
+            try {
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    final String backupLine = line;
+                    backgroundExecutor.execute(() -> {
+                        String[] row = backupLine.split("\\|");
+                        //1- notes
+                        //2- tomrating
+                        //3- tierrating
+                        //4- link
+                        //5- tag
+                        Log.d("TOM_TEST", backupLine);
+//                    Log.d("TOM_TEST", String.format("%s\n%s\n%s\n%s\n%s",row[1],row[2],row[3],row[4],row[5]));
+
+                        try {
+                            RecipeWithTagsAndIngredients populatedRecipe = slaRepository.getPopulatedRecipeById((generateRecipeIdFromUrl(row[4])));
+
+                            Recipe recipe = populatedRecipe.getRecipe();
+
+                            if (null != row[1] && !row[1].isEmpty()) {
+                                recipe.setNotes(row[1].trim());
+                            }
+
+                            recipe.setTom_rating(Integer.parseInt(row[2]) * 2);
+                            recipe.setTier_rating(Integer.parseInt(row[3]) * 2);
+
+                            if (row.length > 5 && null != row[5] && !row[5].isEmpty()) {
+                                slaRepository.insertTag(recipe.getId(), row[5]);
+                            }
+
+                            slaRepository.updateRecipe(recipe);
+                        } catch (NullPointerException  | ExecutionException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        catch (NumberFormatException e) {
+                            Log.e("BACKUP_LOAD", "From url: " + row[4], e);
+                        }
+                        catch (InvalidRecipeUrlExeception e) {
+                            Log.e("BACKUP_LOAD", "Could not load recipe from this url" + row[4]);
+                        }
+                        catch (InvalidIngredientStringException e) {
+                            Log.e("BACKUP_LOAD", e.getMessage() + "\nFrom url: " + row[4]);
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        t1.start();
     }
 }

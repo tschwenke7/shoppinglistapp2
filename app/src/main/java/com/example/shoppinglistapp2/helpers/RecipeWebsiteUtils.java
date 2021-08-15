@@ -103,6 +103,14 @@ public class RecipeWebsiteUtils {
         }
     }
 
+    /**
+     * Things to tell the user about:
+     *  - If there is more than one quantity listed for an ingredient, the smaller one will be chosen.
+     *
+     * @param url
+     * @return
+     * @throws IOException
+     */
     private static RecipeWithTagsAndIngredients convertRecipeTinEats(String url) throws IOException {
         //open webpage
         Document doc = Jsoup.connect(url).get();
@@ -187,6 +195,7 @@ public class RecipeWebsiteUtils {
             //sometimes the unit span is not present, and instead it's combined with qty
             //therefore, we will just combine them and let IngredientsUtil separate the units
             String ingAmount = ingredientRow.getElementsByClass("wprm-recipe-ingredient-amount").text().trim()
+                    + " " //separate with a space
                     + ingredientRow.getElementsByClass("wprm-recipe-ingredient-unit").text().trim();
 
             String ingName = ingredientRow.getElementsByClass("wprm-recipe-ingredient-name").text().trim();
@@ -205,7 +214,7 @@ public class RecipeWebsiteUtils {
                     if(ingAmountComponents[0].contains(unit)){
                         //if it does, we will take the second part instead.
                         ingAmount = ingAmountComponents[1].trim();
-                        ingAmount.replace(")", "");//get rid of the close bracket
+                        ingAmount = ingAmount.replace(")", "");//get rid of the close bracket
                     }
                 }
             }
@@ -263,13 +272,11 @@ public class RecipeWebsiteUtils {
 
                 //add an ingredient for name (amount stays the same for each)
                 for (String name: namesList){
-                    //concatenate the resulting amount/name and delegate to IngredientsUtil to convert
+                    //concatenate the resulting amount/name and delegate to IngListItemUtils to convert
                     //it to an actual Ingredient object
                     String ingText = String.format("%s %s", ingAmount, name);
-                    IngListItem ingredient = IngListItemUtils.toIngListItem(ingText);
-                    if (!IngListItemUtils.pointlessIngredients.contains(ingredient.getName())){
-                        ingredients.add(ingredient);
-                    }
+                    //replace any instances of "+" symbol with "plus" to avoid breaking the toIngListItem
+                    addIngredientToList(ingredients, ingText);
                 }
             }
             //otherwise just add the ingredient
@@ -277,10 +284,7 @@ public class RecipeWebsiteUtils {
                 //concatenate the resulting amount/name and delegate to IngredientsUtil to convert
                 //it to an actual Ingredient object
                 String ingText = String.format("%s %s", ingAmount, ingName);
-                IngListItem ingredient = IngListItemUtils.toIngListItem(ingText);
-                if (!IngListItemUtils.pointlessIngredients.contains(ingredient.getName())){
-                    ingredients.add(ingredient);
-                }
+                addIngredientToList(ingredients, ingText);
             }
         }
 
@@ -290,6 +294,34 @@ public class RecipeWebsiteUtils {
         populatedRecipe.setIngredients(ingredients);
 
         return populatedRecipe;
+    }
+
+    /**
+     * Shared business logic for final checks before adding an ingredient to the recipe.
+     * - Replaces "+" with "plus" to avoid confusing toIngListItem, as "+" usually separates
+     * multiple incompatible qtys of an item.
+     * - Doesn't add the ingredient if it's part of the "pointless ingredients" list
+     * - If ingText cannot be cleanly converted to an IngListItem, appends [edit me] to the front.
+     * This will convert successfully, but inform the user to edit the item themselves.
+     * @param ingredients
+     * @param ingText
+     */
+    private static void addIngredientToList(List<IngListItem> ingredients, String ingText) {
+        //replace any instances of "+" symbol with "plus" to avoid breaking the toIngListItem
+        ingText = ingText.replaceAll("\\+", "plus");
+
+        try{
+            IngListItem ingredient = IngListItemUtils.toIngListItem(ingText);
+            if (!IngListItemUtils.pointlessIngredients.contains(ingredient.getName())) {
+                ingredients.add(ingredient);
+            }
+        }
+        //if the item was invalid, add a "[EDIT_ME] to the front so it will convert, but the user will
+        //know to edit it.
+        catch (Exception e){
+            IngListItem ingredient = IngListItemUtils.toIngListItem("[edit me] " + ingText);
+            ingredients.add(ingredient);
+        }
     }
 
     private static RecipeWithTagsAndIngredients convertHelloFresh(String url) throws IOException {
@@ -327,10 +359,7 @@ public class RecipeWebsiteUtils {
             String amount = ingDetails.child(0).text().trim();
             amount = amount.replaceFirst(" unit","");
 
-            IngListItem ingredient = IngListItemUtils.toIngListItem(amount + " " + ingDetails.child(1).text().trim());
-            if (!IngListItemUtils.pointlessIngredients.contains(ingredient.getName())){
-                ingredients.add(ingredient);
-            }
+            addIngredientToList(ingredients, amount + " " + ingDetails.child(1).text().trim());
         }
 
 
