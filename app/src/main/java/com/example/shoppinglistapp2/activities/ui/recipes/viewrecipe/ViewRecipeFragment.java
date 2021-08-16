@@ -95,8 +95,6 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //recipe to be viewed
         recipeId = ViewRecipeFragmentArgs.fromBundle(getArguments()).getRecipeId();
 
-        //decide whether to start in edit mode or not
-        editingFlag = ViewRecipeFragmentArgs.fromBundle(getArguments()).getEditingFlag();
         //true if this recipe was just created rather than selected from recipe list
         newRecipeFlag = ViewRecipeFragmentArgs.fromBundle(getArguments()).getNewRecipeFlag();
 
@@ -109,10 +107,12 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         backgroundExecutor.submit(() -> viewModel.saveBackupOfRecipe(recipeId));
-        setupViews(view);
+
+        //decide whether to start in edit mode or not
+        setupViews(view, ViewRecipeFragmentArgs.fromBundle(getArguments()).getEditingFlag());
     }
 
-    private void setupViews(View root){
+    private void setupViews(View root, boolean editingFlag){
         //setup action bar
         this.setHasOptionsMenu(true);
 
@@ -136,7 +136,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         ingredientRecyclerView.setAdapter(adapter);
         ingredientRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
-        ingredients.observe(getViewLifecycleOwner(), (list) -> adapter.setList(list));
+        ingredients.observe(getViewLifecycleOwner(), (list) -> adapter.submitList(list));
 
         //handle ingredient being added
         Button addIngredientButton = root.findViewById(R.id.recipe_add_ingredient_button);
@@ -182,24 +182,24 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
         //setup tag input autocomplete
         Futures.addCallback(
-                backgroundExecutor.submit(() -> viewModel.getAllTagNames()),
-                new FutureCallback<String[]>() {
-                    @Override
-                    public void onSuccess(@Nullable String[] result) {
-                        AutoCompleteTextView tagField = root.findViewById(R.id.edit_text_tag);
-                        tagField.post(() -> {
-                            ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                                    getContext(), android.R.layout.simple_dropdown_item_1line, result);
-                            tagField.setAdapter(adapter);
-                        });
-                    }
+            backgroundExecutor.submit(() -> viewModel.getAllTagNames()),
+            new FutureCallback<String[]>() {
+                @Override
+                public void onSuccess(@Nullable String[] result) {
+                    AutoCompleteTextView tagField = root.findViewById(R.id.edit_text_tag);
+                    tagField.post(() -> {
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                                getContext(), android.R.layout.simple_dropdown_item_1line, result);
+                        tagField.setAdapter(adapter);
+                    });
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.e(TAG, "getting all tag names for autocomplete: ", t);
-                    }
-                },
-                uiExecutor
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.e(TAG, "getting all tag names for autocomplete: ", t);
+                }
+            },
+            uiExecutor
         );
 
 
@@ -296,6 +296,9 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             Chip chip = (Chip) getLayoutInflater().inflate(R.layout.tag_chip, null, false);
             chip.setText(tag.getName());
 
+            //show close icon only if we are in editing mode
+            chip.setCloseIconVisible(editingFlag);
+
 
             chip.setOnCloseIconClickListener((view -> {
                 viewModel.deleteTag(tag);
@@ -352,6 +355,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     }
 
     private void enterEditMode(){
+        editingFlag = true;
         View root = requireView();
         //save backups of current state of chips, ingredients in case changes are to be discarded
         backgroundExecutor.submit(() -> viewModel.saveBackupOfRecipe(recipeId));
@@ -412,6 +416,8 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     }
 
     private void enterViewMode(){
+        editingFlag = false;
+
         //hide keyboard in case it was open
         KeyboardHider.hideKeyboard(requireActivity());
 

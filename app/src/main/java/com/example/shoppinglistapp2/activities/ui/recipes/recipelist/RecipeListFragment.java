@@ -90,9 +90,6 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         //setup action bar
         this.setHasOptionsMenu(true);
 
-        if (savedInstanceState != null) {
-            binding.viewgroupAdvancedSearch.setVisibility(savedInstanceState.getInt("advancedSearchOpen"));
-        }
         if(advancedSearchVisible) {
             binding.viewgroupAdvancedSearch.setVisibility(View.VISIBLE);
         }
@@ -113,8 +110,8 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                     binding.textviewNoRecipes.setVisibility(View.GONE);
 
                     //display loading spinner
-                    binding.progressBarRecipeList.setVisibility(View.VISIBLE);
-                    binding.recipeRecyclerview.setVisibility(View.GONE);
+//                    binding.progressBarRecipeList.setVisibility(View.VISIBLE);
+//                    binding.recipeRecyclerview.setVisibility(View.GONE);
                 }
                 adapter.updateList(recipes, () -> {
                     adapter.getFilter().filter(binding.searchBar.getText().toString());

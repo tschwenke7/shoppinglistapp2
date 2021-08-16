@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.BaseRecyclerViewAdapter;
+import com.example.shoppinglistapp2.activities.ui.ListAndCallback;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;
@@ -38,6 +39,8 @@ public class RecipeListAdapter extends ListAdapter<RecipeWithTagsAndIngredients,
     private List<Integer> selectedPositions = new ArrayList<>();
     private DecimalFormat ratingFormat = new DecimalFormat("#.#");
     private SearchCriteria searchCriteria;
+
+    protected Deque<ListAndCallback<RecipeWithTagsAndIngredients>> pendingUpdates = new ArrayDeque<>();
 
     public enum SearchCriteria {
         NAME,
@@ -66,7 +69,43 @@ public class RecipeListAdapter extends ListAdapter<RecipeWithTagsAndIngredients,
 
     public void updateList(@Nullable List<RecipeWithTagsAndIngredients> list, @Nullable Runnable commitCallback){
         backupFullList(list);
-        submitList(list, commitCallback);
+        //queue this list update
+        ListAndCallback<RecipeWithTagsAndIngredients> current = new ListAndCallback<>(list, commitCallback);
+        pendingUpdates.push(current);
+
+        //if there's already another update being run, then don't start a new one
+        if(pendingUpdates.size() > 1){
+            return;
+        }
+
+        //append call to check for new list update at the end
+        Runnable callback = () -> {
+            if(commitCallback != null) {
+                commitCallback.run();
+            }
+            runNextUpdate(current);
+        };
+
+        submitList(list, callback);
+    }
+
+    private void runNextUpdate(ListAndCallback<RecipeWithTagsAndIngredients> current){
+        pendingUpdates.remove(current);
+        //if there are more updates queued now, then take the latest one and run it
+        if(pendingUpdates.size() > 0) {
+            ListAndCallback<RecipeWithTagsAndIngredients> latest = pendingUpdates.pop();
+
+            //remove older, outdated updates from queue
+            pendingUpdates.clear();
+
+            //run latest update
+            submitList(latest.list, latest.callback);
+        }
+    }
+
+    @Override
+    public void onCurrentListChanged(@NonNull List<RecipeWithTagsAndIngredients> previousList, @NonNull List<RecipeWithTagsAndIngredients> currentList) {
+        super.onCurrentListChanged(previousList, currentList);
     }
 
     private void backupFullList(@Nullable List<RecipeWithTagsAndIngredients> list) {

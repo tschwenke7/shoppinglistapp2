@@ -11,7 +11,9 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
@@ -20,14 +22,13 @@ import com.example.shoppinglistapp2.db.tables.IngListItem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAdapter.ViewHolder> {
-
-    private List<IngListItem> ingredients;
+public class IngredientListAdapter extends ListAdapter<IngListItem, IngredientListAdapter.ViewHolder> {
     private IngredientClickListener ingredientClickListener;
     private boolean editMode = false;
     private List<Integer> deselectedPositions;
 
     public IngredientListAdapter(IngredientClickListener ingredientClickListener){
+        super(new IngListItem.DiffCallback());
         this.ingredientClickListener = ingredientClickListener;
         deselectedPositions = new ArrayList<>();
     }
@@ -43,25 +44,13 @@ public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAd
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(ingredients.get(position));
+        holder.bind(getItem(position));
     }
 
     @Override
-    public int getItemCount() {
-        if(null == ingredients){
-            return 0;
-        }
-        return ingredients.size();
-    }
-
-    public void setList(List<IngListItem> newList){
-        //clear any selection/deselection info, as the list may have changed
-        // and invalidated the recorded positions
+    public void submitList(@Nullable List<IngListItem> list) {
+        super.submitList(list);
         resetSelections();
-
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new IngredientDiff(newList, ingredients));
-        diffResult.dispatchUpdatesTo(this);
-        ingredients = newList;
     }
 
     public void setEditMode(boolean editMode) {
@@ -69,8 +58,7 @@ public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAd
     }
 
     public void resetSelections(){
-        if(null != ingredients)
-            deselectedPositions.clear();
+        deselectedPositions.clear();
     }
 
     /**
@@ -82,9 +70,9 @@ public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAd
         List<IngListItem> selected = new ArrayList<>();
 
         //add all ingredients which haven't been deselected by the user
-        for (int i = 0; i < ingredients.size(); i++){
+        for (int i = 0; i < getCurrentList().size(); i++){
             if(!deselectedPositions.contains(i)){
-                selected.add(ingredients.get(i));
+                selected.add(getItem(i));
             }
         }
 
@@ -123,8 +111,8 @@ public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAd
                 Drawable transparentDrawable = new ColorDrawable(Color.TRANSPARENT);
                 checkBoxView.setButtonDrawable(transparentDrawable);
 
-                //set longclick listener for editing ingredients
-                checkBoxView.setOnLongClickListener(v -> {
+                //set click listener for editing ingredients
+                checkBoxView.setOnClickListener(v -> {
                     //hide textview and delete button
                     checkBoxView.setVisibility(View.GONE);
                     deleteIcon.setVisibility(View.GONE);
@@ -135,7 +123,6 @@ public class IngredientListAdapter extends RecyclerView.Adapter<IngredientListAd
                     editText.requestFocus();
 
                     confirmEditButton.setVisibility(View.VISIBLE);
-                    return true;
                 });
 
                 //set listener for confirm edit button

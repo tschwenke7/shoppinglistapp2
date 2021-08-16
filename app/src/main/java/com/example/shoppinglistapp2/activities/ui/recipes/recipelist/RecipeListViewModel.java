@@ -28,7 +28,7 @@ public class RecipeListViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<RecipeWithTagsAndIngredients>> getAllRecipes(){
-        return Transformations.distinctUntilChanged(allRecipes);
+        return allRecipes;
     }
 
     public ListenableFuture<Integer> deleteRecipes(List<RecipeWithTagsAndIngredients> populatedRecipes){

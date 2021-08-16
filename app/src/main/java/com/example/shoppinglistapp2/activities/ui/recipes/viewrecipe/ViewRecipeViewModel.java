@@ -13,6 +13,7 @@ import com.example.shoppinglistapp2.db.tables.Tag;
 import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
 import com.example.shoppinglistapp2.helpers.IngListItemUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -130,8 +131,7 @@ public class ViewRecipeViewModel extends AndroidViewModel {
     }
     
     private void restoreOldValues(List<IngListItem> ingredients, List<IngListItem> ingredientsBackup) {
-        //get() forces deletion to complete and block before inserting ingredients in
-        //which may have duplicate ids (primary keys)
+        //delete all ingredients, then add back in all from backup
         slaRepository.deleteIngListItems(ingredients);
         slaRepository.insertIngListItems(ingredientsBackup);
     }
@@ -144,7 +144,7 @@ public class ViewRecipeViewModel extends AndroidViewModel {
      */
     public List<Tag> restoreTagsToBackup() {
         List<Tag> currentTags = slaRepository.getTagsByRecipe(backup.getRecipe().getId());
-        List<Tag> backupTags = backup.getTags();
+        List<Tag> backupTags = new ArrayList<>(backup.getTags());
 
         if (currentTags.size() == backupTags.size()){
             boolean different = false;

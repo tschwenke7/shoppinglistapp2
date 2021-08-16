@@ -3,6 +3,7 @@ package com.example.shoppinglistapp2.db;
 import android.content.Context;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 
 import com.example.shoppinglistapp2.db.dao.IngListDao;
 import com.example.shoppinglistapp2.db.dao.IngListItemDao;
@@ -53,7 +54,7 @@ public class SlaRepository {
     }
 
     public LiveData<List<RecipeWithTagsAndIngredients>> getAllRecipesPopulated(){
-        return allRecipesPopulated;
+        return Transformations.distinctUntilChanged(allRecipesPopulated);
     }
 
     public ListenableFuture<Integer> insertRecipe(final Recipe recipe){
@@ -66,7 +67,7 @@ public class SlaRepository {
 
 
     public LiveData<List<IngListItem>> getIngredientsByRecipeId(int id){
-        return ingListItemDao.getAllFromRecipe(id);
+        return Transformations.distinctUntilChanged(ingListItemDao.getAllFromRecipe(id));
     }
 
     public List<IngListItem> getIngredientsByRecipeIdNonLive(int id){
@@ -137,8 +138,8 @@ public class SlaRepository {
         return SlaDatabase.databaseWriteExecutor.submit(() -> ingListItemDao.delete(item));
     }
 
-    public Future<Integer> deleteIngListItems(List<IngListItem> ingListItems) {
-        return SlaDatabase.databaseWriteExecutor.submit(() -> ingListItemDao.deleteAll(ingListItems));
+    public int deleteIngListItems(List<IngListItem> ingListItems) {
+        return ingListItemDao.deleteAll(ingListItems);
     }
 
     public LiveData<List<IngListItem>> getSlItems(){
