@@ -1,5 +1,7 @@
 package com.example.shoppinglistapp2.db.tables;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -233,5 +235,18 @@ public class IngListItem {
         }
 
         return str + name;
+    }
+
+    public static class DiffCallback extends DiffUtil.ItemCallback<IngListItem> {
+
+        @Override
+        public boolean areItemsTheSame(@NonNull IngListItem oldItem, @NonNull IngListItem newItem) {
+            return oldItem.getId() == newItem.getId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull IngListItem oldItem, @NonNull IngListItem newItem) {
+            return oldItem.equals(newItem);
+        }
     }
 }

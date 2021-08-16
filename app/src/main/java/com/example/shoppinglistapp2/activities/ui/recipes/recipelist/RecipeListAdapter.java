@@ -8,7 +8,10 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.BaseRecyclerViewAdapter;
@@ -29,16 +32,12 @@ import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients> implements Filterable {
+public class RecipeListAdapter extends ListAdapter<RecipeWithTagsAndIngredients, RecipeListAdapter.ViewHolder> implements Filterable {
     private List<RecipeWithTagsAndIngredients> itemsFull;
-    private Deque<List<RecipeWithTagsAndIngredients>> pendingUpdates =
-            new ArrayDeque<>();
-
     private OnRecipeClickListener onRecipeClickListener;
     private List<Integer> selectedPositions = new ArrayList<>();
     private DecimalFormat ratingFormat = new DecimalFormat("#.#");
     private SearchCriteria searchCriteria;
-    private String queryText = "";
 
     public enum SearchCriteria {
         NAME,
@@ -46,37 +45,41 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         TAG
     }
 
-    public RecipeListAdapter(Executor listUpdateExecutor, View recyclerView, View progressBar, OnRecipeClickListener onRecipeClickListener){
-        super(listUpdateExecutor, recyclerView, progressBar);
+    public RecipeListAdapter(OnRecipeClickListener onRecipeClickListener){
+        super(new RecipeWithTagsAndIngredients.DiffCallback());
         this.onRecipeClickListener = onRecipeClickListener;
         searchCriteria = SearchCriteria.NAME;
     }
 
     @NonNull
     @Override
-    public BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients>.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_recyclerview_item, parent, false);
         return new ViewHolder(view, onRecipeClickListener);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients>.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.itemView.setSelected(selectedPositions.contains(position));
-        super.onBindViewHolder(holder,position);
+        holder.bind(getItem(position));
     }
 
-    public void updateList(List<RecipeWithTagsAndIngredients> newItems, String queryText) {
-        super.updateList(newItems);
-        this.queryText = queryText;
+    public void updateList(@Nullable List<RecipeWithTagsAndIngredients> list, @Nullable Runnable commitCallback){
+        backupFullList(list);
+        submitList(list, commitCallback);
     }
 
-    @Override
-    protected void dispatchUpdates(List<RecipeWithTagsAndIngredients> newItems, DiffUtil.DiffResult diffResult) {
-        super.dispatchUpdates(newItems, diffResult);
-        if(newItems != null) {
-            itemsFull = new ArrayList<>(newItems);
+    private void backupFullList(@Nullable List<RecipeWithTagsAndIngredients> list) {
+        //update full list
+        if (itemsFull != null) {
+            itemsFull.clear();
+        } else {
+            itemsFull = new ArrayList<>();
         }
-        getFilter().filter(queryText);
+
+        if (list != null) {
+            itemsFull.addAll(list);
+        }
     }
 
     public void setSearchCriteria(int searchCriteria){
@@ -94,52 +97,52 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
     }
 
     public void sort(int orderingCriteria){
-        //choose a comparator depending on which option was selected by the user
-        Comparator<RecipeWithTagsAndIngredients> comparator = null;
-        switch (orderingCriteria){
-            //alphabetically by recipe name
-            case 0:
-                comparator = new RecipeComparators.CompareRecipeName();
-                break;
-            //by prep time
-            case 1:
-                comparator = new RecipeComparators.ComparePrepTime();
-                break;
-            //by total time
-            case 2:
-                comparator = new RecipeComparators.CompareTotalTime();
-                break;
-            //by Tom rating
-            case 3:
-                comparator = new RecipeComparators.CompareTomRating();
-                break;
-            //by Tiernan rating
-            case 4:
-                comparator = new RecipeComparators.CompareTiernanRating();
-                break;
-            //by combined rating
-            case 5:
-                comparator = new RecipeComparators.CompareCombinedRating();
-                break;
+        if(itemsFull != null){
+            //choose a comparator depending on which option was selected by the user
+            Comparator<RecipeWithTagsAndIngredients> comparator = null;
+            switch (orderingCriteria){
+                //alphabetically by recipe name
+                case 0:
+                    comparator = new RecipeComparators.CompareRecipeName();
+                    break;
+                //by prep time
+                case 1:
+                    comparator = new RecipeComparators.ComparePrepTime();
+                    break;
+                //by total time
+                case 2:
+                    comparator = new RecipeComparators.CompareTotalTime();
+                    break;
+                //by Tom rating
+                case 3:
+                    comparator = new RecipeComparators.CompareTomRating();
+                    break;
+                //by Tiernan rating
+                case 4:
+                    comparator = new RecipeComparators.CompareTiernanRating();
+                    break;
+                //by combined rating
+                case 5:
+                    comparator = new RecipeComparators.CompareCombinedRating();
+                    break;
+            }
+
+            //now sort both the filtered and full lists using this comparator
+            List<RecipeWithTagsAndIngredients> sortedList = new ArrayList<>(getCurrentList());
+            List<RecipeWithTagsAndIngredients> sortedListFull = new ArrayList<>(itemsFull);
+            Collections.sort(sortedList, comparator);
+            Collections.sort(sortedListFull, comparator);
+
+            //update lists
+            this.submitList(sortedList);
+            this.itemsFull = sortedListFull;
         }
-
-        //now sort both the filtered and full lists using this comparator
-        List<RecipeWithTagsAndIngredients> sortedList = new ArrayList<>(items);
-        List<RecipeWithTagsAndIngredients> sortedListFull = new ArrayList<>(itemsFull);
-        Collections.sort(sortedList, comparator);
-        Collections.sort(sortedListFull, comparator);
-
-        //calculate DiffUtil
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new RecipeDiff(sortedList, items));
-        diffResult.dispatchUpdatesTo(this);
-        this.items = sortedList;
-        this.itemsFull = sortedListFull;
     }
 
     public List<RecipeWithTagsAndIngredients> getSelectedItems(){
         List<RecipeWithTagsAndIngredients> selectedItems = new ArrayList<>();
         for(Integer position : selectedPositions){
-            selectedItems.add(items.get(position));
+            selectedItems.add(getCurrentList().get(position));
         }
         return selectedItems;
     }
@@ -171,7 +174,6 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
     private Filter nameFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-            queryText = (String) constraint;
             List<RecipeWithTagsAndIngredients> filteredList = new ArrayList<>();
 
             if(constraint == null || constraint.length() == 0){
@@ -205,9 +207,8 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             if(filterResults.values != null){
-                items = (List) filterResults.values;
+                submitList((List<RecipeWithTagsAndIngredients>) filterResults.values);
             }
-            notifyDataSetChanged();
         }
     };
 
@@ -216,7 +217,6 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             List<RecipeWithTagsAndIngredients> filteredList = new ArrayList<>();
-            queryText = (String) constraint;
 
             if (constraint == null || constraint.length() == 0) {
                 //if recipes haven't finished loading yet, wait until they have
@@ -270,9 +270,8 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             if(filterResults.values != null){
-                items = (List) filterResults.values;
+                submitList((List<RecipeWithTagsAndIngredients>) filterResults.values);
             }
-            notifyDataSetChanged();
         }
     };
 
@@ -281,7 +280,6 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             List<RecipeWithTagsAndIngredients> filteredList = new ArrayList<>();
-            queryText = (String) constraint;
 
             if (constraint == null || constraint.length() == 0) {
                 //if recipes haven't finished loading yet, wait until they have
@@ -335,9 +333,8 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             if(filterResults.values != null){
-                items = (List) filterResults.values;
+                submitList((List<RecipeWithTagsAndIngredients>) filterResults.values);
             }
-            notifyDataSetChanged();
         }
     };
 
@@ -348,30 +345,7 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         return true;
     }
 
-    public class RecipeDiff extends BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients>.ItemDiff {
-        public RecipeDiff (List<RecipeWithTagsAndIngredients> newList, List<RecipeWithTagsAndIngredients> oldList){
-            super(newList, oldList);
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            //compare Recipe ids
-            return oldList.get(oldItemPosition).getRecipe().getId() == newList.get(newItemPosition).getRecipe().getId();
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            //compare all Recipe contents
-            return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
-        }
-    }
-
-    @Override
-    protected ItemDiff createDiffCallback(List<RecipeWithTagsAndIngredients> newList, List<RecipeWithTagsAndIngredients> oldList) {
-        return new RecipeDiff(newList, oldList);
-    }
-
-    public class ViewHolder extends BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients>.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private final View itemView;
         private OnRecipeClickListener onRecipeClickListener;
         private int recipeId;
@@ -384,7 +358,6 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
             this.onRecipeClickListener = onRecipeClickListener;
         }
 
-        @Override
         public void bind (RecipeWithTagsAndIngredients recipeWithTagsAndIngredients){
             Recipe recipe = recipeWithTagsAndIngredients.getRecipe();
             recipeId = recipe.getId();

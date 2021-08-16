@@ -54,7 +54,8 @@
         tools:text="@string/ingredient_search_hint"
         tools:visibility="visible" />
 
-    <LinearLayout
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/viewgroup_advanced_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -67,44 +68,46 @@
         app:layout_constraintTop_toBottomOf="@id/search_hint"
         tools:visibility="visible">
 
-        <LinearLayout
+
+        <TextView
+            android:id="@+id/search_criteria_heading"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:text="@string/search_criteria_heading"
+            app:layout_constraintEnd_toStartOf="@+id/order_by_heading"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/search_criteria_heading"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/search_criteria_heading" />
-
-            <Spinner
-                android:id="@+id/search_criteria_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                 />
-        </LinearLayout>
-
-        <LinearLayout
+        <Spinner
+            android:id="@+id/search_criteria_spinner"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@id/search_criteria_heading"
+            app:layout_constraintStart_toStartOf="@id/search_criteria_heading"
+            app:layout_constraintTop_toBottomOf="@id/search_criteria_heading" />
 
-            <TextView
-                android:id="@+id/order_by_heading"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/order_by_heading" />
 
-            <Spinner
-                android:id="@+id/order_by_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/order_by_heading"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/order_by_heading"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/search_criteria_heading"
+            app:layout_constraintTop_toTopOf="@id/search_criteria_heading" />
 
-    </LinearLayout>
+        <Spinner
+            android:id="@+id/order_by_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/order_by_heading"
+            app:layout_constraintEnd_toEndOf="@id/order_by_heading"
+            app:layout_constraintTop_toBottomOf="@id/order_by_heading" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/advanced_search_prompt"
@@ -113,6 +116,7 @@
         android:layout_marginTop="4dp"
         android:gravity="center"
         android:text="@string/show_advanced_search_prompt"
+        android:textSize="18sp"
         android:textColor="@android:color/holo_blue_dark" />
 
     <TextView

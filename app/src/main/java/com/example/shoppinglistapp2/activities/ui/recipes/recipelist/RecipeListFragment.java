@@ -38,6 +38,7 @@ import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
 import com.example.shoppinglistapp2.activities.ui.ViewPagerNavigationCallback;
+import com.example.shoppinglistapp2.databinding.FragmentRecipeListBinding;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -51,11 +52,14 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     private ActionMode.Callback multiSelectActionModeCallback = new ActionModeCallback(1);
     private ActionMode.Callback chooseMealPlanItemActionModeCallback = new ActionModeCallback(2);
     private RecipeListAdapter adapter;
-    private boolean advancedSearchVisible;
     private ViewPagerNavigationCallback callback;
     private ListeningExecutorService backgroundExecutor;
 
-    private MultiAutoCompleteTextView searchBar;
+    private FragmentRecipeListBinding binding;
+
+    private int orderByIndex = 0;
+    private int searchByIndex = 0;
+    private boolean advancedSearchVisible = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -64,6 +68,8 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         sharedViewModel =
                 new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
+        binding = FragmentRecipeListBinding.inflate(inflater, container, false);
+
         callback = (ViewPagerNavigationCallback) getActivity();
 
         backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
@@ -71,76 +77,81 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         //this will delete ALL recipes and load recipetineats websites from the spreadsheet in res/raw/<name>.csv
 //        recipesViewModel.loadFromBackup(this);
 
-        return inflater.inflate(R.layout.fragment_recipe_list, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setupViews();
+        setupViews(savedInstanceState);
     }
 
-    private void setupViews(){
+    private void setupViews(Bundle savedInstanceState){
         //setup action bar
         this.setHasOptionsMenu(true);
 
-        View root = requireView();
+        if (savedInstanceState != null) {
+            binding.viewgroupAdvancedSearch.setVisibility(savedInstanceState.getInt("advancedSearchOpen"));
+        }
+        if(advancedSearchVisible) {
+            binding.viewgroupAdvancedSearch.setVisibility(View.VISIBLE);
+        }
 
         //setup recipe list recyclerview
-        RecyclerView recipeRecyclerView = root.findViewById(R.id.recipe_recyclerview);
-        ProgressBar recyclerViewLoadingBar = root.findViewById(R.id.progress_bar_recipe_list);
-        adapter = new RecipeListAdapter(backgroundExecutor, recipeRecyclerView, recyclerViewLoadingBar, this);
-        recipeRecyclerView.setAdapter(adapter);
-        recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
-
-        View noRecipesMessage = root.findViewById(R.id.textview_no_recipes);
+        adapter = new RecipeListAdapter(this);
+        binding.recipeRecyclerview.setAdapter(adapter);
+        binding.recipeRecyclerview.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
         //set observer to update recipe list if it changes
         viewModel.getAllRecipes().observe(getViewLifecycleOwner(),
             recipes -> {
             //show or hide placeholder text for when there are no recipes
                 if(recipes.size() == 0){
-                    noRecipesMessage.setVisibility(View.VISIBLE);
+                    binding.textviewNoRecipes.setVisibility(View.VISIBLE);
                 }
                 else {
-                    noRecipesMessage.setVisibility(View.GONE);
+                    binding.textviewNoRecipes.setVisibility(View.GONE);
+
+                    //display loading spinner
+                    binding.progressBarRecipeList.setVisibility(View.VISIBLE);
+                    binding.recipeRecyclerview.setVisibility(View.GONE);
                 }
-                adapter.updateList(recipes, searchBar.getText().toString());
+                adapter.updateList(recipes, () -> {
+                    adapter.getFilter().filter(binding.searchBar.getText().toString());
+                    adapter.sort(orderByIndex);
+                    binding.progressBarRecipeList.setVisibility(View.GONE);
+                    binding.recipeRecyclerview.setVisibility(View.VISIBLE);
+                });
             });
 
         //populate advanced search spinners
-        Spinner searchCriteriaSpinner = root.findViewById(R.id.search_criteria_spinner);
         ArrayAdapter<CharSequence> scAdapter = ArrayAdapter.createFromResource(
                 this.getContext(), R.array.search_criteria_options,android.R.layout.simple_spinner_item);
         scAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        searchCriteriaSpinner.setAdapter(scAdapter);
-        searchCriteriaSpinner.setOnItemSelectedListener(this);
+        binding.searchCriteriaSpinner.setAdapter(scAdapter);
+        binding.searchCriteriaSpinner.setOnItemSelectedListener(this);
 
-        Spinner orderBySpinner = root.findViewById(R.id.order_by_spinner);
         ArrayAdapter<CharSequence> obAdapter = ArrayAdapter.createFromResource(
                 this.getContext(), R.array.order_by_options,android.R.layout.simple_spinner_item);
         obAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        orderBySpinner.setAdapter(obAdapter);
-        orderBySpinner.setOnItemSelectedListener(this);
+        binding.orderBySpinner.setAdapter(obAdapter);
+        binding.orderBySpinner.setOnItemSelectedListener(this);
 
         //setup advanced search show/hide prompt
-        ((TextView) root.findViewById(R.id.advanced_search_prompt)).setOnClickListener((view -> toggleAdvancedSearch()));
+        binding.advancedSearchPrompt.setOnClickListener((view -> toggleAdvancedSearch()));
 
         //setup search bar
-        searchBar = root.findViewById(R.id.search_bar);
-
         //configure searchbar to not allow newline character entries, but still allow wrapping
         //over multiple lines
-        searchBar.setSingleLine(true);
-        searchBar.setHorizontallyScrolling(false);
-        searchBar.setMaxLines(20);
+        binding.searchBar.setSingleLine(true);
+        binding.searchBar.setHorizontallyScrolling(false);
+        binding.searchBar.setMaxLines(20);
 
         //setup clear search button
-        View clearSearchButton = root.findViewById(R.id.clear_search_button);
-        clearSearchButton.setOnClickListener((v) -> searchBar.setText(""));
+        binding.clearSearchButton.setOnClickListener((v) -> binding.searchBar.setText(""));
 
         //have it listen and update results in realtime as the user types
-        searchBar.addTextChangedListener(new TextWatcher() {
+        binding.searchBar.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
@@ -154,10 +165,10 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
                 //show clear search button if there's any text in the search bar
                 if (newText.length() == 0){
-                    clearSearchButton.setVisibility(View.GONE);
+                    binding.clearSearchButton.setVisibility(View.GONE);
                 }
                 else{
-                    clearSearchButton.setVisibility(View.VISIBLE);
+                    binding.clearSearchButton.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -166,7 +177,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         });
 
         //hide keyboard when enter key pressed when using searchbar, so user can see the results
-        searchBar.setOnEditorActionListener((v, actionId, event) -> {
+        binding.searchBar.setOnEditorActionListener((v, actionId, event) -> {
             KeyboardHider.hideKeyboard(requireActivity());
             v.clearFocus();
             return false;
@@ -185,22 +196,18 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
      * to the inverse of its current state.
      */
     private void toggleAdvancedSearch(){
-        ViewGroup advancedSearch = requireView().findViewById(R.id.viewgroup_advanced_search);
-        TextView advancedSearchPrompt = requireView().findViewById(R.id.advanced_search_prompt);
-
         //if it was visible
         if (advancedSearchVisible){
             //hide advanced search and change prompt back to 'show'
-            advancedSearch.setVisibility(View.GONE);
-            advancedSearchPrompt.setText(R.string.show_advanced_search_prompt);
+            binding.viewgroupAdvancedSearch.setVisibility(View.GONE);
+            binding.advancedSearchPrompt.setText(R.string.show_advanced_search_prompt);
         }
         //if it was hidden
         else{
             //show advanced search and change prompt to 'hide'
-            advancedSearch.setVisibility(View.VISIBLE);
-            advancedSearchPrompt.setText(R.string.hide_advanced_search_prompt);
+            binding.viewgroupAdvancedSearch.setVisibility(View.VISIBLE);
+            binding.advancedSearchPrompt.setText(R.string.hide_advanced_search_prompt);
         }
-
         advancedSearchVisible = !advancedSearchVisible;
     }
 
@@ -322,22 +329,22 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             case R.id.search_criteria_spinner:
                 //respond to option selection here
                 adapter.setSearchCriteria(pos);
+
                 //show appropriate hint
-                TextView hintTextView = requireView().findViewById(R.id.search_hint);
                 switch (pos){
                     case 0:
-                        hintTextView.setVisibility(View.GONE);
-                        searchBar.setHint(R.string.searchbar_name_hint);
+                        binding.searchHint.setVisibility(View.GONE);
+                        binding.searchBar.setHint(R.string.searchbar_name_hint);
                         break;
                     case 1:
-                        hintTextView.setText(R.string.ingredient_search_hint);
-                        hintTextView.setVisibility(View.VISIBLE);
-                        searchBar.setHint(R.string.searchbar_ingredient_hint);
+                        binding.searchHint.setText(R.string.ingredient_search_hint);
+                        binding.searchHint.setVisibility(View.VISIBLE);
+                        binding.searchBar.setHint(R.string.searchbar_ingredient_hint);
                         break;
                     case 2:
-                        hintTextView.setText(R.string.tag_search_hint);
-                        searchBar.setHint(R.string.searchbar_tag_hint);
-                        hintTextView.setVisibility(View.VISIBLE);
+                        binding.searchHint.setText(R.string.tag_search_hint);
+                        binding.searchBar.setHint(R.string.searchbar_tag_hint);
+                        binding.searchHint.setVisibility(View.VISIBLE);
                         break;
                 }
                 break;
@@ -345,6 +352,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             //when an option is selected in the "order by" spinner
             case R.id.order_by_spinner:
                 adapter.sort(pos);
+                orderByIndex = pos;
                 break;
         }
     }
@@ -450,6 +458,11 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             sharedViewModel.clearSelectingForMeal();
             actionMode = null;
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 
     @Override

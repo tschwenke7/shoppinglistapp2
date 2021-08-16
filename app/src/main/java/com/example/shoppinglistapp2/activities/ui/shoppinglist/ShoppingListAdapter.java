@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
@@ -18,11 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewHolder> {
-    private List<IngListItem> items;
+public class ShoppingListAdapter extends ListAdapter<IngListItem, ShoppingListAdapter.ViewHolder> {
     private final SlItemClickListener slItemClickListener;
 
     public ShoppingListAdapter(SlItemClickListener slItemClickListener){
+        super(new IngListItem.DiffCallback());
+
         this.slItemClickListener = slItemClickListener;
     }
 
@@ -40,35 +42,6 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         holder.bind(current);
     }
 
-    @Override
-    public int getItemCount() {
-        if(null != items){
-            return items.size();
-        }
-        return 0;
-    }
-
-    public IngListItem getItem(int position){
-        if(null != items){
-            return items.get(position);
-        }
-        return null;
-    }
-
-    public void setItems(List<IngListItem> newItems) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SlItemDiff(newItems, items));
-        diffResult.dispatchUpdatesTo(this);
-        if(items != null){
-            items.clear();
-            if(newItems != null){
-                items.addAll(newItems);
-            }
-        }
-        else if(newItems != null){
-            items = new ArrayList<>();
-            items.addAll(newItems);
-        }
-    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private View itemView;
@@ -120,47 +93,6 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
                 editItemContainer.setVisibility(View.GONE);
             });
 
-        }
-    }
-
-    private class SlItemDiff extends DiffUtil.Callback {
-        List<IngListItem> newList;
-        List<IngListItem> oldList;
-
-        public SlItemDiff(List<IngListItem> newList, List<IngListItem> oldList) {
-            this.newList = newList;
-            this.oldList = oldList;
-        }
-
-        @Override
-        public int getOldListSize() {
-            if(oldList == null){
-                return 0;
-            }
-            return oldList.size();
-        }
-
-        @Override
-        public int getNewListSize() {
-            if(newList == null){
-                return 0;
-            }
-            return newList.size();
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList.get(oldItemPosition).getId() == newList.get(newItemPosition).getId();
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            IngListItem newItem = newList.get(newItemPosition);
-            IngListItem oldItem = oldList.get(oldItemPosition);
-
-            boolean boo = newItem.equals(oldItem);
-
-            return boo;
         }
     }
 

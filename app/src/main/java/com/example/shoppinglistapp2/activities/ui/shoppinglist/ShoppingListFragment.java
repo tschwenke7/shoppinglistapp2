@@ -75,7 +75,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
         //set observer to update shopping list when it changes
         shoppingListViewModel.getSlItems().observe(getViewLifecycleOwner(), items -> {
             Parcelable recyclerViewState = shoppingListRecyclerView.getLayoutManager().onSaveInstanceState();
-            adapter.setItems(items);
+            adapter.submitList(items);
             shoppingListRecyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
         });
 
