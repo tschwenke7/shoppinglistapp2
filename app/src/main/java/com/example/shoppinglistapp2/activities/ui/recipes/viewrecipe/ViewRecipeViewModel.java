@@ -79,7 +79,10 @@ public class ViewRecipeViewModel extends AndroidViewModel {
 
     public boolean addIngredientsToShoppingList(List<IngListItem> ingListItems) {
         for (IngListItem item : ingListItems){
-            slaRepository.insertOrMergeItem(IngListItemUtils.SHOPPING_LIST_ID, item);
+            //make a copy of the item with no "id" so it will be inserted into the db as a new row
+            IngListItem copy = item.deepCopy();
+            copy.setId(0);
+            slaRepository.insertOrMergeItem(IngListItemUtils.SHOPPING_LIST_ID, copy);
         }
         return true;
     }

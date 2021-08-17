@@ -167,42 +167,6 @@ public class IngredientListAdapter extends ListAdapter<IngListItem, IngredientLi
         }
     }
 
-    private class IngredientDiff extends DiffUtil.Callback {
-        List<IngListItem> newList;
-        List<IngListItem> oldList;
-
-        public IngredientDiff(List<IngListItem> newList, List<IngListItem> oldList) {
-            this.newList = newList;
-            this.oldList = oldList;
-        }
-
-        @Override
-        public int getOldListSize() {
-            if(oldList == null){
-                return 0;
-            }
-            return oldList.size();
-        }
-
-        @Override
-        public int getNewListSize() {
-            if(newList == null){
-                return 0;
-            }
-            return newList.size();
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList.get(oldItemPosition).getId() == newList.get(newItemPosition).getId();
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
-        }
-    }
-
     public interface IngredientClickListener{
         void onDeleteClicked(int position);
         void onConfirmEditClicked(int position, String newIngredientText);

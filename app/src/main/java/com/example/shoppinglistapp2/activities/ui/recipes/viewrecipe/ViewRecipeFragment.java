@@ -1,5 +1,6 @@
 package com.example.shoppinglistapp2.activities.ui.recipes.viewrecipe;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -40,6 +41,7 @@ import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
 import com.example.shoppinglistapp2.activities.ui.ViewPagerNavigationCallback;
+import com.example.shoppinglistapp2.databinding.FragmentViewRecipeBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Tag;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
@@ -60,6 +62,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     private static final String TAG = "TDB_VIEW_REC_FRAG";
     private ViewRecipeViewModel viewModel;
     private SharedViewModel sharedViewModel;
+    private FragmentViewRecipeBinding binding;
 
     private ListeningExecutorService backgroundExecutor;
     private Executor uiExecutor;
@@ -73,7 +76,6 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     private ActionMode actionMode;
     private ActionMode.Callback actionModeCallback = new ViewRecipeFragment.ActionModeCallback();
     private IngredientListAdapter adapter;
-    private RecyclerView ingredientRecyclerView;
     private String pageTitle;
     private ViewPagerNavigationCallback callback;
 
@@ -84,7 +86,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         sharedViewModel =
                 new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
-        View root = inflater.inflate(R.layout.fragment_view_recipe, container, false);
+        binding = FragmentViewRecipeBinding.inflate(inflater,container,false);
 
         callback = (ViewPagerNavigationCallback) getActivity();
 
@@ -100,7 +102,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
         saved = false;
 
-        return root;
+        return binding.getRoot();
     }
 
     @Override
@@ -129,18 +131,16 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         );
 
         //setup ingredient list recyclerview
-        ingredientRecyclerView = root.findViewById(R.id.recipe_ingredients_list);
         //set observer to update ingredient list if it changes
         ingredients = viewModel.getRecipeIngredientsById(recipeId);
         adapter = new IngredientListAdapter(this);
-        ingredientRecyclerView.setAdapter(adapter);
-        ingredientRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        binding.recipeIngredientsList.setAdapter(adapter);
+        binding.recipeIngredientsList.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
         ingredients.observe(getViewLifecycleOwner(), (list) -> adapter.submitList(list));
 
         //handle ingredient being added
-        Button addIngredientButton = root.findViewById(R.id.recipe_add_ingredient_button);
-        addIngredientButton.setOnClickListener((v) -> addIngredients());
+        binding.recipeAddIngredientButton.setOnClickListener((v) -> addIngredients());
 
         //add existing tags
         Futures.addCallback(
@@ -164,8 +164,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         );
 
         //handle new tag being added
-        Button addTagButton = root.findViewById(R.id.add_tag_button);
-        addTagButton.setOnClickListener((view) -> {
+        binding.addTagButton.setOnClickListener((view) -> {
             TextView tagField =  root.findViewById(R.id.edit_text_tag);
             String tagName = tagField.getText().toString();
             if (!tagName.isEmpty()){
@@ -186,11 +185,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             new FutureCallback<List<String>>() {
                 @Override
                 public void onSuccess(@Nullable List<String> result) {
-                    AutoCompleteTextView tagField = root.findViewById(R.id.edit_text_tag);
-                    tagField.post(() -> {
+                    binding.editTextTag.post(() -> {
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                                 getContext(), android.R.layout.simple_dropdown_item_1line, result);
-                        tagField.setAdapter(adapter);
+                        binding.editTextTag.setAdapter(adapter);
                     });
                 }
 
@@ -223,6 +221,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
     }
 
+    @SuppressLint("SetTextI18n")
     private void populateRecipeViews(Recipe recipe){
         View root = requireView();
         //set name as action bar title
@@ -240,59 +239,55 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         }
 
         //prefill recipe name field
-        ((TextView) root.findViewById(R.id.edit_text_recipe_name)).setText(recipe.getName());
+        binding.editTextRecipeName.setText(recipe.getName());
 
         //number of serves
-        ((TextView) root.findViewById(R.id.edit_text_serves)).setText(Integer.toString(recipe.getServes()));
-        ((TextView) root.findViewById(R.id.text_view_serves)).setText(Integer.toString(recipe.getServes()));
+        binding.editTextServes.setText(Integer.toString(recipe.getServes()));
+        binding.textViewServes.setText(Integer.toString(recipe.getServes()));
 
         //prep and cook times
-        ((TextView) root.findViewById(R.id.edit_text_prep_time)).setText(Integer.toString(recipe.getPrepTime()));
-        ((TextView) root.findViewById(R.id.text_view_prep_time)).setText(Integer.toString(recipe.getPrepTime()));
+        binding.editTextPrepTime.setText(Integer.toString(recipe.getPrepTime()));
+        binding.textViewPrepTime.setText(Integer.toString(recipe.getPrepTime()));
 
-        ((TextView) root.findViewById(R.id.edit_text_cook_time)).setText(Integer.toString(recipe.getCookTime()));
-        ((TextView) root.findViewById(R.id.text_view_cook_time)).setText(Integer.toString(recipe.getCookTime()));
+        binding.editTextCookTime.setText(Integer.toString(recipe.getCookTime()));
+        binding.textViewCookTime.setText(Integer.toString(recipe.getCookTime()));
 
         //website link
-        Button websiteButton = root.findViewById(R.id.recipe_url_button);
         if (null != recipe.getUrl() && !recipe.getUrl().isEmpty()){
-            websiteButton.setText(R.string.view_recipe_website_button);
-            websiteButton.setOnClickListener(view -> {
+            binding.recipeUrlButton.setText(R.string.view_recipe_website_button);
+            binding.recipeUrlButton.setOnClickListener(view -> {
                 Uri uri = Uri.parse(recipe.getUrl());
                 Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(launchBrowser);
             });
         }
         else{
-            websiteButton.setText(getString(R.string.default_url_button_text));
-            websiteButton.setOnClickListener(null);
+            binding.recipeUrlButton.setText(getString(R.string.default_url_button_text));
+            binding.recipeUrlButton.setOnClickListener(null);
         }
 
         //ratings
-        ((RatingBar) root.findViewById(R.id.tiernan_rating_bar)).setRating(((float) recipe.getTier_rating()) / 2f);
-        ((RatingBar) root.findViewById(R.id.tom_rating_bar)).setRating(((float) recipe.getTom_rating()) / 2f);
+        binding.tiernanRatingBar.setRating(((float) recipe.getTier_rating()) / 2f);
+        binding.tomRatingBar.setRating(((float) recipe.getTom_rating()) / 2f);
 
         //url field
         if(null != recipe.getUrl()){
-            ((TextView) root.findViewById(R.id.edit_text_url)).setText(recipe.getUrl());
+            binding.editTextUrl.setText(recipe.getUrl());
         }
 
         //notes
-        TextView notesField = root.findViewById(R.id.recipe_notes);
-        TextView editNotesField = root.findViewById(R.id.edit_text_recipe_notes);
         if (null != recipe.getNotes() && !recipe.getNotes().isEmpty()){
-            notesField.setText(recipe.getNotes());
-            editNotesField.setText(recipe.getNotes());
+            binding.recipeNotes.setText(recipe.getNotes());
+            binding.editTextRecipeNotes.setText(recipe.getNotes());
         }
         else{
-            notesField.setText(getString(R.string.default_notes_text));
+            binding.recipeNotes.setText(getString(R.string.default_notes_text));
         }
     }
 
     private void addTag(Tag tag){
-        //add a sample tag
-        ChipGroup chipGroup = requireView().findViewById(R.id.recipe_tags);
-        chipGroup.post(() -> {
+        //add a tag
+        binding.recipeTags.post(() -> {
             Chip chip = (Chip) getLayoutInflater().inflate(R.layout.tag_chip, null, false);
             chip.setText(tag.getName());
 
@@ -302,10 +297,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
             chip.setOnCloseIconClickListener((view -> {
                 viewModel.deleteTag(tag);
-                chipGroup.removeView(view);
+                binding.recipeTags.removeView(view);
             }));
 
-            chipGroup.addView(chip);
+            binding.recipeTags.addView(chip);
         });
     }
 
@@ -314,8 +309,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
      * textview to this recipe.
      */
     private void addIngredients(){
-        EditText input = requireView().findViewById(R.id.edit_text_ingredient);
-        String inputText = input.getText().toString();
+        String inputText = binding.editTextIngredient.getText().toString();
         Log.d("TEST", "inputText: " + inputText);
 
         if (!(inputText.isEmpty())){
@@ -329,7 +323,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
                     @Override
                     public void onSuccess(@Nullable Boolean result) {
                         //clear new item input
-                        input.setText("");
+                        binding.editTextIngredient.setText("");
                     }
 
                     @Override
@@ -356,7 +350,6 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
     private void enterEditMode(){
         editingFlag = true;
-        View root = requireView();
         //save backups of current state of chips, ingredients in case changes are to be discarded
         backgroundExecutor.submit(() -> viewModel.saveBackupOfRecipe(recipeId));
 
@@ -370,49 +363,48 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         actionMode.invalidate();
 
         //show recipe name field
-        root.findViewById(R.id.edit_text_recipe_name).setVisibility(View.VISIBLE);
+        binding.editTextRecipeName.setVisibility(View.VISIBLE);
 
         //show new ingredient field and button
-        root.findViewById(R.id.recipe_add_ingredient_button).setVisibility(View.VISIBLE);
-        root.findViewById(R.id.edit_text_ingredient).setVisibility(View.VISIBLE);
+        binding.recipeAddIngredientButton.setVisibility(View.VISIBLE);
+        binding.editTextIngredient.setVisibility(View.VISIBLE);
 
         //show add tag field and button
-        root.findViewById(R.id.add_tag_button).setVisibility(View.VISIBLE);
-        root.findViewById(R.id.edit_text_tag).setVisibility(View.VISIBLE);
+        binding.addTagButton.setVisibility(View.VISIBLE);
+        binding.editTextTag.setVisibility(View.VISIBLE);
 
         //show delete tag icons
-        ChipGroup tagContainer = root.findViewById(R.id.recipe_tags);
-        for (int i = 0; i < tagContainer.getChildCount(); i++){
-            Chip chip = (Chip) tagContainer.getChildAt(i);
+        for (int i = 0; i < binding.recipeTags.getChildCount(); i++){
+            Chip chip = (Chip) binding.recipeTags.getChildAt(i);
             chip.setCloseIconVisible(true);
         }
 
         //swap serves textView to editText
-        root.findViewById(R.id.edit_text_serves).setVisibility(View.VISIBLE);
-        root.findViewById(R.id.text_view_serves).setVisibility(View.GONE);
+        binding.editTextServes.setVisibility(View.VISIBLE);
+        binding.textViewServes.setVisibility(View.GONE);
 
         //swap prep and cook time textViews to editTexts
-        root.findViewById(R.id.edit_text_prep_time).setVisibility(View.VISIBLE);
-        root.findViewById(R.id.text_view_prep_time).setVisibility(View.GONE);
+        binding.editTextPrepTime.setVisibility(View.VISIBLE);
+        binding.textViewPrepTime.setVisibility(View.GONE);
 
-        root.findViewById(R.id.edit_text_cook_time).setVisibility(View.VISIBLE);
-        root.findViewById(R.id.text_view_cook_time).setVisibility(View.GONE);
+        binding.editTextCookTime.setVisibility(View.VISIBLE);
+        binding.textViewCookTime.setVisibility(View.GONE);
 
         //enable ratings bars
-        ((RatingBar) root.findViewById(R.id.tiernan_rating_bar)).setIsIndicator(false);
-        ((RatingBar) root.findViewById(R.id.tom_rating_bar)).setIsIndicator(false);
+        binding.tiernanRatingBar.setIsIndicator(false);
+        binding.tomRatingBar.setIsIndicator(false);
 
         //swap url button for field/title
-        root.findViewById(R.id.url_editor_container).setVisibility(View.VISIBLE);
-        root.findViewById(R.id.recipe_url_button).setVisibility(View.GONE);
+        binding.urlEditorContainer.setVisibility(View.VISIBLE);
+        binding.recipeUrlButton.setVisibility(View.GONE);
 
         //swap notes textView for editText
-        root.findViewById(R.id.edit_text_recipe_notes).setVisibility(View.VISIBLE);
-        root.findViewById(R.id.recipe_notes).setVisibility(View.GONE);
+        binding.editTextRecipeNotes.setVisibility(View.VISIBLE);
+        binding.recipeNotes.setVisibility(View.GONE);
 
         //show per-ingredient delete icons
         adapter.setEditMode(true);
-        ingredientRecyclerView.setAdapter(adapter);
+        binding.recipeIngredientsList.setAdapter(adapter);
     }
 
     private void enterViewMode(){
@@ -423,56 +415,49 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
         View root = requireView();
         //hide recipe name field
-        root.findViewById(R.id.edit_text_recipe_name).setVisibility(View.GONE);
+        binding.editTextRecipeName.setVisibility(View.GONE);
 
         //hide new ingredient field and button
-        root.findViewById(R.id.recipe_add_ingredient_button).setVisibility(View.GONE);
-        root.findViewById(R.id.edit_text_ingredient).setVisibility(View.GONE);
+        binding.recipeAddIngredientButton.setVisibility(View.GONE);
+        binding.editTextIngredient.setVisibility(View.GONE);
 
         //show add tag field and button
-        root.findViewById(R.id.add_tag_button).setVisibility(View.GONE);
-        root.findViewById(R.id.edit_text_tag).setVisibility(View.GONE);
+        binding.addTagButton.setVisibility(View.GONE);
+        binding.editTextTag.setVisibility(View.GONE);
 
         //hide delete tag icons
-        ChipGroup tagContainer = root.findViewById(R.id.recipe_tags);
-        for (int i = 0; i < tagContainer.getChildCount(); i++){
-            Chip chip = (Chip) tagContainer.getChildAt(i);
+        for (int i = 0; i < binding.recipeTags.getChildCount(); i++){
+            Chip chip = (Chip) binding.recipeTags.getChildAt(i);
             chip.setCloseIconVisible(false);
         }
 
         //swap serves editText to textview
-        root.findViewById(R.id.edit_text_serves).setVisibility(View.GONE);
-        root.findViewById(R.id.text_view_serves).setVisibility(View.VISIBLE);
+        binding.editTextServes.setVisibility(View.GONE);
+        binding.textViewServes.setVisibility(View.VISIBLE);
 
         //swap prep and cook time editTexts to textViews
-        TextView prepTimeEditText = root.findViewById(R.id.edit_text_prep_time);
-        prepTimeEditText.setVisibility(View.GONE);
-        TextView prepTimeTextView = root.findViewById(R.id.text_view_prep_time);
-        prepTimeTextView.setVisibility(View.VISIBLE);
+        binding.editTextPrepTime.setVisibility(View.GONE);
+        binding.textViewPrepTime.setVisibility(View.VISIBLE);
 
-        TextView cookTimeEditText = root.findViewById(R.id.edit_text_cook_time);
-        cookTimeEditText.setVisibility(View.GONE);
-        TextView cookTimeTextView = root.findViewById(R.id.text_view_cook_time);
-        cookTimeTextView.setVisibility(View.VISIBLE);
+        binding.editTextCookTime.setVisibility(View.GONE);
+        binding.textViewCookTime.setVisibility(View.VISIBLE);
 
         //disable ratings bars
-        ((RatingBar) root.findViewById(R.id.tiernan_rating_bar)).setIsIndicator(true);
-        ((RatingBar) root.findViewById(R.id.tom_rating_bar)).setIsIndicator(true);
+        binding.tiernanRatingBar.setIsIndicator(true);
+        binding.tomRatingBar.setIsIndicator(true);
 
         //swap url field/title for button
-        root.findViewById(R.id.url_editor_container).setVisibility(View.GONE);
-        root.findViewById(R.id.recipe_url_button).setVisibility(View.VISIBLE);
+        binding.urlEditorContainer.setVisibility(View.GONE);
+        binding.recipeUrlButton.setVisibility(View.VISIBLE);
 
         //swap notes editText for textView
-        TextView notesEditText = root.findViewById(R.id.edit_text_recipe_notes);
-        notesEditText.setVisibility(View.GONE);
-        TextView notesTextView = root.findViewById(R.id.recipe_notes);
-        notesTextView.setVisibility(View.VISIBLE);
+        binding.editTextRecipeNotes.setVisibility(View.GONE);
+        binding.recipeNotes.setVisibility(View.VISIBLE);
 
         //hide per-ingredient delete icons and reset selections
         adapter.setEditMode(false);
         adapter.resetSelections();
-        ingredientRecyclerView.setAdapter(adapter);
+        binding.recipeIngredientsList.setAdapter(adapter);
     }
 
     /**
@@ -484,40 +469,39 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         Recipe recipe = currentRecipe.getValue();
 
         /* Read all fields */
-        String recipeName = ((TextView) root.findViewById(R.id.edit_text_recipe_name))
-                .getText().toString();
+        String recipeName = binding.editTextRecipeName.getText().toString();
         //read website link
-        String url = ((TextView)  root.findViewById(R.id.edit_text_url)).getText().toString();
+        String url = binding.editTextUrl.getText().toString();
 
         //read number of serves
-        String serves = ((TextView) root.findViewById(R.id.edit_text_serves)).getText().toString();
+        String serves = binding.editTextServes.getText().toString();
 
         //read prep time if provided
-        String prepTime = ((TextView) root.findViewById(R.id.edit_text_prep_time)).getText().toString();
+        String prepTime = binding.editTextPrepTime.getText().toString();
 
         //read cook time if provided
-        String cookTime = ((TextView) root.findViewById(R.id.edit_text_cook_time)).getText().toString();
+        String cookTime = binding.editTextCookTime.getText().toString();
 
         //read notes
-        String notes = ((TextView) root.findViewById(R.id.edit_text_recipe_notes)).getText().toString();
+        String notes = binding.editTextRecipeNotes.getText().toString();
 
         //read ratings - * 2 and cast to int so we can store half stars as ints
-        int tierRating = (int) (((RatingBar) root.findViewById(R.id.tiernan_rating_bar)).getRating() * 2);
-        int tomRating = (int) (((RatingBar) root.findViewById(R.id.tom_rating_bar)).getRating() * 2);
+        int tierRating = (int) (binding.tiernanRatingBar.getRating() * 2);
+        int tomRating = (int) (binding.tomRatingBar.getRating() * 2);
 
-        //ingredients are already saved, and so don't need to be read
+        //ingredients and tags are already saved, and so don't need to be read
 
         /* VALIDATION */
         try{
             UrlValidator urlValidator = new UrlValidator();
             //check that a recipe name was entered
             if (recipeName.isEmpty()){
-                cancelSave(getString(R.string.error_no_recipe_name_entered),requireView().findViewById(R.id.edit_text_recipe_name));
+                cancelSave(getString(R.string.error_no_recipe_name_entered),binding.editTextRecipeName);
             }
 
             //check that the name is unique if it has been changed
             else if (!recipeName.equals(recipe.getName()) && !viewModel.recipeNameIsUnique(recipeName)){
-                cancelSave(getString(R.string.error_recipe_name_already_used), requireView().findViewById(R.id.edit_text_recipe_name));
+                cancelSave(getString(R.string.error_recipe_name_already_used), binding.editTextRecipeName);
             }
 
             //check that recipe url is a valid url
@@ -591,10 +575,9 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         }
 
         //scroll to the offending view that prevented saving
-        NestedScrollView scrollView = requireView().findViewById(R.id.scrollview);
         if(scrollTo != null){
-            scrollView.post(() -> {
-                scrollView.smoothScrollTo(0, scrollTo.getTop());
+            binding.scrollview.post(() -> {
+                binding.scrollview.smoothScrollTo(0, scrollTo.getTop());
             });
         }
 
@@ -628,8 +611,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
                         //if null returned, it means there's been no change and we don't need to update them
                         if (null != tagsToRestoreTo){
                             //clear all chips
-                            ChipGroup chipGroup = requireView().findViewById(R.id.recipe_tags);
-                            chipGroup.removeAllViews();
+                            binding.recipeTags.removeAllViews();
 
                             //re-add backup tags
                             for (Tag tag : tagsToRestoreTo){
