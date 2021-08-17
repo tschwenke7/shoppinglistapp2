@@ -35,6 +35,7 @@ import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
 import com.example.shoppinglistapp2.activities.ui.ViewPagerNavigationCallback;
 import com.example.shoppinglistapp2.databinding.FragmentRecipeListBinding;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
+import com.google.common.base.CharMatcher;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -58,6 +59,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
 
     private FragmentRecipeListBinding binding;
+    private int numSearchbarTokens;
 
     private boolean advancedSearchVisible = false;
     public enum SearchCriteria {
@@ -166,6 +168,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         //have it listen and update results in realtime as the user types
         binding.searchBar.addTextChangedListener(new TextWatcher() {
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
@@ -184,6 +187,21 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                 else{
                     binding.clearSearchButton.setVisibility(View.VISIBLE);
                 }
+
+                /* If searching by tag or ingredient, we want autocomplete to suggest only tokens
+                * which can be found in the recipes matching existing tokens.
+                * If a comma was added or removed, then the tokens will have changed, which will
+                * affect the list of possible matching tokens and require an autocomplete update */
+                int currentCommaCount = CharMatcher.is(',').countIn(newText);
+                if((searchCriteria == SearchCriteria.TAG ||
+                    searchCriteria == SearchCriteria.INGREDIENT) &&
+                    numSearchbarTokens != currentCommaCount) {
+
+                    numSearchbarTokens = currentCommaCount;
+                    //update the autocomplete suggestions accordingly
+                    setAutoCompleteSuggestions();
+                }
+                numSearchbarTokens = currentCommaCount;
             }
 
             @Override
@@ -198,7 +216,6 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         });
 
         //configure autocomplete to consider comma separated phrases as separate tokens
-        binding.searchBar.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
         setAutoCompleteSuggestions();
 
 
@@ -212,14 +229,36 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         switch (searchCriteria) {
             case INGREDIENT:
-                suggestions = viewModel.getDistinctIngredientNames();
+                //if no tokens have been completed, use full list of ingredients as suggestions
+                if (numSearchbarTokens == 0){
+                    suggestions = viewModel.getDistinctIngredientNames();
+                }
+                //if 1 or more tokens already exists, fetch autocomplete suggestions for ingredients
+                //in the filtered list of recipes only
+                else{
+                    suggestions = backgroundExecutor.submit(() -> adapter.getOtherMatchingIngredients());
+                }
+
+                binding.searchBar.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
                 break;
+
             case TAG:
-                suggestions = viewModel.getDistinctTagNames();
+                //if no tokens have been completed, use full list of tags as suggestions
+                if(numSearchbarTokens == 0){
+                    suggestions = viewModel.getDistinctTagNames();
+                }
+                //if 1 or more tokens already exists, fetch autocomplete suggestions for tags
+                //in the filtered list of recipes only
+                else{
+                    suggestions = backgroundExecutor.submit(() -> adapter.getOtherMatchingTags());
+                }
+
+                binding.searchBar.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
                 break;
             case NAME:
             default:
                 suggestions = viewModel.getAllRecipeNames();
+                binding.searchBar.setTokenizer(null);
                 break;
         }
 
@@ -234,7 +273,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
                 @Override
                 public void onFailure(Throwable t) {
-                    Toast.makeText(requireContext(), R.string.error_could_not_load_autocomplete_suggestions, Toast.LENGTH_LONG).show();
+//                    Toast.makeText(requireContext(), R.string.error_could_not_load_autocomplete_suggestions, Toast.LENGTH_LONG).show();
                     Log.e(TAG, "Failed to load autocomplete suggestions for search criteria" + searchCriteria.toString(), t);
                 }
             },

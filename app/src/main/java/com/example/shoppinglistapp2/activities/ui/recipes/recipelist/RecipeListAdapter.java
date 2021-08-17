@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.BaseDiffCallback;
 import com.example.shoppinglistapp2.activities.ui.BaseRecyclerViewAdapter;
+import com.example.shoppinglistapp2.db.tables.IngList;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;
@@ -25,10 +26,14 @@ import com.google.android.material.chip.ChipGroup;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients> implements Filterable {
     private List<RecipeWithTagsAndIngredients> itemsFull;
@@ -83,6 +88,56 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
     @Override
     protected BaseDiffCallback<RecipeWithTagsAndIngredients> createDiffCallback(List<RecipeWithTagsAndIngredients> newList, List<RecipeWithTagsAndIngredients> oldList) {
         return new RecipeDiffCallback(newList, oldList);
+    }
+
+    public List<String> getOtherMatchingTags() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            return getCurrentList().stream()
+                    .map(RecipeWithTagsAndIngredients::getTags)
+                    .flatMap(Collection::stream)
+                    .map(Tag::getName)
+                    .distinct()
+                    .collect(Collectors.toList());
+        }
+        else {
+            List<String> list = new ArrayList<>();
+            Set<String> uniqueValues = new HashSet<>();
+            for (RecipeWithTagsAndIngredients recipeWithTagsAndIngredients : getCurrentList()) {
+                List<Tag> tags = recipeWithTagsAndIngredients.getTags();
+                for (Tag tag : tags) {
+                    String name = tag.getName();
+                    if (uniqueValues.add(name)) {
+                        list.add(name);
+                    }
+                }
+            }
+            return list;
+        }
+    }
+
+    public List<String> getOtherMatchingIngredients() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            return getCurrentList().stream()
+                    .map(RecipeWithTagsAndIngredients::getIngredients)
+                    .flatMap(Collection::stream)
+                    .map(IngListItem::getName)
+                    .distinct()
+                    .collect(Collectors.toList());
+        }
+        else {
+            List<String> list = new ArrayList<>();
+            Set<String> uniqueValues = new HashSet<>();
+            for (RecipeWithTagsAndIngredients recipeWithTagsAndIngredients : getCurrentList()) {
+                List<IngListItem> ingredients = recipeWithTagsAndIngredients.getIngredients();
+                for (IngListItem ingredient : ingredients) {
+                    String name = ingredient.getName();
+                    if (uniqueValues.add(name)) {
+                        list.add(name);
+                    }
+                }
+            }
+            return list;
+        }
     }
 
     private static class RecipeDiffCallback extends BaseDiffCallback<RecipeWithTagsAndIngredients> {
