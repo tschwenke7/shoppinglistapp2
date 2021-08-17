@@ -87,10 +87,10 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                 binding.shoppingListRecyclerview.setVisibility(View.VISIBLE);
 
                 Parcelable recyclerViewState = binding.shoppingListRecyclerview.getLayoutManager().onSaveInstanceState();
-                adapter.submitList(items);
-                binding.shoppingListRecyclerview.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+                adapter.submitList(items, () -> {
+                    binding.shoppingListRecyclerview.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+                });
             }
-
         });
 
         //listen to add item button
