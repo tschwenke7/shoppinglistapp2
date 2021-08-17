@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
+import com.example.shoppinglistapp2.databinding.FragmentShoppingListBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.helpers.IngListItemUtils;
 import com.google.common.util.concurrent.FutureCallback;
@@ -43,6 +44,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
     private ShoppingListViewModel shoppingListViewModel;
     private ListeningExecutorService backgroundExecutor;
     private Executor uiExecutor;
+    private FragmentShoppingListBinding binding;
 
     private final String TAG = "T_DBG_SL_FRAG";
 
@@ -53,11 +55,12 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                 new ViewModelProvider(requireActivity()).get(ShoppingListViewModel.class);
 
         //inflate fragment
-        View root = inflater.inflate(R.layout.fragment_shopping_list, container, false);
+        binding = FragmentShoppingListBinding.inflate(inflater, container, false);
 
         backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
         uiExecutor = ContextCompat.getMainExecutor(requireContext());
-        return root;
+
+        return binding.getRoot();
     }
 
     @Override
@@ -67,25 +70,35 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
         this.setHasOptionsMenu(true);
 
         //setup shopping list recyclerview
-        RecyclerView shoppingListRecyclerView = root.findViewById(R.id.shopping_list_recyclerview);
         final ShoppingListAdapter adapter = new ShoppingListAdapter(this);
-        shoppingListRecyclerView.setAdapter(adapter);
-        shoppingListRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        binding.shoppingListRecyclerview.setAdapter(adapter);
+        binding.shoppingListRecyclerview.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
         //set observer to update shopping list when it changes
         shoppingListViewModel.getSlItems().observe(getViewLifecycleOwner(), items -> {
-            Parcelable recyclerViewState = shoppingListRecyclerView.getLayoutManager().onSaveInstanceState();
-            adapter.submitList(items);
-            shoppingListRecyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+            //if the list is empty, show placeholder text instead
+            if(items == null || items.size() == 0){
+                binding.textviewNoSlItems.setVisibility(View.VISIBLE);
+                binding.shoppingListRecyclerview.setVisibility(View.GONE);
+            }
+            else{
+                //hide placeholder text
+                binding.textviewNoSlItems.setVisibility(View.GONE);
+                binding.shoppingListRecyclerview.setVisibility(View.VISIBLE);
+
+                Parcelable recyclerViewState = binding.shoppingListRecyclerview.getLayoutManager().onSaveInstanceState();
+                adapter.submitList(items);
+                binding.shoppingListRecyclerview.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+            }
+
         });
 
         //listen to add item button
-        ((Button) root.findViewById(R.id.button_new_list_item)).setOnClickListener(this::addItems);
+        binding.buttonNewListItem.setOnClickListener(this::addItems);
     }
 
     private void addItems(View view){
-        EditText input = view.getRootView().findViewById(R.id.edit_text_new_list_item);
-        String inputText = input.getText().toString();
+        String inputText = binding.editTextNewListItem.getText().toString();
 
         if(inputText.isEmpty()){
             Toast.makeText(this.getContext(), R.string.error_no_list_item_entered, Toast.LENGTH_LONG).show();
@@ -97,7 +110,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                     @Override
                     public void onSuccess(@Nullable Object result) {
                         //clear input box
-                        input.setText("");
+                        binding.editTextNewListItem.setText("");
                     }
 
                     @Override

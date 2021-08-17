@@ -165,5 +165,7 @@
     <string name="error_sending_ingredients_to_shopping_list">Something went wrong while trying to add these ingredients to the shopping list. Please try again later and report this bug if it continues.</string>
     <string name="error_could_not_add_items">There item you tried to enter was invalid.\nPlease enter the item\'s quantity and unit of measurement (optional) followed by its name.\ne.g. \"500g butter\", \"6 carrots\", or \"avocado\".\n\nNote: for technical reasons, you can\'t use the \"+\" icon in the ingredient\'s name.</string>
     <string name="error_could_not_load_autocomplete_suggestions">Error - could not load auto complete suggestions for search bar.</string>
+    <string name="no_sl_items_placeholder_text">Your shopping list is empty!\n\nAdd items to it using the text box above, or by adding ingredients directly from a recipe or meal plan.
+    \n\nHint: Someone texted you a shopping list? You can paste in a list of items, each on a new line, to easily add them all.</string>
 
 </resources>
