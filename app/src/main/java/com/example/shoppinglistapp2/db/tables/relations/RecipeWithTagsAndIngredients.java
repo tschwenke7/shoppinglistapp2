@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.room.Embedded;
 import androidx.room.Relation;
 
+import com.example.shoppinglistapp2.activities.ui.BaseDiffCallback;
 import com.example.shoppinglistapp2.db.tables.IngList;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Recipe;
@@ -71,18 +72,5 @@ public class RecipeWithTagsAndIngredients {
     @Override
     public int hashCode() {
         return Objects.hash(recipe, ingListWithItems, tags);
-    }
-
-    public static class DiffCallback extends DiffUtil.ItemCallback<RecipeWithTagsAndIngredients> {
-
-        @Override
-        public boolean areItemsTheSame(@NonNull RecipeWithTagsAndIngredients oldItem, @NonNull RecipeWithTagsAndIngredients newItem) {
-            return oldItem.getRecipe().getId() == newItem.getRecipe().getId();
-        }
-
-        @Override
-        public boolean areContentsTheSame(@NonNull RecipeWithTagsAndIngredients oldItem, @NonNull RecipeWithTagsAndIngredients newItem) {
-            return oldItem.equals(newItem);
-        }
     }
 }

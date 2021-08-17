@@ -1,5 +1,7 @@
 package com.example.shoppinglistapp2.activities.ui.recipes.recipelist;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,11 +11,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.ListAdapter;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ui.BaseDiffCallback;
 import com.example.shoppinglistapp2.activities.ui.BaseRecyclerViewAdapter;
 import com.example.shoppinglistapp2.activities.ui.ListAndCallback;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
@@ -33,14 +33,14 @@ import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-public class RecipeListAdapter extends ListAdapter<RecipeWithTagsAndIngredients, RecipeListAdapter.ViewHolder> implements Filterable {
+public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients> implements Filterable {
     private List<RecipeWithTagsAndIngredients> itemsFull;
     private OnRecipeClickListener onRecipeClickListener;
     private List<Integer> selectedPositions = new ArrayList<>();
     private DecimalFormat ratingFormat = new DecimalFormat("#.#");
     private SearchCriteria searchCriteria;
-
-    protected Deque<ListAndCallback<RecipeWithTagsAndIngredients>> pendingUpdates = new ArrayDeque<>();
+    private int orderByCriteria;
+    private CharSequence latestConstraint;
 
     public enum SearchCriteria {
         NAME,
@@ -48,64 +48,65 @@ public class RecipeListAdapter extends ListAdapter<RecipeWithTagsAndIngredients,
         TAG
     }
 
-    public RecipeListAdapter(OnRecipeClickListener onRecipeClickListener){
-        super(new RecipeWithTagsAndIngredients.DiffCallback());
+    public RecipeListAdapter(Executor listUpdateExecutor, OnRecipeClickListener onRecipeClickListener){
+        super(listUpdateExecutor);
         this.onRecipeClickListener = onRecipeClickListener;
         searchCriteria = SearchCriteria.NAME;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients>.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_recyclerview_item, parent, false);
         return new ViewHolder(view, onRecipeClickListener);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients>.ViewHolder holder, int position) {
         holder.itemView.setSelected(selectedPositions.contains(position));
         holder.bind(getItem(position));
     }
 
+    /** Use this method in fragment */
     public void updateList(@Nullable List<RecipeWithTagsAndIngredients> list, @Nullable Runnable commitCallback){
-        backupFullList(list);
-        //queue this list update
-        ListAndCallback<RecipeWithTagsAndIngredients> current = new ListAndCallback<>(list, commitCallback);
-        pendingUpdates.push(current);
+        updateListExecutor.execute(() -> {
+            backupFullList(list);
+            sortList(itemsFull);
+            filter(latestConstraint);//calls submit list after filtering
 
-        //if there's already another update being run, then don't start a new one
-        if(pendingUpdates.size() > 1){
-            return;
-        }
-
-        //append call to check for new list update at the end
-        Runnable callback = () -> {
+            //run callback after all this has finished if one provided
             if(commitCallback != null) {
-                commitCallback.run();
+                Handler uiHandler = new Handler(Looper.getMainLooper());
+                uiHandler.post(commitCallback);
             }
-            runNextUpdate(current);
-        };
-
-        submitList(list, callback);
+        });
     }
 
-    private void runNextUpdate(ListAndCallback<RecipeWithTagsAndIngredients> current){
-        pendingUpdates.remove(current);
-        //if there are more updates queued now, then take the latest one and run it
-        if(pendingUpdates.size() > 0) {
-            ListAndCallback<RecipeWithTagsAndIngredients> latest = pendingUpdates.pop();
-
-            //remove older, outdated updates from queue
-            pendingUpdates.clear();
-
-            //run latest update
-            submitList(latest.list, latest.callback);
-        }
+    /** Use this method in fragment */
+    public void updateList(@Nullable List<RecipeWithTagsAndIngredients> list){
+        submitList(list, null);
     }
 
     @Override
-    public void onCurrentListChanged(@NonNull List<RecipeWithTagsAndIngredients> previousList, @NonNull List<RecipeWithTagsAndIngredients> currentList) {
-        super.onCurrentListChanged(previousList, currentList);
+    protected BaseDiffCallback<RecipeWithTagsAndIngredients> createDiffCallback(List<RecipeWithTagsAndIngredients> newList, List<RecipeWithTagsAndIngredients> oldList) {
+        return new RecipeDiffCallback(newList, oldList);
+    }
+
+    private static class RecipeDiffCallback extends BaseDiffCallback<RecipeWithTagsAndIngredients> {
+
+        public RecipeDiffCallback(List<RecipeWithTagsAndIngredients> newList, List<RecipeWithTagsAndIngredients> oldList) {
+            super(newList, oldList);
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPos, int newItemPos) {
+            return oldList.get(oldItemPos).getRecipe().getId() == newList.get(newItemPos).getRecipe().getId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPos, int newItemPos) {
+            return oldList.get(oldItemPos).equals(newList.get(newItemPos));
+        }
     }
 
     private void backupFullList(@Nullable List<RecipeWithTagsAndIngredients> list) {
@@ -121,6 +122,7 @@ public class RecipeListAdapter extends ListAdapter<RecipeWithTagsAndIngredients,
         }
     }
 
+
     public void setSearchCriteria(int searchCriteria){
         switch (searchCriteria){
             case 0:
@@ -135,47 +137,64 @@ public class RecipeListAdapter extends ListAdapter<RecipeWithTagsAndIngredients,
         }
     }
 
+    public void setOrderByCriteria(int criteriaIndex){
+        this.orderByCriteria = criteriaIndex;
+    }
+
+    public void setLatestConstraint(CharSequence constraint){
+        this.latestConstraint = constraint;
+    }
+
     public void sort(int orderingCriteria){
-        if(itemsFull != null){
-            //choose a comparator depending on which option was selected by the user
-            Comparator<RecipeWithTagsAndIngredients> comparator = null;
-            switch (orderingCriteria){
-                //alphabetically by recipe name
-                case 0:
-                    comparator = new RecipeComparators.CompareRecipeName();
-                    break;
-                //by prep time
-                case 1:
-                    comparator = new RecipeComparators.ComparePrepTime();
-                    break;
-                //by total time
-                case 2:
-                    comparator = new RecipeComparators.CompareTotalTime();
-                    break;
-                //by Tom rating
-                case 3:
-                    comparator = new RecipeComparators.CompareTomRating();
-                    break;
-                //by Tiernan rating
-                case 4:
-                    comparator = new RecipeComparators.CompareTiernanRating();
-                    break;
-                //by combined rating
-                case 5:
-                    comparator = new RecipeComparators.CompareCombinedRating();
-                    break;
-            }
+        //set the orderByCriteria
+        this.orderByCriteria = orderingCriteria;
 
-            //now sort both the filtered and full lists using this comparator
-            List<RecipeWithTagsAndIngredients> sortedList = new ArrayList<>(getCurrentList());
+        //sort the filtered and full lists
+        if(itemsFull != null) {
             List<RecipeWithTagsAndIngredients> sortedListFull = new ArrayList<>(itemsFull);
-            Collections.sort(sortedList, comparator);
-            Collections.sort(sortedListFull, comparator);
-
-            //update lists
-            this.submitList(sortedList);
-            this.itemsFull = sortedListFull;
+            this.itemsFull = sortList(sortedListFull);
         }
+
+        if (getCurrentList() != null) {
+            List<RecipeWithTagsAndIngredients> sortedList = new ArrayList<>(getCurrentList());
+
+            //submit sorted list to adapter
+            this.submitList(sortList(sortedList));
+        }
+    }
+
+    private List<RecipeWithTagsAndIngredients> sortList(List<RecipeWithTagsAndIngredients> list) {
+        //choose a comparator depending on which option was selected by the user
+        Comparator<RecipeWithTagsAndIngredients> comparator = null;
+        switch (orderByCriteria){
+            //alphabetically by recipe name
+            case 0:
+                comparator = new RecipeComparators.CompareRecipeName();
+                break;
+            //by prep time
+            case 1:
+                comparator = new RecipeComparators.ComparePrepTime();
+                break;
+            //by total time
+            case 2:
+                comparator = new RecipeComparators.CompareTotalTime();
+                break;
+            //by Tom rating
+            case 3:
+                comparator = new RecipeComparators.CompareTomRating();
+                break;
+            //by Tiernan rating
+            case 4:
+                comparator = new RecipeComparators.CompareTiernanRating();
+                break;
+            //by combined rating
+            case 5:
+                comparator = new RecipeComparators.CompareCombinedRating();
+                break;
+        }
+
+        Collections.sort(list, comparator);
+        return list;
     }
 
     public List<RecipeWithTagsAndIngredients> getSelectedItems(){
@@ -207,6 +226,15 @@ public class RecipeListAdapter extends ListAdapter<RecipeWithTagsAndIngredients,
             default:
                 return nameFilter;
         }
+    }
+
+    public void filter(CharSequence constraint) {
+        latestConstraint = constraint;
+        getFilter().filter(constraint);
+    }
+
+    public void refilter(){
+        filter(latestConstraint);
     }
 
     /** Filters recipes to match those whose name contains the query string */
@@ -384,7 +412,7 @@ public class RecipeListAdapter extends ListAdapter<RecipeWithTagsAndIngredients,
         return true;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients>.ViewHolder {
         private final View itemView;
         private OnRecipeClickListener onRecipeClickListener;
         private int recipeId;

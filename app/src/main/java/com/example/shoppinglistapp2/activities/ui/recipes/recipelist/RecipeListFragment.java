@@ -1,7 +1,6 @@
 package com.example.shoppinglistapp2.activities.ui.recipes.recipelist;
 
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import android.text.Editable;
@@ -14,11 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.MultiAutoCompleteTextView;
-import android.widget.ProgressBar;
-import android.widget.SearchView;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,7 +25,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
@@ -57,8 +50,6 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
     private FragmentRecipeListBinding binding;
 
-    private int orderByIndex = 0;
-    private int searchByIndex = 0;
     private boolean advancedSearchVisible = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -95,7 +86,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         }
 
         //setup recipe list recyclerview
-        adapter = new RecipeListAdapter(this);
+        adapter = new RecipeListAdapter(backgroundExecutor,this);
         binding.recipeRecyclerview.setAdapter(adapter);
         binding.recipeRecyclerview.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
@@ -113,9 +104,14 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 //                    binding.progressBarRecipeList.setVisibility(View.VISIBLE);
 //                    binding.recipeRecyclerview.setVisibility(View.GONE);
                 }
+
+                //restore state of adapter in case of fragment reload
+                adapter.setSearchCriteria(binding.searchCriteriaSpinner.getSelectedItemPosition());
+                adapter.setOrderByCriteria(binding.orderBySpinner.getSelectedItemPosition());
+                adapter.setLatestConstraint(binding.searchBar.getText().toString());
+
+                //submit list
                 adapter.updateList(recipes, () -> {
-                    adapter.getFilter().filter(binding.searchBar.getText().toString());
-                    adapter.sort(orderByIndex);
                     binding.progressBarRecipeList.setVisibility(View.GONE);
                     binding.recipeRecyclerview.setVisibility(View.VISIBLE);
                 });
@@ -158,7 +154,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                 if(actionMode != null && sharedViewModel.getSelectingForMeal() == null){
                     actionMode.finish();
                 }
-                adapter.getFilter().filter(newText);
+                adapter.filter(newText);
 
                 //show clear search button if there's any text in the search bar
                 if (newText.length() == 0){
@@ -326,6 +322,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             case R.id.search_criteria_spinner:
                 //respond to option selection here
                 adapter.setSearchCriteria(pos);
+                adapter.refilter();
 
                 //show appropriate hint
                 switch (pos){
@@ -349,7 +346,6 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             //when an option is selected in the "order by" spinner
             case R.id.order_by_spinner:
                 adapter.sort(pos);
-                orderByIndex = pos;
                 break;
         }
     }

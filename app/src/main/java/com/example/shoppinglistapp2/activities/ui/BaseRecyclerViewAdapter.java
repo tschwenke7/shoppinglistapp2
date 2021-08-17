@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,15 +15,13 @@ import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-public abstract class BaseRecyclerViewAdapter<Item> extends RecyclerView.Adapter<BaseRecyclerViewAdapter<Item>.ViewHolder>{
-    protected List<Item> items;
-    protected Deque<List<Item>> pendingUpdates = new ArrayDeque<>();
+public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<BaseRecyclerViewAdapter<T>.ViewHolder>{
+    protected List<T> items;
+    protected Deque<ListAndCallback<T>> pendingUpdates = new ArrayDeque<>();
     protected Executor updateListExecutor;
-    protected View recyclerView;
-    protected View progressBar;
 
-    /** Using this constructor will mean there's no progress bar to show/hide while loading, and
-     * all background operations will run on the uiThread. It is recommended to at least specify
+    /** Using this constructor will mean
+     * all background operations will run on the uiThread. It is recommended to specify
      * a listUpdateExecutor using the single-argument constructor.
      */
     public BaseRecyclerViewAdapter() {
@@ -34,23 +33,6 @@ public abstract class BaseRecyclerViewAdapter<Item> extends RecyclerView.Adapter
      */
     public BaseRecyclerViewAdapter(Executor listUpdateExecutor) {
         this.updateListExecutor = listUpdateExecutor;
-        this.recyclerView = null;
-        this.progressBar = null;
-    }
-
-    /**
-     * Constructor which provides both a background thread executor to run listUpdates on,
-     * as well a progressBar. When the list update is complete, the progressBar will have its
-     * visibility set to View.GONE, and the recyclerView will be set to View.VISIBLE.
-     * @param listUpdateExecutor - the executor to perform diffUtil calculations on
-     * @param recyclerView - the recyclerview managed by this adapter, to be shown when list is loaded
-     * @param progressBar - the progress bar associated with this recyclerview, which will be hidden
-     *                    once the list has been updated.
-     */
-    public BaseRecyclerViewAdapter(Executor listUpdateExecutor, View recyclerView, View progressBar) {
-        this.updateListExecutor = listUpdateExecutor;
-        this.recyclerView = recyclerView;
-        this.progressBar = progressBar;
     }
 
     @Override
@@ -69,25 +51,94 @@ public abstract class BaseRecyclerViewAdapter<Item> extends RecyclerView.Adapter
         return 0;
     }
 
-    public Item getItem(int position) {
+    public T getItem(int position) {
         if (null != items && items.size() > position) {
             return items.get(position);
         }
         return null;
     }
 
-    public void updateList(final List<Item> newItems){
-        pendingUpdates.push(newItems);
+    public List<T> getCurrentList(){
+        return items;
+    }
+
+    public void submitList(final List<T> newItems){
+        //otherwise start this update
+        submitList(newItems, null);
+    }
+
+    public void submitList(final List<T> newItems, @Nullable Runnable callback){
+        ListAndCallback<T> current = new ListAndCallback<>(newItems, callback);
+        pendingUpdates.push(current);
         //if there's already another update being run, then don't start a new one
         if(pendingUpdates.size() > 1){
             //do nothing
             return;
         }
         //otherwise start this update
-        updateListInternal(newItems);
+        submitListInternal(current);
     }
 
-    public void setItems(List<Item> newItems) {
+    protected void submitListInternal(ListAndCallback<T> listAndCallback) {
+        final List<T> oldItems;
+        if(null != items){
+            oldItems = new ArrayList<>(items);
+        }
+        else{
+            oldItems = null;
+        }
+
+        final Handler handler = new Handler(Looper.getMainLooper());
+
+        if(updateListExecutor != null) {
+            updateListExecutor.execute(() -> {
+                final DiffUtil.DiffResult diffResult =
+                        DiffUtil.calculateDiff(createDiffCallback(listAndCallback.list, oldItems));
+                handler.post(() -> applyDiffResult(listAndCallback, diffResult));
+            });
+        }
+        //run operations on ui thread if no other executor provided
+        else {
+            final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(createDiffCallback(listAndCallback.list, oldItems));
+            handler.post(() -> applyDiffResult(listAndCallback, diffResult));
+        }
+    }
+
+    protected void applyDiffResult(ListAndCallback<T> current, DiffUtil.DiffResult diffResult){
+        //take this update off the queue now that it is being executed
+        pendingUpdates.remove(current);
+        dispatchUpdates(current.list, diffResult);
+        if(current.callback != null) {
+            current.callback.run();
+        }
+
+        //if there are more updates queued now, then take the latest one and run it
+        if(pendingUpdates.size() > 0) {
+            ListAndCallback<T> latest = pendingUpdates.pop();
+
+            //remove older, outdated updates from queue
+            pendingUpdates.clear();
+
+            //run latest update
+            submitListInternal(latest);
+        }
+    }
+
+    protected void dispatchUpdates(List<T> newItems, DiffUtil.DiffResult diffResult) {
+        diffResult.dispatchUpdatesTo(this);
+        if (items == null){
+            items = new ArrayList<>();
+        }
+        else {
+            items.clear();
+        }
+
+        if(items != null){
+            items.addAll(newItems);
+        }
+    }
+
+    public void updateListSync(List<T> newItems) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(createDiffCallback(newItems, items));
         diffResult.dispatchUpdatesTo(this);
         if(items != null){
@@ -102,117 +153,8 @@ public abstract class BaseRecyclerViewAdapter<Item> extends RecyclerView.Adapter
         }
     }
 
-    protected void updateListInternal(List<Item> newItems) {
-        final List<Item> oldItems;
-        if(null != items){
-            oldItems = new ArrayList<>(items);
-        }
-        else{
-            oldItems = null;
-        }
-
-        final Handler handler = new Handler(Looper.getMainLooper());
-
-        if(updateListExecutor != null) {
-            updateListExecutor.execute(() -> {
-                final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(createDiffCallback(newItems, oldItems));
-                handler.post(() -> applyDiffResult(newItems,diffResult));
-                handler.post(this::hideProgressBar);
-            });
-        }
-        //run operations on ui thread if no other executor provided
-        else {
-            handler.post(() -> {
-                final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(createDiffCallback(newItems, oldItems));
-                handler.post(() -> applyDiffResult(newItems,diffResult));
-                handler.post(this::hideProgressBar);
-            });
-        }
-    }
-
-    protected void applyDiffResult(List<Item> newItems, DiffUtil.DiffResult diffResult){
-        //take this update off the queue now that it is being executed
-        pendingUpdates.remove(newItems);
-        dispatchUpdates(newItems, diffResult);
-
-        //if there are more updates queued now, then take the latest one and run it
-        if(pendingUpdates.size() > 0) {
-            List<Item> latest = pendingUpdates.pop();
-
-            //remove older, outdated updates from queue
-            pendingUpdates.clear();
-
-            //run latest update
-            updateListInternal(latest);
-        }
-    }
-
-    protected void dispatchUpdates(List<Item> newItems, DiffUtil.DiffResult diffResult) {
-        diffResult.dispatchUpdatesTo(this);
-        if (items == null){
-            items = new ArrayList<>();
-        }
-        else {
-            items.clear();
-        }
-
-        if(items != null){
-            items.addAll(newItems);
-        }
-    }
-
-    protected void showProgressBar(){
-        if (progressBar != null && recyclerView != null) {
-            recyclerView.setVisibility(View.GONE);
-            progressBar.setVisibility(View.VISIBLE);
-        }
-    }
-    protected void hideProgressBar(){
-        if (progressBar != null && recyclerView != null) {
-            recyclerView.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
-        }
-    }
-
-    protected ItemDiff createDiffCallback(List<Item> newList, List<Item> oldList) {
-        return new ItemDiff(newList, oldList);
-    }
-
-    public class ItemDiff extends DiffUtil.Callback {
-        protected List<Item> newList;
-        protected List<Item> oldList;
-
-        public ItemDiff(List<Item> newList, List<Item> oldList) {
-            this.newList = newList;
-            this.oldList = oldList;
-        }
-
-        @Override
-        public int getOldListSize() {
-            if(oldList == null){
-                return 0;
-            }
-            return oldList.size();
-        }
-
-        @Override
-        public int getNewListSize() {
-            if (newList == null){
-                return 0;
-            }
-            return newList.size();
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            //compare Recipe ids
-            return oldList.get(oldItemPosition) == newList.get(newItemPosition);
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
-        }
+    protected BaseDiffCallback<T> createDiffCallback(List<T> newList, List<T> oldList) {
+        return new BaseDiffCallback<T>(newList, oldList);
     }
 
     public abstract class ViewHolder extends RecyclerView.ViewHolder {
@@ -221,6 +163,16 @@ public abstract class BaseRecyclerViewAdapter<Item> extends RecyclerView.Adapter
             super(itemView);
         }
 
-        public abstract void bind(Item item);
+        public abstract void bind(T item);
+    }
+
+    private class ListAndCallback<T> {
+        public List<T> list;
+        public Runnable callback;
+
+        public ListAndCallback(List<T> list, Runnable callback) {
+            this.list = list;
+            this.callback = callback;
+        }
     }
 }
