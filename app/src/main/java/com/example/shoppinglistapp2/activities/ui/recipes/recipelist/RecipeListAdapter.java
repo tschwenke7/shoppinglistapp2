@@ -15,7 +15,6 @@ import androidx.annotation.Nullable;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.BaseDiffCallback;
 import com.example.shoppinglistapp2.activities.ui.BaseRecyclerViewAdapter;
-import com.example.shoppinglistapp2.activities.ui.ListAndCallback;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;
@@ -25,11 +24,9 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
 import java.text.DecimalFormat;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -38,20 +35,16 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
     private OnRecipeClickListener onRecipeClickListener;
     private List<Integer> selectedPositions = new ArrayList<>();
     private DecimalFormat ratingFormat = new DecimalFormat("#.#");
-    private SearchCriteria searchCriteria;
+    private RecipeListFragment.SearchCriteria searchCriteria;
     private int orderByCriteria;
     private CharSequence latestConstraint;
 
-    public enum SearchCriteria {
-        NAME,
-        INGREDIENT,
-        TAG
-    }
+
 
     public RecipeListAdapter(Executor listUpdateExecutor, OnRecipeClickListener onRecipeClickListener){
         super(listUpdateExecutor);
         this.onRecipeClickListener = onRecipeClickListener;
-        searchCriteria = SearchCriteria.NAME;
+        searchCriteria = RecipeListFragment.SearchCriteria.NAME;
     }
 
     @NonNull
@@ -123,18 +116,8 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
     }
 
 
-    public void setSearchCriteria(int searchCriteria){
-        switch (searchCriteria){
-            case 0:
-                this.searchCriteria = SearchCriteria.NAME;
-                break;
-            case 1:
-                this.searchCriteria = SearchCriteria.INGREDIENT;
-                break;
-            case 2:
-                this.searchCriteria = SearchCriteria.TAG;
-                break;
-        }
+    public void setSearchCriteria(RecipeListFragment.SearchCriteria searchCriteria){
+        this.searchCriteria = searchCriteria;
     }
 
     public void setOrderByCriteria(int criteriaIndex){
@@ -223,6 +206,7 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
                 return ingredientFilter;
             case TAG:
                 return tagFilter;
+            case NAME:
             default:
                 return nameFilter;
         }

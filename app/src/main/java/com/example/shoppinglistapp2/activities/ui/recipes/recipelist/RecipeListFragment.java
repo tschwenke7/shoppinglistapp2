@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,9 +37,14 @@ import com.example.shoppinglistapp2.databinding.FragmentRecipeListBinding;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 
+import java.util.List;
+import java.util.concurrent.Executor;
+
 public class RecipeListFragment extends Fragment implements RecipeListAdapter.OnRecipeClickListener, AdapterView.OnItemSelectedListener {
+    private final String TAG = "TDB_RCP_LIST_FRAG";
 
     private RecipeListViewModel viewModel;
     private SharedViewModel sharedViewModel;
@@ -47,10 +54,19 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     private RecipeListAdapter adapter;
     private ViewPagerNavigationCallback callback;
     private ListeningExecutorService backgroundExecutor;
+    private Executor uiExecutor;
+
 
     private FragmentRecipeListBinding binding;
 
     private boolean advancedSearchVisible = false;
+    public enum SearchCriteria {
+        NAME,
+        INGREDIENT,
+        TAG
+    }
+
+    private SearchCriteria searchCriteria;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -64,6 +80,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         callback = (ViewPagerNavigationCallback) getActivity();
 
         backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
+        uiExecutor = ContextCompat.getMainExecutor(requireContext());
 
         //this will delete ALL recipes and load recipetineats websites from the spreadsheet in res/raw/<name>.csv
 //        recipesViewModel.loadFromBackup(this);
@@ -83,6 +100,10 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         if(advancedSearchVisible) {
             binding.viewgroupAdvancedSearch.setVisibility(View.VISIBLE);
+        }
+        //provide default starting state for searchCriteria if not set
+        if(searchCriteria == null){
+            searchCriteria = SearchCriteria.NAME;
         }
 
         //setup recipe list recyclerview
@@ -106,7 +127,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                 }
 
                 //restore state of adapter in case of fragment reload
-                adapter.setSearchCriteria(binding.searchCriteriaSpinner.getSelectedItemPosition());
+                adapter.setSearchCriteria(searchCriteria);
                 adapter.setOrderByCriteria(binding.orderBySpinner.getSelectedItemPosition());
                 adapter.setLatestConstraint(binding.searchBar.getText().toString());
 
@@ -176,12 +197,48 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             return false;
         });
 
-//        //setup autocomplete on the searchbar
-//        ArrayAdapter<String> searchBarAdapter = new ArrayAdapter<>(getContext(),
-//                android.R.layout.simple_dropdown_item_1line, outfitViewModel.getAllDistinctClothingItems());
-//        searchBar.setAdapter(searchBarAdapter);
-//        //configure autocomplete to consider comma separated phrases as separate tokens
-//        searchBar.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+        //configure autocomplete to consider comma separated phrases as separate tokens
+        binding.searchBar.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+        setAutoCompleteSuggestions();
+
+
+    }
+
+    /** Retrieves and sets the autocomplete suggestions for the search bar based on the
+     * current values of this.searchCriteria.
+     */
+    private void setAutoCompleteSuggestions(){
+        ListenableFuture<List<String>> suggestions;
+
+        switch (searchCriteria) {
+            case INGREDIENT:
+                suggestions = viewModel.getDistinctIngredientNames();
+                break;
+            case TAG:
+                suggestions = viewModel.getDistinctTagNames();
+                break;
+            case NAME:
+            default:
+                suggestions = viewModel.getAllRecipeNames();
+                break;
+        }
+
+        Futures.addCallback(suggestions,
+            new FutureCallback<List<String>>() {
+                @Override
+                public void onSuccess(@Nullable List<String> result) {
+                    ArrayAdapter<String> searchBarAdapter = new ArrayAdapter<>(getContext(),
+                            android.R.layout.simple_dropdown_item_1line, result);
+                    binding.searchBar.setAdapter(searchBarAdapter);
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    Toast.makeText(requireContext(), R.string.error_could_not_load_autocomplete_suggestions, Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "Failed to load autocomplete suggestions for search criteria" + searchCriteria.toString(), t);
+                }
+            },
+            uiExecutor);
     }
 
     /**
@@ -320,27 +377,35 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         switch (adapterView.getId()){
             //when an option is selected in the "search by" spinner
             case R.id.search_criteria_spinner:
-                //respond to option selection here
-                adapter.setSearchCriteria(pos);
-                adapter.refilter();
-
                 //show appropriate hint
                 switch (pos){
                     case 0:
+                        searchCriteria = SearchCriteria.NAME;
                         binding.searchHint.setVisibility(View.GONE);
                         binding.searchBar.setHint(R.string.searchbar_name_hint);
                         break;
                     case 1:
+                        searchCriteria = SearchCriteria.INGREDIENT;
                         binding.searchHint.setText(R.string.ingredient_search_hint);
                         binding.searchHint.setVisibility(View.VISIBLE);
                         binding.searchBar.setHint(R.string.searchbar_ingredient_hint);
                         break;
                     case 2:
+                        searchCriteria = SearchCriteria.TAG;
                         binding.searchHint.setText(R.string.tag_search_hint);
                         binding.searchBar.setHint(R.string.searchbar_tag_hint);
                         binding.searchHint.setVisibility(View.VISIBLE);
                         break;
                 }
+
+                //notify adapter of change
+                adapter.setSearchCriteria(searchCriteria);
+                //refilter list based on new search criteria
+                adapter.refilter();
+
+                //update autocompelte suggestions for the new search criteria
+                setAutoCompleteSuggestions();
+
                 break;
 
             //when an option is selected in the "order by" spinner
@@ -465,6 +530,5 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         if(null != actionMode){
             actionMode.finish();
         }
-
     }
 }

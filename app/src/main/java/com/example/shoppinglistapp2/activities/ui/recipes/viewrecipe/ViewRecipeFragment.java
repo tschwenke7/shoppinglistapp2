@@ -182,10 +182,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
         //setup tag input autocomplete
         Futures.addCallback(
-            backgroundExecutor.submit(() -> viewModel.getAllTagNames()),
-            new FutureCallback<String[]>() {
+            viewModel.getDistinctTagNames(),
+            new FutureCallback<List<String>>() {
                 @Override
-                public void onSuccess(@Nullable String[] result) {
+                public void onSuccess(@Nullable List<String> result) {
                     AutoCompleteTextView tagField = root.findViewById(R.id.edit_text_tag);
                     tagField.post(() -> {
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(

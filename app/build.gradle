@@ -87,6 +87,8 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.guava/guava
     implementation group: 'com.google.guava', name: 'guava', version: '30.0-android'
 
+    implementation "androidx.room:room-guava:$rootProject.roomVersion"
+
 
 
 }

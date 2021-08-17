@@ -166,7 +166,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Ba
         public abstract void bind(T item);
     }
 
-    private class ListAndCallback<T> {
+    private static class ListAndCallback<T> {
         public List<T> list;
         public Runnable callback;
 

@@ -5,6 +5,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 
 import com.example.shoppinglistapp2.db.tables.Tag;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface TagDao extends BaseDao<Tag> {
     void delete(int recipeId, String tagName);
 
     @Query("SELECT DISTINCT name FROM tags")
-    String[] getAllTagNames();
+    ListenableFuture<List<String>> getAllTagNames();
 
     @Query("SELECT * FROM tags WHERE recipe_id = :recipeId")
     List<Tag> getTagsByRecipe(int recipeId);

@@ -12,6 +12,7 @@ import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;
 import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
 import com.example.shoppinglistapp2.helpers.IngListItemUtils;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +44,8 @@ public class ViewRecipeViewModel extends AndroidViewModel {
         slaRepository.deleteTag(tag);
     }
 
-    public String[] getAllTagNames() throws ExecutionException, InterruptedException {
-        return slaRepository.getAllTagNames().get();
+    public ListenableFuture<List<String>> getDistinctTagNames() {
+        return slaRepository.getDistinctTagNames();
     }
 
     public List<Tag> getRecipeTags(int recipeId) {

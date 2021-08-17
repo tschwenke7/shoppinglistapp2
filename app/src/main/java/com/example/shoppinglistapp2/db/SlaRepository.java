@@ -207,10 +207,6 @@ public class SlaRepository {
         SlaDatabase.databaseWriteExecutor.execute(() -> tagDao.delete(recipeId, tag));
     }
 
-    public ListenableFuture<String[]> getAllTagNames(){
-        return SlaDatabase.databaseWriteExecutor.submit(tagDao::getAllTagNames);
-    }
-
     public List<Tag> getTagsByRecipe(int recipeId){
         return tagDao.getTagsByRecipe(recipeId);
     }
@@ -398,5 +394,17 @@ public class SlaRepository {
             }
         }
         return existingItemWithSameName;
+    }
+
+    public ListenableFuture<List<String>> getAllRecipeNames() {
+        return recipeDao.getAllNames();
+    }
+
+    public ListenableFuture<List<String>> getDistinctIngredientNames() {
+        return ingListItemDao.getDistinctIngredientNames(IngListItemUtils.SHOPPING_LIST_ID);
+    }
+
+    public ListenableFuture<List<String>> getDistinctTagNames() {
+        return tagDao.getAllTagNames();
     }
 }

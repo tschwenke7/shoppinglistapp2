@@ -5,6 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Query;
 
 import com.example.shoppinglistapp2.db.tables.IngListItem;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.List;
 
@@ -39,4 +40,7 @@ public interface IngListItemDao extends BaseDao<IngListItem> {
 
     @Query("SELECT * FROM ing_list_items WHERE list_id = :shoppingListId ORDER BY checked ASC, id DESC")
     LiveData<List<IngListItem>> getAllFromShoppingList(int shoppingListId);
+
+    @Query("SELECT DISTINCT name FROM ing_list_items WHERE list_id != :ignoreListId")
+    ListenableFuture<List<String>> getDistinctIngredientNames(int ignoreListId);
 }

@@ -8,6 +8,7 @@ import androidx.room.Transaction;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.relations.RecipeWithIngredients;
 import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.List;
 
@@ -55,4 +56,7 @@ public interface RecipeDao extends BaseDao<Recipe> {
 
     @Query("DELETE FROM recipes WHERE id = :recipeId")
     int deleteById(int recipeId);
+
+    @Query("SELECT DISTINCT name FROM recipes")
+    ListenableFuture<List<String>> getAllNames();
 }

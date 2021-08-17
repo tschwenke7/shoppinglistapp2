@@ -38,4 +38,16 @@ public class RecipeListViewModel extends AndroidViewModel {
         }
         return slaRepository.deleteRecipes(toDelete);
     }
+
+    public ListenableFuture<List<String>> getAllRecipeNames(){
+        return slaRepository.getAllRecipeNames();
+    }
+
+    public ListenableFuture<List<String>> getDistinctIngredientNames(){
+        return slaRepository.getDistinctIngredientNames();
+    }
+
+    public ListenableFuture<List<String>> getDistinctTagNames(){
+        return slaRepository.getDistinctTagNames();
+    }
 }
