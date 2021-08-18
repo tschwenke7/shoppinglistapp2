@@ -137,7 +137,19 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         binding.recipeIngredientsList.setAdapter(adapter);
         binding.recipeIngredientsList.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
-        ingredients.observe(getViewLifecycleOwner(), (list) -> adapter.submitList(list));
+        ingredients.observe(getViewLifecycleOwner(), (list) -> {
+            //if list is empty, show placeholder text instead
+            if(list == null || list.size() == 0){
+                binding.recipeIngredientsList.setVisibility(View.GONE);
+                binding.textviewNoIngredientsPlaceholder.setVisibility(View.VISIBLE);
+            }
+            else{
+                binding.recipeIngredientsList.setVisibility(View.VISIBLE);
+                binding.textviewNoIngredientsPlaceholder.setVisibility(View.GONE);
+                adapter.submitList(list);
+            }
+
+        });
 
         //handle ingredient being added
         binding.recipeAddIngredientButton.setOnClickListener((v) -> addIngredients());
@@ -405,6 +417,9 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //show per-ingredient delete icons
         adapter.setEditMode(true);
         binding.recipeIngredientsList.setAdapter(adapter);
+
+        //swap placeholder text for no ingredients
+        binding.textviewNoIngredientsPlaceholder.setText(R.string.recipe_no_ingredients_placeholder_edit_mode);
     }
 
     private void enterViewMode(){
@@ -458,6 +473,9 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         adapter.setEditMode(false);
         adapter.resetSelections();
         binding.recipeIngredientsList.setAdapter(adapter);
+
+        //swap placeholder text for no ingredients
+        binding.textviewNoIngredientsPlaceholder.setText(R.string.recipe_no_ingredients_placeholder_view_mode);
     }
 
     /**

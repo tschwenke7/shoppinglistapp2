@@ -110,16 +110,23 @@
     <string name="save_recipe_prompt_message">Do you wish to save any changes you may have just made to this recipe?</string>
     <string name="save_recipe_prompt_positive_button">Save changes</string>
     <string name="save_recipe_prompt_negative_button">Discard changes</string>
+
+    <string name="content_description_add_ingredient_button">Add ingredient</string>
+    <string name="content_description_clock_icon">clock icon</string>
+    <string name="recipe_no_ingredients_placeholder_view_mode">This recipe has no ingredients yet.\nAdd some by clicking the edit icon (pen) in the top right corner of your screen to edit the recipe.</string>
+    <string name="recipe_no_ingredients_placeholder_edit_mode">This recipe has no ingredients yet.\nAdd some using the box above.
+        \n\nHint: you can copy/paste in a list of ingredients at once, as long as each ingredient is on a separate line.</string>
+
     <string name="error_recipe_name_already_used">This recipe name is already in use - please choose another.</string>
     <string name="error_no_recipe_name_entered">Please enter a name for this recipe</string>
     <string name="error_adding_recipe_to_meal">Something went wrong trying to add the recipe to this meal - please try again later.</string>
-
     <string name="error_loading_tags">Error - unable to load tags for recipe.</string>
-
 
     <!-- Shopping list page -->
     <string name="new_list_item_button">Add</string>
     <string name="new_list_item_field_placeholder">New item/s…</string>
+    <string name="no_sl_items_placeholder_text">Your shopping list is empty!\n\nAdd items to it using the text box above, or by adding ingredients directly from a recipe or meal plan.
+    \n\nHint: Someone texted you a shopping list? You can copy/paste in a list of items at once, as long as each item is on a separate line.</string>
     <string name="error_no_list_item_entered">No item entered</string>
     <string name="clear_checked_list_items_title">Clear crossed-off items</string>
     <string name="clear_all_list_items_title">Clear ALL items</string>
@@ -140,6 +147,7 @@
     <string name="copy_to_clipboard_dialog_message">Do you want to include crossed-off items?</string>
     <string name="copy_to_clipboard_dialog_positive_button">Yes</string>
     <string name="copy_to_clipboard_dialog_negative_button">Don\'t Include</string>
+
 
     <!-- Meal Plan Fragment -->
     <string name="plans_heading">Meals</string>
@@ -164,8 +172,5 @@
     <!-- Multi-location errors -->
     <string name="error_sending_ingredients_to_shopping_list">Something went wrong while trying to add these ingredients to the shopping list. Please try again later and report this bug if it continues.</string>
     <string name="error_could_not_add_items">There item you tried to enter was invalid.\nPlease enter the item\'s quantity and unit of measurement (optional) followed by its name.\ne.g. \"500g butter\", \"6 carrots\", or \"avocado\".\n\nNote: for technical reasons, you can\'t use the \"+\" icon in the ingredient\'s name.</string>
-    <string name="error_could_not_load_autocomplete_suggestions">Error - could not load auto complete suggestions for search bar.</string>
-    <string name="no_sl_items_placeholder_text">Your shopping list is empty!\n\nAdd items to it using the text box above, or by adding ingredients directly from a recipe or meal plan.
-    \n\nHint: Someone texted you a shopping list? You can paste in a list of items, each on a new line, to easily add them all.</string>
 
 </resources>
