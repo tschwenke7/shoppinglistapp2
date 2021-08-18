@@ -31,6 +31,7 @@ import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
+import com.example.shoppinglistapp2.databinding.FragmentCreateRecipeBinding;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -49,9 +50,8 @@ public class CreateRecipeFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private ListeningExecutorService backgroundExecutor;
     private Executor uiExecutor;
-    private View root;
-    private ProgressBar progressBar;
-    private View mainContent;
+
+    private FragmentCreateRecipeBinding binding;
 
     public CreateRecipeFragment() {
         // Required empty public constructor
@@ -61,7 +61,7 @@ public class CreateRecipeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        root = inflater.inflate(R.layout.fragment_create_recipe, container, false);
+        binding = FragmentCreateRecipeBinding.inflate(inflater, container, false);
 
         viewModel =
                 new ViewModelProvider(requireActivity()).get(CreateRecipeViewModel.class);
@@ -71,7 +71,7 @@ public class CreateRecipeFragment extends Fragment {
         backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
         uiExecutor = ContextCompat.getMainExecutor(this.requireContext());
 
-        return root;
+        return binding.getRoot();
     }
 
     @Override
@@ -86,23 +86,15 @@ public class CreateRecipeFragment extends Fragment {
         //setup action bar to allow back button
         this.setHasOptionsMenu(true);
 
-        progressBar = root.findViewById(R.id.progressBar);
-        mainContent = root.findViewById(R.id.main_content_container);
-
-        TextView supportedSitesText = root.findViewById(R.id.text_view_supported_websites);
-        supportedSitesText.setText(Html.fromHtml(getString(R.string.supported_recipes)));
-        supportedSitesText.setMovementMethod(LinkMovementMethod.getInstance());
+        binding.textViewSupportedWebsites.setText(Html.fromHtml(getString(R.string.supported_recipes)));
+        binding.textViewSupportedWebsites.setMovementMethod(LinkMovementMethod.getInstance());
 
         //setup "create recipe from website" button
-        Button websiteButton = root.findViewById(R.id.create_recipe_from_website_button);
-        websiteButton.setOnClickListener(this::onWebsiteButtonClicked);
+        binding.createRecipeFromWebsiteButton.setOnClickListener(this::onWebsiteButtonClicked);
 
         //setup manual recipe creation button to get a new recipe id for an empty recipe and navigate
         //to editor
-        Button manualButton = root.findViewById(R.id.create_recipe_manually_button);
-        manualButton.setOnClickListener(view -> onManualButtonClicked());
-
-
+        binding.createRecipeManuallyButton.setOnClickListener(view -> onManualButtonClicked());
 
         //configure back button to work within parent fragment
         Fragment f1 = this;
@@ -131,7 +123,7 @@ public class CreateRecipeFragment extends Fragment {
                             CreateRecipeFragmentDirections.actionCreateRecipeToViewRecipe();
                     //pass id of newly created website as parameter of navigation
                     action.setRecipeId(result);
-                    Navigation.findNavController(root).navigate(action);
+                    Navigation.findNavController(requireView()).navigate(action);
 
                     //hide progress bar and reset opacity of everything else
                     hideProgressBar();
@@ -150,7 +142,7 @@ public class CreateRecipeFragment extends Fragment {
         //show progress bar and fade everything else
         showProgressBar();
 
-        String url = ((EditText) root.findViewById(R.id.edit_text_recipe_website)).getText().toString().trim();
+        String url = binding.editTextRecipeWebsite.getText().toString().trim();
         //attempt to create a Recipe from the website//attempt to load the website
         ListenableFuture<Integer> recipeId = backgroundExecutor.submit(
                () -> viewModel.generateRecipeIdFromUrl(url));
@@ -171,10 +163,9 @@ public class CreateRecipeFragment extends Fragment {
                     action.setRecipeId(recipeId);
 
                     //navigate
-                    Navigation.findNavController(root).navigate(action);
+                    Navigation.findNavController(requireView()).navigate(action);
                     //hide progress bar and reset opacity of everything else
-                    progressBar.setVisibility(View.GONE);
-                    mainContent.setAlpha(1.0f);
+                    hideProgressBar();
                 }
             }
             //respond to differenct potential errors
@@ -242,13 +233,18 @@ public class CreateRecipeFragment extends Fragment {
 
     /** hide progress bar and reset opacity of everything else */
     private void showProgressBar(){
-        progressBar.setVisibility(View.VISIBLE);
-        mainContent.setAlpha(0.2f);
+        binding.progressBar.setVisibility(View.VISIBLE);
+        binding.mainContentContainer.setAlpha(0.2f);
+        binding.createRecipeManuallyButton.setEnabled(false);
+        binding.createRecipeFromWebsiteButton.setEnabled(false);
+
     }
 
     /** fade main content and display loading spinner over the top */
     private void hideProgressBar() {
-        progressBar.setVisibility(View.GONE);
-        mainContent.setAlpha(1.0f);
+        binding.progressBar.setVisibility(View.GONE);
+        binding.mainContentContainer.setAlpha(1.0f);
+        binding.createRecipeManuallyButton.setEnabled(true);
+        binding.createRecipeFromWebsiteButton.setEnabled(true);
     }
 }
