@@ -73,7 +73,8 @@
             android:layout_marginTop="16dp"
             android:text="@string/recipe_no_ingredients_placeholder_view_mode"
             android:textSize="18sp"
-            android:textAlignment="center"/>
+            android:textAlignment="center"
+            android:visibility="gone"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recipe_ingredients_list"
