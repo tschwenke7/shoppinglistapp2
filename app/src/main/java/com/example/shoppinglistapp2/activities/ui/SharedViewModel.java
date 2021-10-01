@@ -6,8 +6,11 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.example.shoppinglistapp2.db.SlaRepository;
+import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Meal;
 import com.google.common.util.concurrent.ListenableFuture;
+
+import java.util.List;
 
 public class SharedViewModel extends AndroidViewModel {
     private Integer navigateToRecipeId = null;
@@ -44,15 +47,16 @@ public class SharedViewModel extends AndroidViewModel {
         //retrieve meal object and update its recipe id
         selectingForMeal.setRecipeId(recipeId);
 
+        //get the ingredient list for the meal plan this meal was part of
+        int ingListId = slaRepository.getIngListIdForMealPlan(selectingForMeal.getPlanId());
+
+        //add all items from the selected recipe to the mealPlan's ingList
+        List<IngListItem> items = slaRepository.getIngredientsByRecipeIdNonLive(recipeId);
+        for (IngListItem item : items) {
+            slaRepository.insertOrMergeItem(ingListId, item);
+        }
+
         //update meal plan in db
         return slaRepository.updateMeal(selectingForMeal);
-
-        //update meal plan ingredients needed accordingly
-//        todo slaRepository.addAllItemsFromRecipeToList(recipeId, selectingForMeal.getPlanId());
-//        List<Ingredient> newIngredients = slaRepository.getIngredientsByRecipeIdNonLive(recipeId);
-//        for(Ingredient ingredient : newIngredients){
-//            insertOrMergeItem(SlItemUtils.MEALPLAN_LIST_ID, SlItemUtils.toSlItem(ingredient));
-//        }
-
     }
 }

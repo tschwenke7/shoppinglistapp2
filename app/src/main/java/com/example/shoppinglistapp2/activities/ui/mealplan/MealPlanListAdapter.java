@@ -85,6 +85,11 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
             /* set day name */
             binding.dayTitle.setText(meal.getDayTitle());
 
+            /* Set default visibilities */
+            plusIcon.setVisibility(View.VISIBLE);
+            binding.editDayTitleConfirm.setVisibility(View.GONE);
+            binding.deleteMealIcon.setVisibility(View.GONE);
+
             /* Listen for click on day name for editing */
             binding.dayTitle.setOnTouchListener((v, event) -> {
                 if(MotionEvent.ACTION_UP == event.getAction()){
@@ -171,6 +176,7 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
                 addNotesButton.setVisibility(View.GONE);
             }
             else{
+                notesView.setText("");
                 notesView.setVisibility(View.GONE);
                 addNotesButton.setVisibility(View.VISIBLE);
             }

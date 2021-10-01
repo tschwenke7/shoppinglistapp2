@@ -105,4 +105,15 @@ public class Meal {
     public int hashCode() {
         return Objects.hash(id, planId, dayId, dayTitle, recipeId, notes);
     }
+
+    public Meal deepCopy() {
+        Meal copy = new Meal();
+        copy.setId(id);
+        copy.setPlanId(planId);
+        copy.setDayTitle(dayTitle);
+        copy.setRecipeId(recipeId);
+        copy.setNotes(notes);
+        copy.setDayId(dayId);
+        return copy;
+    }
 }

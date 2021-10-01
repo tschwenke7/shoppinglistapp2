@@ -133,7 +133,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Ba
             items.clear();
         }
 
-        if(items != null){
+        if(newItems != null){
             items.addAll(newItems);
         }
     }

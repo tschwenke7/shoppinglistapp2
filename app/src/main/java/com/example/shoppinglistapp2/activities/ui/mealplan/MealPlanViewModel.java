@@ -16,6 +16,7 @@ import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.relations.IngListWithItems;
 import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
 import com.example.shoppinglistapp2.helpers.IngListItemUtils;
+import com.example.shoppinglistapp2.helpers.InvalidIngredientStringException;
 import com.example.shoppinglistapp2.helpers.MealPlanUtils;
 
 import java.util.List;
@@ -154,11 +155,13 @@ public class MealPlanViewModel extends AndroidViewModel {
         slaRepository.updateMeal(meal);
     }
 
-    /** Clears all recipes and ingredients from meal plans, but doesn't delete the plans themselves. */
-    public void removeAllRecipes(){
+    /** Clears all recipes, notes and ingredients from meals, but doesn't delete the meals themselves. */
+    public void clearAllMeals(){
         for(MealWithRecipe m : meals.getValue()){
-            m.getMeal().setRecipeId(null);
-            slaRepository.updateMeal(m.getMeal());
+            Meal meal = m.getMeal().deepCopy();
+            meal.setRecipeId(null);
+            meal.setNotes(null);
+            slaRepository.updateMeal(meal);
         }
 
         //clear ingredient list
@@ -195,11 +198,6 @@ public class MealPlanViewModel extends AndroidViewModel {
     public void removeRecipeFromMealAtPos(int position) {
         Meal meal = getMeals().getValue().get(position).getMeal();
 
-        //remove the recipe from the meal plan slot
-        //remove the recipe from this meal
-        meal.setRecipeId(null);
-        slaRepository.updateMeal(meal);
-
         int ingListId = mealPlanIngListDb.getValue().getIngList().getId();
 
         //remove ingredients used by this recipe by adding a negative qty of each ingredient
@@ -208,6 +206,14 @@ public class MealPlanViewModel extends AndroidViewModel {
             item.negateQuantities();
             slaRepository.insertOrMergeItem(ingListId, item);
         }
+
+        //remove the recipe from the meal plan slot
+        //remove the recipe from this meal
+        meal.setRecipeId(null);
+        slaRepository.updateMeal(meal);
+
+        //refresh livedata to make sure notes are deleted
+
     }
 
     public boolean exportToShoppingList() {
@@ -221,5 +227,19 @@ public class MealPlanViewModel extends AndroidViewModel {
         }
 
         return true;
+    }
+
+    public void toggleChecked(int position) {
+        //if we directly edit the item from the list which the adapter is using, it won't be different
+        //when setList is called.
+        IngListItem item = mealPlanIngredients.getValue().get(position).deepCopy();
+
+        item.setChecked(!item.isChecked());
+        slaRepository.deleteIngListItem(item);
+        slaRepository.insertOrMergeItem(item.getListId(), item);
+    }
+
+    public void editIngListItem(IngListItem oldItem, String newItemString) throws InvalidIngredientStringException {
+        slaRepository.editItem(oldItem, newItemString);
     }
 }

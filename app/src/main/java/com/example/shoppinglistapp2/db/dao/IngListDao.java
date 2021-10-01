@@ -22,4 +22,7 @@ public interface IngListDao extends BaseDao<IngList> {
     @Transaction
     @Query("SELECT * FROM ing_lists WHERE meal_plan_id = :mealPlanId")
     LiveData<IngListWithItems> getIngListForMealPlan(int mealPlanId);
+
+    @Query("SELECT id FROM ing_lists WHERE meal_plan_id = :mealPlanId")
+    int getIngListIdForMealPlan(int mealPlanId);
 }

@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,10 +30,10 @@ import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListAdapter;
 import com.example.shoppinglistapp2.databinding.FragmentMealPlanBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
-import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +42,7 @@ import java.util.concurrent.Executor;
 
 public class MealPlanFragment extends Fragment implements MealPlanListAdapter.MealPlanClickListener, ShoppingListAdapter.SlItemClickListener {
 
+    private static final String TAG = "T_DBG_MP_FRAG";
     private SharedViewModel sharedViewModel;
     private MealPlanViewModel viewModel;
     int currentMPId;
@@ -93,11 +95,17 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
         //listen to meal plan list
         viewModel.getMeals().observe(getViewLifecycleOwner(), (newList) -> {
-            mealPlanListAdapter.submitList(newList, () -> {
-                //swap loading spinner for recyclerview once loaded
-                binding.planRecipesRecyclerview.setVisibility(View.VISIBLE);
-                binding.mealsLoadingSpinner.setVisibility(View.GONE);
-            });
+//            //todo - make empty list placeholder
+//            if (newList.isEmpty()) {
+//
+//            }
+//            else {
+                mealPlanListAdapter.submitList(newList, () -> {
+                    //swap loading spinner for recyclerview once loaded
+                    binding.planRecipesRecyclerview.setVisibility(View.VISIBLE);
+                    binding.mealsLoadingSpinner.setVisibility(View.GONE);
+                });
+//            }
         });
 
         //listen to add day button
@@ -192,8 +200,8 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                         .setTitle(R.string.remove_recipes_option)
                         .setMessage(R.string.remove_recipes_warning)
                         .setPositiveButton(R.string.remove_recipes_positive_button, (dialogInterface, i) -> {
-                            //delete all recipes and ingredients
-                            viewModel.removeAllRecipes();
+                            //delete all recipes, notes and ingredients
+                            clearAllMeals();
                         })
                         //otherwise don't do anything
                         .setNegativeButton(R.string.cancel, null)
@@ -206,7 +214,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                         .setMessage(R.string.clear_meal_plans_warning)
                         .setPositiveButton(R.string.clear_meal_plans_positive_button, (dialogInterface, i) -> {
                             //delete everything
-                            viewModel.resetMealPlan();
+                            backgroundExecutor.submit(() -> viewModel.resetMealPlan());
                         })
                         //otherwise don't do anything
                         .setNegativeButton(R.string.cancel, null)
@@ -216,6 +224,22 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                 return super.onOptionsItemSelected(item);
         }
         return false;
+    }
+
+    private void clearAllMeals() {
+        Futures.addCallback(backgroundExecutor.submit(() -> viewModel.clearAllMeals()),
+                new FutureCallback<Object>() {
+                    @Override
+                    public void onSuccess(@Nullable Object result) {
+
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        Toast.makeText(requireContext(), R.string.error_clearing_meals, Toast.LENGTH_LONG).show();
+                    }
+                },
+                uiExecutor);
     }
 
     @Override
@@ -274,16 +298,16 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     @Override
     public void onRemoveRecipeClicked(int position) {
         Futures.addCallback(backgroundExecutor.submit(() -> viewModel.removeRecipeFromMealAtPos(position)),
-                new FutureCallback<Object>() {
-                    @Override
-                    public void onSuccess(@Nullable Object result) {}
+            new FutureCallback<Object>() {
+                @Override
+                public void onSuccess(@Nullable Object result) {}
 
-                    @Override
-                    public void onFailure(Throwable t) {
-
-                    }
-                },
-                uiExecutor
+                @Override
+                public void onFailure(Throwable t) {
+                    Toast.makeText(requireContext(), R.string.error_removing_recipe_from_meal, Toast.LENGTH_LONG).show();
+                }
+            },
+            uiExecutor
         );
     }
 
@@ -304,13 +328,47 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     @Override
     public void onSlItemClick(int position) {
-        //todo
-//        recipesViewModel.toggleChecked(viewModel.getAllMealPlanSlItems().getValue().get(position));
+        Futures.addCallback(backgroundExecutor.submit(() -> viewModel.toggleChecked(position)),
+            new FutureCallback<Object>() {
+                @Override
+                public void onSuccess(@Nullable Object result) {
+
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.e(TAG, "while crossing off item: ", t);
+                    Toast.makeText(requireContext(), R.string.error_could_not_access_database, Toast.LENGTH_LONG).show();
+                }
+            },
+            uiExecutor);
     }
 
     @Override
     public void onSlItemEditConfirm(IngListItem oldItem, String newItem) {
-        //todo
+        Futures.addCallback(backgroundExecutor.submit(() -> viewModel.editIngListItem(oldItem,newItem)),
+            new FutureCallback<Object>() {
+                @Override
+                public void onSuccess(@Nullable Object result) {
+
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    if (t instanceof InterruptedException){
+                        Log.e(TAG, "adding items to shoppping list: ", t);
+                        Toast.makeText(requireContext(), R.string.error_could_not_access_database, Toast.LENGTH_LONG).show();
+                    }
+                    else{
+                        new AlertDialog.Builder(requireContext())
+                                .setTitle(R.string.error_title)
+                                .setMessage(R.string.error_could_not_add_items)
+                                .setPositiveButton(R.string.ok, null)
+                                .show();
+                    }
+                }
+            },
+            uiExecutor);
     }
 
     /** Navigation between viewpager fragments via activity */
