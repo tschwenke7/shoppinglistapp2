@@ -325,6 +325,18 @@ public class SlaRepository {
 
         //if there's still no match, just insert
         if(null == existingItemWithSameName){
+            //if we are adding a negative quantity item (e.g. to remove a quantity of it from the list)
+            if (newItem.hasNegativeQtys()){
+                //remove any negative quantities
+                IngListItem negativeQtyOverflow = newItem.extractNegativeQtys();
+                //if no match was found with un-checked items, match negative qtys
+                // against checked (crossed off) items
+                if(!newItem.isChecked()){
+                    negativeQtyOverflow.setChecked(true);
+                    insertOrMergeItem(listId, negativeQtyOverflow);
+                }
+            }
+
             //create a copy of this ingListItem to add to the new list if it already has an id
             //i.e. it already exists in the database in another list so it needs a unique id
             if(newItem.getId() != 0){
@@ -334,9 +346,11 @@ public class SlaRepository {
                 copy.setId(0);
                 //set the list id
                 copy.setListId(listId);
-                insertIngListItem(copy);
+                newItem = copy;
             }
-            else {
+
+            //insert the new item, assuming it has some positive quantity associated
+            if(!newItem.isEmpty()) {
                 newItem.setListId(listId);
                 insertIngListItem(newItem);
             }
@@ -344,8 +358,19 @@ public class SlaRepository {
         //if one was found, merge their quantities then persist the change
         else{
             IngListItemUtils.mergeQuantities(existingItemWithSameName, newItem);
+
+            //if the merge resulted in negative quantities, check to see if there's a match with a
+            //crossed off item we can deduct any negative quantities from.
+            if (!newItem.isChecked() && existingItemWithSameName.hasNegativeQtys()) {
+                IngListItem negativeQtyOverflow = existingItemWithSameName.extractNegativeQtys();
+                negativeQtyOverflow.setChecked(true);
+
+                insertOrMergeItem(listId, negativeQtyOverflow);
+            }
+
             updateOrDeleteIfEmptyIngListItem(existingItemWithSameName);
         }
+
     }
 
     /**

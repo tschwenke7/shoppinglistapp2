@@ -120,6 +120,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                             Toast.makeText(requireContext(), R.string.error_could_not_access_database, Toast.LENGTH_LONG).show();
                         }
                         else{
+                            Log.e(TAG, "adding items to shoppping list: ", t);
                             new AlertDialog.Builder(requireContext())
                                     .setTitle(R.string.error_title)
                                     .setMessage(R.string.error_could_not_add_items)

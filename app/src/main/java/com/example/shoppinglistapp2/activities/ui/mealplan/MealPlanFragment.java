@@ -95,17 +95,19 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
         //listen to meal plan list
         viewModel.getMeals().observe(getViewLifecycleOwner(), (newList) -> {
-//            //todo - make empty list placeholder
-//            if (newList.isEmpty()) {
-//
-//            }
-//            else {
+            if (newList.isEmpty()) {
+                binding.noMealsPlaceholder.setVisibility(View.VISIBLE);
+                binding.planRecipesRecyclerview.setVisibility(View.GONE);
+                binding.mealsLoadingSpinner.setVisibility(View.GONE);
+            }
+            else {
+                binding.noMealsPlaceholder.setVisibility(View.GONE);
                 mealPlanListAdapter.submitList(newList, () -> {
                     //swap loading spinner for recyclerview once loaded
                     binding.planRecipesRecyclerview.setVisibility(View.VISIBLE);
                     binding.mealsLoadingSpinner.setVisibility(View.GONE);
                 });
-//            }
+            }
         });
 
         //listen to add day button
@@ -120,8 +122,21 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
         //listen to meal plan ingredient list
         viewModel.getMealPlanIngredients().observe(getViewLifecycleOwner(), (newList) -> {
-            planIngredientAdapter.submitList(newList);
+            if(newList.isEmpty()) {
+                binding.noPlanIngredientsPlaceholder.setVisibility(View.VISIBLE);
+                binding.planIngredientsRecyclerview.setVisibility(View.GONE);
+            }
+            else{
+                binding.noPlanIngredientsPlaceholder.setVisibility(View.GONE);
+                binding.planIngredientsRecyclerview.setVisibility(View.VISIBLE);
+                planIngredientAdapter.submitList(newList);
+            }
+
         });
+
+        //suggested recipe list
+        binding.noSuggestionsPlaceholder.setVisibility(View.VISIBLE);
+        binding.suggestedRecipesRecyclerview.setVisibility(View.GONE);
 
         /* listen to expand/hide section arrows */
         //'meals' clicked
@@ -131,12 +146,12 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
         //'ingredients needed' clicked
         binding.layoutIngredientsTitle.setOnClickListener((view) -> {
-            expandOrCollapseSection(binding.planIngredientsRecyclerview, binding.planIngredientsExpandArrow);
+            expandOrCollapseSection(binding.layoutIngredientsContent, binding.planIngredientsExpandArrow);
         });
 
         //'suggested recipes' clicked
         binding.layoutSuggestionsTitle.setOnClickListener((view) -> {
-            expandOrCollapseSection(binding.suggestedRecipesRecyclerview, binding.planSuggestionsExpandArrow);
+            expandOrCollapseSection(binding.layoutSuggestionsContent, binding.planSuggestionsExpandArrow);
         });
 
         //listen to 'export ingredients to shopping list' icon

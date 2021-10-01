@@ -169,6 +169,11 @@
     <string name="clear_meal_plans_warning">This will delete all meal slots, recipes and ingredients. You will need to add days/meals before adding more recipes again.\nAre you sure?</string>
     <string name="clear_meal_plans_positive_button">Reset all</string>
 
+    <string name="no_meals_placeholder">This meal plan is empty! Click the \"Add Meal\" button below to add your first meal to this plan.</string>
+    <string name="no_plan_ingredients_placeholder">Ingredients used in recipes you add to this meal plan will show up here.</string>
+    <string name="no_suggestions_placeholder">Once you\'ve added some recipes to your plan, other recipes using similar ingredients will be suggested here.\nAdd some recipes to get started!</string>
+
+
     <!-- Multi-location errors -->
     <string name="error_sending_ingredients_to_shopping_list">Something went wrong while trying to add these ingredients to the shopping list. Please try again later and report this bug if it continues.</string>
     <string name="error_could_not_add_items">There item you tried to enter was invalid.\nPlease enter the item\'s quantity and unit of measurement (optional) followed by its name.\ne.g. \"500g butter\", \"6 carrots\", or \"avocado\".\n\nNote: for technical reasons, you can\'t use the \"+\" icon in the ingredient\'s name.</string>

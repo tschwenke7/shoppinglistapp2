@@ -245,6 +245,46 @@ public class IngListItem {
         otherQty *= -1;
     }
 
+    public boolean hasNegativeQtys() {
+        return wholeItemQty < 0 || massQty < 0 || volumeQty < 0 || otherQty < 0;
+    }
+
+    /**
+     * Use this to get the negative quantities that are associated with this item if they exist.
+     * Any qunatities extracted to the return value of this method are removed from the original item
+     * (i.e. set to 0)
+     * @return a new IngListItem with any of the negative quantities of this one cut and pasted in
+     */
+    @Ignore
+    public IngListItem extractNegativeQtys() {
+        IngListItem item = new IngListItem();
+        item.setName(name);
+
+        if (wholeItemQty < 0) {
+            item.setWholeItemQty(wholeItemQty);
+            wholeItemQty = 0;
+        }
+        if (massQty < 0) {
+            item.setMassQty(massQty);
+            item.setMassUnit(massUnit);
+            massQty = 0;
+            massUnit = null;
+        }
+        if (volumeQty < 0) {
+            item.setVolumeQty(volumeQty);
+            item.setVolumeUnit(volumeUnit);
+            volumeQty = 0;
+            volumeUnit = null;
+        }
+        if(otherQty < 0) {
+            item.setOtherUnit(otherUnit);
+            item.setOtherQty(otherQty);
+            otherQty = 0;
+            otherUnit = null;
+        }
+        return item;
+    }
+
     public static class DiffCallback extends DiffUtil.ItemCallback<IngListItem> {
 
         @Override
