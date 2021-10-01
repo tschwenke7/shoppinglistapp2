@@ -43,9 +43,6 @@ public class Meal {
 
     private String notes;
 
-    @Ignore
-    private Recipe recipe;
-
     public int getId() {
         return id;
     }
@@ -86,14 +83,6 @@ public class Meal {
         this.notes = notes;
     }
 
-    public Recipe getRecipe() {
-        return recipe;
-    }
-
-    public void setRecipe(Recipe recipe) {
-        this.recipe = recipe;
-    }
-
     public int getPlanId() {
         return planId;
     }
@@ -108,12 +97,12 @@ public class Meal {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Meal meal = (Meal) o;
-        return id == meal.id && planId == meal.planId && dayId == meal.dayId && Objects.equals(dayTitle, meal.dayTitle) && Objects.equals(recipeId, meal.recipeId) && Objects.equals(notes, meal.notes) && Objects.equals(recipe, meal.recipe);
+        return id == meal.id && planId == meal.planId && dayId == meal.dayId && Objects.equals(dayTitle, meal.dayTitle) && Objects.equals(recipeId, meal.recipeId) && Objects.equals(notes, meal.notes);
     }
 
     @Ignore
     @Override
     public int hashCode() {
-        return Objects.hash(id, planId, dayId, dayTitle, recipeId, notes, recipe);
+        return Objects.hash(id, planId, dayId, dayTitle, recipeId, notes);
     }
 }

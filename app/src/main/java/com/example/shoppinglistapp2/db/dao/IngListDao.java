@@ -1,11 +1,14 @@
 package com.example.shoppinglistapp2.db.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Ignore;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 
 import com.example.shoppinglistapp2.db.tables.IngList;
+import com.example.shoppinglistapp2.db.tables.relations.IngListWithItems;
 
 @Dao()
 public interface IngListDao extends BaseDao<IngList> {
@@ -15,4 +18,8 @@ public interface IngListDao extends BaseDao<IngList> {
 
     @Query("INSERT INTO ing_lists(id) VALUES(:id)")
     void insertShoppingList(int id);
+
+    @Transaction
+    @Query("SELECT * FROM ing_lists WHERE meal_plan_id = :mealPlanId")
+    LiveData<IngListWithItems> getIngListForMealPlan(int mealPlanId);
 }

@@ -364,7 +364,9 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                     new FutureCallback<Object>() {
                         @Override
                         public void onSuccess(@Nullable Object result) {
-
+                            //navigate back to meal plan tab
+                            actionMode.finish();
+                            callback.setViewpagerTo(0);
                         }
 
                         @Override
@@ -374,10 +376,6 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                         }
                     },
                     ContextCompat.getMainExecutor(requireContext()));
-
-            //navigate back to meal plan tab
-            actionMode.finish();
-            callback.setViewpagerTo(0);
         }
         //otherwise, the click should send the user to view that recipe
         else{

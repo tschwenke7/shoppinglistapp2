@@ -5,6 +5,8 @@ import android.content.Context;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 
+import com.example.shoppinglistapp2.App;
+import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.db.dao.IngListDao;
 import com.example.shoppinglistapp2.db.dao.IngListItemDao;
 import com.example.shoppinglistapp2.db.dao.MealDao;
@@ -17,6 +19,8 @@ import com.example.shoppinglistapp2.db.tables.Meal;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;
+import com.example.shoppinglistapp2.db.tables.relations.IngListWithItems;
+import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
 import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
 import com.example.shoppinglistapp2.helpers.IngListItemUtils;
 import com.example.shoppinglistapp2.helpers.InvalidIngredientStringException;
@@ -406,5 +410,40 @@ public class SlaRepository {
 
     public ListenableFuture<List<String>> getDistinctTagNames() {
         return tagDao.getAllTagNames();
+    }
+
+    public LiveData<List<MealWithRecipe>> getMealsByPlanId(int mealPlanId) {
+        return Transformations.distinctUntilChanged(mealDao.getPopulatedById(mealPlanId));
+    }
+
+    public ListenableFuture<Integer> getMostRecentMealPlanId() {
+        return mealPlanDao.getLatestId();
+    }
+
+    public LiveData<IngListWithItems> getIngListForMealPlan(int mealPlanId) {
+        return Transformations.distinctUntilChanged(ingListDao.getIngListForMealPlan(mealPlanId));
+    }
+
+    public LiveData<MealPlan> getMealPlanById(int mealPlanId) {
+        return Transformations.distinctUntilChanged(mealPlanDao.getById(mealPlanId));
+    }
+
+    public ListenableFuture<Long> insertMeal(Meal meal) {
+        return SlaDatabase.databaseWriteExecutor.submit(() -> mealDao.insert(meal));
+    }
+
+    public int createNewMealPlan() throws ExecutionException, InterruptedException {
+        //create mealPlan db entry
+        MealPlan mealPlan = new MealPlan();
+        mealPlan.setName(App.getRes().getString(R.string.default_meal_plan_title));
+        Future<Long> future = SlaDatabase.databaseWriteExecutor.submit(() -> mealPlanDao.insert(mealPlan));
+        Long mpId = future.get();
+
+        //create corresponding inglist
+        IngList ingList = new IngList();
+        ingList.setMealPlanId(mpId);
+        Future<Long> future2 = SlaDatabase.databaseWriteExecutor.submit(() -> ingListDao.insert(ingList));
+        future2.get();
+        return mpId.intValue();
     }
 }

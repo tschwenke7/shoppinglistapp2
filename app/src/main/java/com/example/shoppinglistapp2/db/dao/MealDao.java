@@ -5,10 +5,12 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
 import com.example.shoppinglistapp2.db.tables.Meal;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
+import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
 
 import java.util.List;
 
@@ -33,4 +35,8 @@ public interface MealDao extends BaseDao<Meal> {
 
     @Query("DELETE FROM meals WHERE plan_id = :planId")
     void deleteAllWithPlanId(int planId);
+
+    @Transaction
+    @Query("SELECT * FROM meals WHERE plan_id = :mealPlanId")
+    LiveData<List<MealWithRecipe>> getPopulatedById(int mealPlanId);
 }

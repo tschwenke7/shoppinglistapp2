@@ -21,10 +21,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.shoppinglistapp2.App;
@@ -168,7 +164,7 @@ public class CreateRecipeFragment extends Fragment {
                     hideProgressBar();
                 }
             }
-            //respond to differenct potential errors
+            //respond to different potential errors
             @Override
             public void onFailure(Throwable t) {
                 //the url entered was not valid for some reason

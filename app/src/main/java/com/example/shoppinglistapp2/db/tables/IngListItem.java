@@ -197,7 +197,7 @@ public class IngListItem {
 
     @Ignore
     public boolean isEmpty(){
-        return wholeItemQty == 0 && massQty == 0 && volumeQty == 0 && otherQty == 0;
+        return wholeItemQty <= 0 && massQty <= 0 && volumeQty <= 0 && otherQty <= 0;
     }
 
     @Override
@@ -235,6 +235,14 @@ public class IngListItem {
         }
 
         return str + name;
+    }
+
+    @Ignore
+    public void negateQuantities() {
+        massQty *= -1;
+        volumeQty *= -1;
+        wholeItemQty *= -1;
+        otherQty *= -1;
     }
 
     public static class DiffCallback extends DiffUtil.ItemCallback<IngListItem> {

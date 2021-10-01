@@ -87,7 +87,17 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
 
     @Override
     protected BaseDiffCallback<RecipeWithTagsAndIngredients> createDiffCallback(List<RecipeWithTagsAndIngredients> newList, List<RecipeWithTagsAndIngredients> oldList) {
-        return new RecipeDiffCallback(newList, oldList);
+        return new BaseDiffCallback<RecipeWithTagsAndIngredients>(newList, oldList) {
+            @Override
+            public boolean areItemsTheSame(RecipeWithTagsAndIngredients oldItem, RecipeWithTagsAndIngredients newItem) {
+                return oldItem.getRecipe().getId() == newItem.getRecipe().getId();
+            }
+
+            @Override
+            public boolean areContentsTheSame(RecipeWithTagsAndIngredients oldItem, RecipeWithTagsAndIngredients newItem) {
+                return oldItem.equals(newItem);
+            }
+        };
     }
 
     public List<String> getOtherMatchingTags() {
@@ -137,23 +147,6 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
                 }
             }
             return list;
-        }
-    }
-
-    private static class RecipeDiffCallback extends BaseDiffCallback<RecipeWithTagsAndIngredients> {
-
-        public RecipeDiffCallback(List<RecipeWithTagsAndIngredients> newList, List<RecipeWithTagsAndIngredients> oldList) {
-            super(newList, oldList);
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPos, int newItemPos) {
-            return oldList.get(oldItemPos).getRecipe().getId() == newList.get(newItemPos).getRecipe().getId();
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPos, int newItemPos) {
-            return oldList.get(oldItemPos).equals(newList.get(newItemPos));
         }
     }
 

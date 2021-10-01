@@ -153,9 +153,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Ba
         }
     }
 
-    protected BaseDiffCallback<T> createDiffCallback(List<T> newList, List<T> oldList) {
-        return new BaseDiffCallback<T>(newList, oldList);
-    }
+    protected abstract BaseDiffCallback<T> createDiffCallback(List<T> newList, List<T> oldList);
 
     public abstract class ViewHolder extends RecyclerView.ViewHolder {
 

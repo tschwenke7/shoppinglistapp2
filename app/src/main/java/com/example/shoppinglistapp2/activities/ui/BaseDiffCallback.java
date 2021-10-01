@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import java.util.List;
 
-public class BaseDiffCallback<T> extends DiffUtil.Callback {
+public abstract class BaseDiffCallback<T> extends DiffUtil.Callback {
     protected List<T> newList;
     protected List<T> oldList;
 
@@ -29,13 +29,16 @@ public class BaseDiffCallback<T> extends DiffUtil.Callback {
         return newList.size();
     }
 
+    public abstract boolean areItemsTheSame(T oldItem, T newItem);
+    public abstract boolean areContentsTheSame(T oldItem, T newItem);
+
     @Override
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        return oldList.get(oldItemPosition) == newList.get(newItemPosition);
+        return areItemsTheSame(oldList.get(oldItemPosition), newList.get(newItemPosition));
     }
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
+        return areContentsTheSame(oldList.get(oldItemPosition), newList.get(newItemPosition));
     }
 }
