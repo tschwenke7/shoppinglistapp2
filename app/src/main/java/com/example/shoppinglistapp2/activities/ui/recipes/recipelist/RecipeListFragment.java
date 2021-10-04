@@ -361,21 +361,21 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         if(sharedViewModel.getSelectingForMeal() != null){
             //update db with this recipe in the specified meal plan slot
             Futures.addCallback(backgroundExecutor.submit(() -> sharedViewModel.saveToMealPlan(recipeId)),
-                    new FutureCallback<Object>() {
-                        @Override
-                        public void onSuccess(@Nullable Object result) {
-                            //navigate back to meal plan tab
-                            actionMode.finish();
-                            callback.setViewpagerTo(0);
-                        }
+                new FutureCallback<Object>() {
+                    @Override
+                    public void onSuccess(@Nullable Object result) {
+                        //navigate back to meal plan tab
+                        actionMode.finish();
+                        callback.setViewpagerTo(0);
+                    }
 
-                        @Override
-                        public void onFailure(Throwable t) {
-                            Toast.makeText(requireContext(), R.string.error_adding_recipe_to_meal, Toast.LENGTH_LONG).show();
-                            t.printStackTrace();
-                        }
-                    },
-                    ContextCompat.getMainExecutor(requireContext()));
+                    @Override
+                    public void onFailure(Throwable t) {
+                        Toast.makeText(requireContext(), R.string.error_adding_recipe_to_meal, Toast.LENGTH_LONG).show();
+                        t.printStackTrace();
+                    }
+                },
+                ContextCompat.getMainExecutor(requireContext()));
         }
         //otherwise, the click should send the user to view that recipe
         else{

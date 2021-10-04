@@ -15,7 +15,6 @@ import androidx.annotation.Nullable;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.BaseDiffCallback;
 import com.example.shoppinglistapp2.activities.ui.BaseRecyclerViewAdapter;
-import com.example.shoppinglistapp2.db.tables.IngList;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;
@@ -55,7 +54,7 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
     @NonNull
     @Override
     public BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients>.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_recyclerview_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_recipe, parent, false);
         return new ViewHolder(view, onRecipeClickListener);
     }
 

@@ -181,5 +181,6 @@
     <string name="default_meal_plan_title">New meal plan</string>
     <string name="error_clearing_meals">Error - something went wrong while clearing meals</string>
     <string name="error_removing_recipe_from_meal">Error - something went wrong when removing the recipe from this meal.</string>
+    <string name="error_getting_suggestions">Error while generating recipe suggestions. Try adding or removing recipes from the meal plan.</string>
 
 </resources>

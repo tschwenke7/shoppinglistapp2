@@ -30,28 +30,33 @@ import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListAdapter;
 import com.example.shoppinglistapp2.databinding.FragmentMealPlanBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
+import com.example.shoppinglistapp2.db.tables.withextras.PopulatedRecipeWithScore;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.Executor;
 
 public class MealPlanFragment extends Fragment implements MealPlanListAdapter.MealPlanClickListener, ShoppingListAdapter.SlItemClickListener {
 
     private static final String TAG = "T_DBG_MP_FRAG";
+    private final int NUM_SUGGESTIONS_TO_LOAD = 5;
     private SharedViewModel sharedViewModel;
     private MealPlanViewModel viewModel;
-    int currentMPId;
     private FragmentMealPlanBinding binding;
 
+    private SuggestedRecipesListAdapter suggestionsAdapter;
     private Executor uiExecutor;
     private ListeningExecutorService backgroundExecutor;
 
     private Callback callback;
+
+    private int currentMPId;
+    private int previousIngListSize;
 
     public static MealPlanFragment newInstance() {
         return new MealPlanFragment();
@@ -115,6 +120,11 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                 button -> viewModel.addMeal()
         );
 
+        //suggested recipe list
+        suggestionsAdapter = new SuggestedRecipesListAdapter();
+        binding.suggestedRecipesRecyclerview.setAdapter(suggestionsAdapter);
+        binding.suggestedRecipesRecyclerview.setLayoutManager(new LinearLayoutManager((this.getContext())));
+
         //setup ingredients recyclerview
         final ShoppingListAdapter planIngredientAdapter = new ShoppingListAdapter(this);
         binding.planIngredientsRecyclerview.setAdapter(planIngredientAdapter);
@@ -132,11 +142,20 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                 planIngredientAdapter.submitList(newList);
             }
 
+            //if the list has added/removed ingredients, update the suggested recipes list
+            if(newList.size() != previousIngListSize) {
+                //show spinner
+                binding.recipeSuggestionsLoadingSpinner.setVisibility(View.VISIBLE);
+                binding.suggestedRecipesRecyclerview.setVisibility(View.GONE);
+                binding.noSuggestionsPlaceholder.setVisibility(View.GONE);
+                //update suggested recipes
+                reloadSuggestedRecipes();
+            }
+
+            previousIngListSize = newList.size();
         });
 
-        //suggested recipe list
-        binding.noSuggestionsPlaceholder.setVisibility(View.VISIBLE);
-        binding.suggestedRecipesRecyclerview.setVisibility(View.GONE);
+
 
         /* listen to expand/hide section arrows */
         //'meals' clicked
@@ -156,7 +175,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
         //listen to 'export ingredients to shopping list' icon
         binding.exportIngredientsIcon.setOnClickListener((view) ->
-                new AlertDialog.Builder(getContext())
+                new AlertDialog.Builder(requireContext())
                 .setTitle(R.string.export_ingredients_option)
                 .setMessage(R.string.export_ingredients_warning)
                 .setPositiveButton(R.string.export_ingredients_positive, (dialogInterface, i) -> {
@@ -168,13 +187,50 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                 .show());
     }
 
+    private void reloadSuggestedRecipes() {
+        //hide spinner
+        Futures.addCallback(
+            backgroundExecutor.submit(() -> viewModel.getSearchSuggestions(NUM_SUGGESTIONS_TO_LOAD)),
+            new FutureCallback<List<PopulatedRecipeWithScore>>() {
+                @Override
+                public void onSuccess(@Nullable List<PopulatedRecipeWithScore> result) {
+                    if(result == null || result.isEmpty()) {
+                        //show placeholder text
+                        binding.noSuggestionsPlaceholder.setVisibility(View.VISIBLE);
+                        binding.noSuggestionsPlaceholder.setText(R.string.no_suggestions_placeholder);
+                        binding.suggestedRecipesRecyclerview.setVisibility(View.GONE);
+                    }
+                    else{
+                        //show suggestions
+                        binding.noSuggestionsPlaceholder.setVisibility(View.GONE);
+                        binding.suggestedRecipesRecyclerview.setVisibility(View.VISIBLE);
+                        suggestionsAdapter.submitList(result);
+                    }
+
+                    //hide spinner
+                    binding.recipeSuggestionsLoadingSpinner.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    //hide spinner
+                    binding.recipeSuggestionsLoadingSpinner.setVisibility(View.GONE);
+                    binding.noSuggestionsPlaceholder.setVisibility(View.VISIBLE);
+                    binding.noSuggestionsPlaceholder.setText(R.string.error_getting_suggestions);
+                    Log.e(TAG, "loading suggested recipes: ", t);
+                }
+            },
+            uiExecutor);
+
+    }
+
     private void exportToShoppingList() {
         //add copy of all items to the shopping list
         Futures.addCallback(backgroundExecutor.submit(() -> viewModel.exportToShoppingList()),
             new FutureCallback<Boolean>() {
                 @Override
                 public void onSuccess(@Nullable Boolean result) {
-                    Toast.makeText(getContext(), getContext().getString(R.string.export_ingredients_success),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), requireContext().getString(R.string.export_ingredients_success),Toast.LENGTH_SHORT).show();
                     callback.setViewpagerTo(MainActivity.SHOPPING_LIST_VIEWPAGER_INDEX);
                 }
 
@@ -211,7 +267,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
         switch (item.getItemId()){
             case R.id.remove_all_recipes:
                 //prompt for confirmation first
-                new AlertDialog.Builder(getContext())
+                new AlertDialog.Builder(requireContext())
                         .setTitle(R.string.remove_recipes_option)
                         .setMessage(R.string.remove_recipes_warning)
                         .setPositiveButton(R.string.remove_recipes_positive_button, (dialogInterface, i) -> {
@@ -224,7 +280,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                 break;
             case R.id.clear_meal_plans:
                 //prompt for confirmation first
-                new AlertDialog.Builder(getContext())
+                new AlertDialog.Builder(requireContext())
                         .setTitle(R.string.clear_meal_plans_option)
                         .setMessage(R.string.clear_meal_plans_warning)
                         .setPositiveButton(R.string.clear_meal_plans_positive_button, (dialogInterface, i) -> {
@@ -329,7 +385,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     @Override
     public void onDeleteMealClicked(int position) {
         KeyboardHider.hideKeyboard(requireActivity());
-        new AlertDialog.Builder(getContext())
+        new AlertDialog.Builder(requireContext())
                 .setTitle(R.string.delete_meal_option)
                 .setMessage(R.string.delete_meal_warning)
                 .setPositiveButton(R.string.delete, (dialogInterface, i) -> {
@@ -365,7 +421,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
             new FutureCallback<Object>() {
                 @Override
                 public void onSuccess(@Nullable Object result) {
-
+                    reloadSuggestedRecipes();
                 }
 
                 @Override

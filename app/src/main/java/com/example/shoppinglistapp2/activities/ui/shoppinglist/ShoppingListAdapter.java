@@ -8,15 +8,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class ShoppingListAdapter extends ListAdapter<IngListItem, ShoppingListAdapter.ViewHolder> {
@@ -32,7 +28,7 @@ public class ShoppingListAdapter extends ListAdapter<IngListItem, ShoppingListAd
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.shopping_list_recyclerview_item, parent, false);
+                .inflate(R.layout.recyclerview_shopping_list_item, parent, false);
         return new ShoppingListAdapter.ViewHolder(view, slItemClickListener);
     }
 

@@ -6,25 +6,18 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.BaseDiffCallback;
 import com.example.shoppinglistapp2.activities.ui.BaseRecyclerViewAdapter;
-import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListAdapter;
-import com.example.shoppinglistapp2.databinding.MealPlanRecyclerviewItemBinding;
+import com.example.shoppinglistapp2.databinding.RecyclerviewMealPlanMealBinding;
 import com.example.shoppinglistapp2.db.tables.Meal;
-import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
-import com.example.shoppinglistapp2.helpers.KeyboardHider;
 
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -41,7 +34,7 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
     @Override
     public BaseRecyclerViewAdapter<MealWithRecipe>.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new MealPlanListAdapter.ViewHolder(
-                MealPlanRecyclerviewItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false),
+                RecyclerviewMealPlanMealBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false),
                 mealPlanClickListener
         );
     }
@@ -62,10 +55,10 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
     }
 
     public class ViewHolder extends BaseRecyclerViewAdapter<MealWithRecipe>.ViewHolder {
-        private final MealPlanRecyclerviewItemBinding binding;
+        private final RecyclerviewMealPlanMealBinding binding;
         private final MealPlanClickListener mealPlanClickListener;
 
-        public ViewHolder(@NonNull MealPlanRecyclerviewItemBinding binding, MealPlanClickListener mealPlanClickListener) {
+        public ViewHolder(@NonNull RecyclerviewMealPlanMealBinding binding, MealPlanClickListener mealPlanClickListener) {
             super(binding.getRoot());
             this.binding = binding;
             this.mealPlanClickListener = mealPlanClickListener;

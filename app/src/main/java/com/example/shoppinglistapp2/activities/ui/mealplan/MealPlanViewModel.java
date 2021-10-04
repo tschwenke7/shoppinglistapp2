@@ -15,10 +15,14 @@ import com.example.shoppinglistapp2.db.tables.Meal;
 import com.example.shoppinglistapp2.db.tables.MealPlan;
 import com.example.shoppinglistapp2.db.tables.relations.IngListWithItems;
 import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
+import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
+import com.example.shoppinglistapp2.db.tables.withextras.PopulatedRecipeWithScore;
 import com.example.shoppinglistapp2.helpers.IngListItemUtils;
 import com.example.shoppinglistapp2.helpers.InvalidIngredientStringException;
 import com.example.shoppinglistapp2.helpers.MealPlanUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MealPlanViewModel extends AndroidViewModel {
@@ -38,10 +42,15 @@ public class MealPlanViewModel extends AndroidViewModel {
 
     private int currentMPId;
 
+    private LiveData<List<RecipeWithTagsAndIngredients>> allRecipes;
 
     public MealPlanViewModel(@NonNull Application application){
         super(application);
         slaRepository = new SlaRepository(application);
+        allRecipes = slaRepository.getAllRecipesPopulated();
+        allRecipes.observeForever(recipeWithTagsAndIngredients -> {
+            //do nothing - this is just here to make sure the livedata is kept up to date
+        });
     }
 
     public boolean setMealPlan(int mealPlanId) throws IndexOutOfBoundsException {
@@ -211,9 +220,6 @@ public class MealPlanViewModel extends AndroidViewModel {
         //remove the recipe from this meal
         meal.setRecipeId(null);
         slaRepository.updateMeal(meal);
-
-        //refresh livedata to make sure notes are deleted
-
     }
 
     public boolean exportToShoppingList() {
@@ -241,5 +247,69 @@ public class MealPlanViewModel extends AndroidViewModel {
 
     public void editIngListItem(IngListItem oldItem, String newItemString) throws InvalidIngredientStringException {
         slaRepository.editItem(oldItem, newItemString);
+    }
+
+    public List<PopulatedRecipeWithScore> getSearchSuggestions(int maxNumSuggestions) {
+        List<PopulatedRecipeWithScore> scoredSuggestions = new ArrayList<>();
+        List<IngListItem> ingsToMatch = mealPlanIngredients.getValue();
+
+        //loop through each recipe
+        if(meals.getValue() != null && allRecipes.getValue() != null && ingsToMatch != null){
+            //compile list of recipe ids already in the meal plan so we don't search ones which are already
+            //in use.
+            List<Integer> existingRecipeIds = new ArrayList<>();
+            for (MealWithRecipe mealWithRecipe : meals.getValue()){
+                if(mealWithRecipe.getRecipe() != null) {
+                    existingRecipeIds.add(mealWithRecipe.getRecipe().getId());
+                }
+            }
+
+            for (RecipeWithTagsAndIngredients recipe : allRecipes.getValue()){
+                //ignore recipes which are already in the meal plan
+                if(!existingRecipeIds.contains(recipe.getRecipe().getId())) {
+                    //copy into object with additional "score" property for ranking suggestions
+                    PopulatedRecipeWithScore scoredRecipe = new PopulatedRecipeWithScore(recipe);
+
+                    //loop through each ingredient
+                    for (IngListItem ingredient : scoredRecipe.getIngredients()) {
+                        //set to "checked" (not matched) by default
+                        ingredient.setChecked(true);
+                        for (IngListItem ingToMatch : ingsToMatch) {
+                            if (ingredient.getName().equals(ingToMatch.getName())) {
+                                //mark this ingredient as matched
+                                ingredient.setChecked(false);
+                                //increase this recipe's score
+                                scoredRecipe.incrementScore();
+                                //no need to continue checking for matches if we found one
+                                break;
+                            }
+                        }
+                    }
+                    //ignore recipes which had no matches/zero score
+                    if(scoredRecipe.getScore() > 0) {
+                        scoredSuggestions.add(scoredRecipe);
+                    }
+                }
+                else{
+                    Log.d(TAG, "getSearchSuggestions: ");
+                }
+            }
+
+            //sort the scored results in descending order
+            Collections.sort(scoredSuggestions);
+            Collections.sort(scoredSuggestions);
+
+            //take the top results
+            List<PopulatedRecipeWithScore> finalSuggestions = new ArrayList<>();
+            int i = 0;
+            while (i < maxNumSuggestions && i < scoredSuggestions.size()) {
+                finalSuggestions.add(scoredSuggestions.get(i));
+                i++;
+            }
+
+            return finalSuggestions;
+        }
+
+        return null;
     }
 }

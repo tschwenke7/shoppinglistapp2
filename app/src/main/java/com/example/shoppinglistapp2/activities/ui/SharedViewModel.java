@@ -43,12 +43,16 @@ public class SharedViewModel extends AndroidViewModel {
         return selectingForMeal;
     }
 
-    public ListenableFuture<Integer> saveToMealPlan(int recipeId) {
+    public int saveToMealPlan(int recipeId) {
         //retrieve meal object and update its recipe id
         selectingForMeal.setRecipeId(recipeId);
 
         //get the ingredient list for the meal plan this meal was part of
         int ingListId = slaRepository.getIngListIdForMealPlan(selectingForMeal.getPlanId());
+
+        //update meal plan in db
+        slaRepository.updateMeal(selectingForMeal);
+
 
         //add all items from the selected recipe to the mealPlan's ingList
         List<IngListItem> items = slaRepository.getIngredientsByRecipeIdNonLive(recipeId);
@@ -56,7 +60,6 @@ public class SharedViewModel extends AndroidViewModel {
             slaRepository.insertOrMergeItem(ingListId, item);
         }
 
-        //update meal plan in db
-        return slaRepository.updateMeal(selectingForMeal);
+        return 0;
     }
 }
