@@ -212,8 +212,7 @@ public class CreateRecipeFragment extends Fragment {
 
             //check if we need to redirect to a recipe, and if so, go back to recipe list so we
             //can navigate to the desired recipe
-            if(null != sharedViewModel.getNavigateToRecipeId()){
-                activity.onBackPressed();
+            if(null != sharedViewModel.getNavigateToRecipeId() || null != sharedViewModel.getSelectingForMeal()){
                 activity.onBackPressed();
             }
         }

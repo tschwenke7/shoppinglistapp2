@@ -49,6 +49,11 @@
             android:name="editingFlag"
             app:argType="boolean"
             android:defaultValue="false" />
+        <action
+            android:id="@+id/action_viewRecipeFragment_to_selectMealFragment"
+            app:destination="@id/selectMealFragment"
+            app:enterAnim="@anim/slide_in_up_over"
+            app:popExitAnim="@anim/slide_out_down_over" />
     </fragment>
     <fragment
         android:id="@+id/createRecipe"
@@ -69,6 +74,18 @@
                 android:name="newRecipeFlag"
                 android:defaultValue="true" />
         </action>
+    </fragment>
+    <fragment
+        android:id="@+id/selectMealFragment"
+        android:name="com.example.shoppinglistapp2.activities.ui.recipes.selectmeal.SelectMealFragment"
+        android:label="fragment_select_meal"
+        tools:layout="@layout/fragment_select_meal" >
+        <argument
+            android:name="selectingRecipeId"
+            app:argType="integer" />
+        <argument
+            android:name="mealPlanId"
+            app:argType="integer" />
     </fragment>
 
 </navigation>

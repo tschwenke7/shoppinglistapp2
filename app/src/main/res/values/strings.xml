@@ -90,6 +90,7 @@
     <string name="edit_mode_title">Editing recipe</string>
 
     <string name="ingredients_heading">Ingredients</string>
+    <string name="edit_ingredient_hint">Tap and hold an ingredient below to edit it.</string>
     <string name="notes_heading">Notes</string>
     <string name="url_heading">Website link:</string>
     <string name="prep_time_heading">Prep time (minutes):</string>
@@ -121,6 +122,16 @@
     <string name="error_no_recipe_name_entered">Please enter a name for this recipe</string>
     <string name="error_adding_recipe_to_meal">Something went wrong trying to add the recipe to this meal - please try again later.</string>
     <string name="error_loading_tags">Error - unable to load tags for recipe.</string>
+
+    <!-- Select meal page -->
+    <string name="replace_meal_button_override">Replace it</string>
+    <string name="replace_meal_button_move">Move it to another recipe</string>
+    <string name="replace_meal_prompt_title">Replace existing meal</string>
+    <string name="replace_meal_button_keep">Keep it</string>
+    <string name="replace_meal_prompt_message">The meal \"%1$s\" already has the recipe \"%2$s.\"
+        \nWhat would you like to do with this recipe?</string>
+    <string name="select_meal_hint">Choose a meal to add \"%1$s\" to:</string>
+
 
     <!-- Shopping list page -->
     <string name="new_list_item_button">Add</string>
@@ -173,14 +184,14 @@
     <string name="no_plan_ingredients_placeholder">Ingredients used in recipes you add to this meal plan will show up here.</string>
     <string name="no_suggestions_placeholder">Once you\'ve added some recipes to your plan, other recipes using similar ingredients will be suggested here.\nAdd some recipes to get started!</string>
 
+    <string name="default_meal_title">Monday</string>
+    <string name="default_meal_plan_title">New meal plan</string>
 
     <!-- Multi-location errors -->
     <string name="error_sending_ingredients_to_shopping_list">Something went wrong while trying to add these ingredients to the shopping list. Please try again later and report this bug if it continues.</string>
     <string name="error_could_not_add_items">There item you tried to enter was invalid.\nPlease enter the item\'s quantity and unit of measurement (optional) followed by its name.\ne.g. \"500g butter\", \"6 carrots\", or \"avocado\".\n\nNote: for technical reasons, you can\'t use the \"+\" icon in the ingredient\'s name.</string>
-    <string name="default_meal_title">Monday</string>
-    <string name="default_meal_plan_title">New meal plan</string>
     <string name="error_clearing_meals">Error - something went wrong while clearing meals</string>
     <string name="error_removing_recipe_from_meal">Error - something went wrong when removing the recipe from this meal.</string>
     <string name="error_getting_suggestions">Error while generating recipe suggestions. Try adding or removing recipes from the meal plan.</string>
-
+    <string name="select_meal_title">Select a meal</string>
 </resources>

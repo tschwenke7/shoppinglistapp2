@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,7 +42,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-public class MealPlanFragment extends Fragment implements MealPlanListAdapter.MealPlanClickListener, ShoppingListAdapter.SlItemClickListener {
+public class MealPlanFragment extends Fragment implements MealPlanListAdapter.MealPlanClickListener, SuggestedRecipesListAdapter.ClickListener, ShoppingListAdapter.SlItemClickListener {
 
     private static final String TAG = "T_DBG_MP_FRAG";
     private final int NUM_SUGGESTIONS_TO_LOAD = 5;
@@ -52,6 +53,9 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     private SuggestedRecipesListAdapter suggestionsAdapter;
     private Executor uiExecutor;
     private ListeningExecutorService backgroundExecutor;
+
+    private ActionMode actionMode = null;
+    private ActionModeCallback actionModeCallback = new ActionModeCallback();
 
     private Callback callback;
 
@@ -121,7 +125,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
         );
 
         //suggested recipe list
-        suggestionsAdapter = new SuggestedRecipesListAdapter();
+        suggestionsAdapter = new SuggestedRecipesListAdapter(this);
         binding.suggestedRecipesRecyclerview.setAdapter(suggestionsAdapter);
         binding.suggestedRecipesRecyclerview.setLayoutManager(new LinearLayoutManager((this.getContext())));
 
@@ -185,6 +189,15 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                 //otherwise don't do anything
                 .setNegativeButton(R.string.cancel, null)
                 .show());
+    }
+
+    private void enterChooseMealMode() {
+        //hide ingredients and suggestions sections
+        //modify meal slot views to selection mode
+    }
+
+    private void exitChooseMealMode() {
+
     }
 
     private void reloadSuggestedRecipes() {
@@ -440,6 +453,38 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                 }
             },
             uiExecutor);
+    }
+
+    @Override
+    public void onSuggestionClicked(int recipeId) {
+        //notify the viewmodel we are wanting to find a recipe for the specified mealplan
+        sharedViewModel.setNavigateToRecipeId(recipeId);
+
+        //navigate to recipes tab
+        callback.setViewpagerTo(MainActivity.RECIPE_LIST_VIEWPAGER_INDEX);
+    }
+
+    private class ActionModeCallback implements ActionMode.Callback {
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            actionMode = null;
+        }
     }
 
     /** Navigation between viewpager fragments via activity */

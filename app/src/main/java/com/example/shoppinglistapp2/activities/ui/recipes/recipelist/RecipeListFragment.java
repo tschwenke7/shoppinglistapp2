@@ -493,12 +493,6 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         @Override
         public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
             switch (menuItem.getItemId()){
-                case R.id.action_add_all_to_list:
-
-                    //TODO - add all ingredients from these recipes to the shopping list
-                    actionMode.finish();
-                    return true;
-
                 //Handle clicking of delete button
                 case R.id.action_delete_recipe:
                     //prompt for confirmation first
@@ -538,10 +532,8 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                 case R.id.action_cancel_selection:
                     //end action mode
                     actionMode.finish();
-
-                    //navigate back to meal plan tab
-                    callback.setViewpagerTo(0);
                     return true;
+
                 default:
                     return false;
             }
@@ -550,6 +542,11 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             adapter.clearSelections();
+            //if we were selecting for a meal, navigate back to meal plan tab
+            if (sharedViewModel.getSelectingForMeal() != null) {
+                //navigate back to meal plan tab
+                callback.setViewpagerTo(MainActivity.MEAL_PLAN_VIEWPAGER_INDEX);
+            }
             sharedViewModel.clearSelectingForMeal();
             actionMode = null;
         }

@@ -17,11 +17,14 @@ public class SharedViewModel extends AndroidViewModel {
     private Meal selectingForMeal = null;
     private final SlaRepository slaRepository;
 
+    private Integer recipeIdToAdd = null;
+
     public SharedViewModel(@NonNull Application application) {
         super(application);
         slaRepository = new SlaRepository(application);
     }
 
+    /*Stuff for navigating to a recipe from any point in the app */
     /** Retrieves the value of navigateToRecipeId, or returns null if not set */
     public Integer getNavigateToRecipeId() {
         return  navigateToRecipeId;
@@ -31,6 +34,7 @@ public class SharedViewModel extends AndroidViewModel {
         this.navigateToRecipeId = navigateToRecipeId;
     }
 
+    /* Stuff for handling selecting a recipe from MealPlanFragment's "add recipe" button */
     public void setSelectingForMeal(Meal meal) {
         selectingForMeal = meal;
     }
@@ -62,4 +66,15 @@ public class SharedViewModel extends AndroidViewModel {
 
         return 0;
     }
+
+    /* Stuff for adding a recipe to a meal plan from the view recipe tab, originating at ViewRecipeFragment
+    * and activating actionmode in mealplan tab */
+    public Integer getRecipeIdToAdd() {
+        return recipeIdToAdd;
+    }
+
+    public void setRecipeIdToAdd(Integer recipeIdToAdd) {
+        this.recipeIdToAdd = recipeIdToAdd;
+    }
+
 }

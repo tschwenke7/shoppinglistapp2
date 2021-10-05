@@ -27,6 +27,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -122,6 +123,10 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
                 }
             })
         );
+
+        //setup add-to buttons
+        binding.buttonAddToShoppingList.setOnClickListener((v) -> promptSendIngredientsToShoppingList());
+        binding.buttonAddToMealPlan.setOnClickListener(this::addRecipeToMealPlan);
 
         //setup ingredient list recyclerview
         //set observer to update ingredient list if it changes
@@ -370,9 +375,13 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //show recipe name field
         binding.editTextRecipeName.setVisibility(View.VISIBLE);
 
-        //show new ingredient field and button
+        //hide add-to buttons
+        binding.actionButtonsContainer.setVisibility(View.GONE);
+
+        //show new ingredient field, button and editing hint
         binding.recipeAddIngredientButton.setVisibility(View.VISIBLE);
         binding.editTextIngredient.setVisibility(View.VISIBLE);
+        binding.editIngredientsHint.setVisibility(View.VISIBLE);
 
         //show add tag field and button
         binding.addTagButton.setVisibility(View.VISIBLE);
@@ -421,13 +430,16 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //hide keyboard in case it was open
         KeyboardHider.hideKeyboard(requireActivity());
 
-        View root = requireView();
         //hide recipe name field
         binding.editTextRecipeName.setVisibility(View.GONE);
 
-        //hide new ingredient field and button
+        //show add-to buttons
+        binding.actionButtonsContainer.setVisibility(View.VISIBLE);
+
+        //hide new ingredient field, button and hint
         binding.recipeAddIngredientButton.setVisibility(View.GONE);
         binding.editTextIngredient.setVisibility(View.GONE);
+        binding.editIngredientsHint.setVisibility(View.GONE);
 
         //show add tag field and button
         binding.addTagButton.setVisibility(View.GONE);
@@ -476,7 +488,6 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
      * object in the database with the form values.
      */
     private void saveRecipe(){
-        View root = requireView();
         Recipe recipe = currentRecipe.getValue();
 
         /* Read all fields */
@@ -660,7 +671,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
             //check if we need to redirect to a recipe, and if so, go back to recipe list so we
             //can navigate to the desired recipe
-            if(null != sharedViewModel.getNavigateToRecipeId()){
+            if(null != sharedViewModel.getNavigateToRecipeId() || null != sharedViewModel.getSelectingForMeal()){
                 activity.onBackPressed();
                 activity.onBackPressed();
             }
@@ -706,23 +717,26 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
                 enterEditMode();
                 return true;
 
-            case R.id.action_add_all_to_list:
-                //prompt for confirmation first
-                new AlertDialog.Builder(requireContext())
-                        .setTitle(R.string.add_all_ingredients_dialog_title)
-                        .setMessage(R.string.add_all_ingredients_dialog)
-                        .setPositiveButton(R.string.add_all_ingredients_dialog_positive_button, (dialogInterface, i) -> {
-                            sendIngredientsToShoppingList();
-                        })
-                        //otherwise don't do anything
-                        .setNegativeButton(R.string.add_all_ingredients_dialog_negative_button, null)
-                        .show();
-
-                return true;
+//            case R.id.action_add_all_to_list:
+//                promptSendIngredientsToShoppingList();
+//                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void promptSendIngredientsToShoppingList() {
+        //prompt for confirmation first
+        new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.add_all_ingredients_dialog_title)
+                .setMessage(R.string.add_all_ingredients_dialog)
+                .setPositiveButton(R.string.add_all_ingredients_dialog_positive_button, (dialogInterface, i) -> {
+                    sendIngredientsToShoppingList();
+                })
+                //otherwise don't do anything
+                .setNegativeButton(R.string.add_all_ingredients_dialog_negative_button, null)
+                .show();
     }
 
     private void sendIngredientsToShoppingList(){
@@ -733,6 +747,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
                     @Override
                     public void onSuccess(@Nullable Boolean result) {
                         Toast.makeText(getContext(),R.string.add_all_ingredients_toast,Toast.LENGTH_LONG).show();
+                        callback.setViewpagerTo(MainActivity.SHOPPING_LIST_VIEWPAGER_INDEX);
                     }
 
                     @Override
@@ -743,6 +758,17 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
                 },
                 uiExecutor
         );
+    }
+
+    private void addRecipeToMealPlan(View v) {
+        ViewRecipeFragmentDirections.ActionViewRecipeFragmentToSelectMealFragment action =
+                ViewRecipeFragmentDirections.actionViewRecipeFragmentToSelectMealFragment(recipeId, chooseMealPlanId());
+        Navigation.findNavController(requireView()).navigate(action);
+    }
+
+    private int chooseMealPlanId() {
+        //when we have multiple, make this into a spinner to choose which meal plan to add to
+        return 1;
     }
 
     @Override

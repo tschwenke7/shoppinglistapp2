@@ -19,6 +19,33 @@
         android:animateLayoutChanges="true"
         android:importantForAutofill="no">
 
+        <LinearLayout
+            android:id="@+id/action_buttons_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_add_to_meal_plan"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:icon="@drawable/ic_add_to_meal_plan"
+                app:iconGravity="start"
+                android:text="Add to meal plan"
+                android:layout_marginEnd="2dp"/>
+
+            <Button
+                android:id="@+id/button_add_to_shopping_list"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:icon="@drawable/add_to_list_drawable_ic"
+                app:iconGravity="start"
+                android:text="Add to shopping list"
+                android:layout_marginStart="2dp"/>
+        </LinearLayout>
+
         <EditText
             android:id="@+id/edit_text_recipe_name"
             android:layout_width="match_parent"
@@ -76,6 +103,14 @@
             android:textAlignment="center"
             android:visibility="gone"/>
 
+        <TextView
+            android:id="@+id/edit_ingredients_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_ingredient_hint"
+            style="@style/hintText"
+            android:textAlignment="center"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recipe_ingredients_list"
             android:layout_width="match_parent"
@@ -128,19 +163,13 @@
                 android:ems="10"
                 android:hint="@string/tags_hint"
                 android:inputType="textCapSentences"
-                android:minHeight="48dp"
-                app:layout_constraintEnd_toStartOf="@+id/recipe_add_ingredient_button"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tags_heading" />
+                android:minHeight="48dp" />
 
             <Button
                 android:id="@+id/add_tag_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/add_ingredient_button"
-                app:layout_constraintBottom_toBottomOf="@+id/edit_text_tag"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/edit_text_tag" />
+                android:text="@string/add_ingredient_button"/>
         </LinearLayout>
 
 
@@ -321,56 +350,46 @@
                 tools:rating="3.5" />
         </LinearLayout>
 
-        <FrameLayout
-            android:id="@+id/frame_layout_url"
+        <LinearLayout
+            android:id="@+id/url_editor_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="4dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ratings_layout">
+            android:orientation="horizontal"
+            android:visibility="visible">
 
-            <LinearLayout
-                android:id="@+id/url_editor_container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:visibility="visible">
-
-                <TextView
-                    android:id="@+id/url_heading"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/url_heading"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/edit_text_url"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:autofillHints="uri"
-                    android:ems="10"
-                    android:hint="@string/recipe_url_placeholder"
-                    android:inputType="textUri|text" />
-
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/recipe_url_button"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/url_heading"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
-                android:layout_marginTop="0dp"
-                android:layout_marginEnd="0dp"
-                android:text="@string/view_recipe_website_button"
-                android:textAlignment="center"
+                android:text="@string/url_heading"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:visibility="visible" />
-        </FrameLayout>
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edit_text_url"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:autofillHints="uri"
+                android:ems="10"
+                android:hint="@string/recipe_url_placeholder"
+                android:inputType="textUri|text" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/recipe_url_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:text="@string/view_recipe_website_button"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
 
 
         <TextView

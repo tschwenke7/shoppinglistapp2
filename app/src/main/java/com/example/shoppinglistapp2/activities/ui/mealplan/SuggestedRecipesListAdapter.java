@@ -2,7 +2,6 @@ package com.example.shoppinglistapp2.activities.ui.mealplan;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.text.HtmlCompat;
@@ -20,6 +19,11 @@ import java.util.List;
 
 public class SuggestedRecipesListAdapter extends BaseRecyclerViewAdapter<PopulatedRecipeWithScore> {
     private DecimalFormat ratingFormat = new DecimalFormat("#.#");
+    private final ClickListener clickListener;
+
+    public SuggestedRecipesListAdapter(ClickListener clickListener) {
+        this.clickListener = clickListener;
+    }
 
     @Override
     protected BaseDiffCallback<PopulatedRecipeWithScore> createDiffCallback(List<PopulatedRecipeWithScore> newList, List<PopulatedRecipeWithScore> oldList) {
@@ -40,16 +44,18 @@ public class SuggestedRecipesListAdapter extends BaseRecyclerViewAdapter<Populat
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new SuggestedRecipesListAdapter.ViewHolder(
-            RecyclerviewSuggestedRecipeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false)
-        );
+            RecyclerviewSuggestedRecipeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false),
+                clickListener);
     }
 
     public class ViewHolder extends BaseRecyclerViewAdapter<PopulatedRecipeWithScore>.ViewHolder {
         private final RecyclerviewSuggestedRecipeBinding binding;
+        private final ClickListener clickListener;
 
-        public ViewHolder(RecyclerviewSuggestedRecipeBinding binding) {
+        public ViewHolder(RecyclerviewSuggestedRecipeBinding binding, ClickListener clickListener) {
             super(binding.getRoot());
             this.binding = binding;
+            this.clickListener = clickListener;
         }
 
         @Override
@@ -111,6 +117,12 @@ public class SuggestedRecipesListAdapter extends BaseRecyclerViewAdapter<Populat
             htmlIngString = htmlIngString.replaceAll(",</b>$", "");
 
             binding.recipeIngredients.setText(HtmlCompat.fromHtml(htmlIngString, HtmlCompat.FROM_HTML_MODE_LEGACY));
+
+            binding.getRoot().setOnClickListener((v) -> clickListener.onSuggestionClicked(recipe.getId()));
         }
+    }
+
+    public interface ClickListener {
+        void onSuggestionClicked(int pos);
     }
 }

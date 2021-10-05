@@ -32,8 +32,8 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
 
     @NonNull
     @Override
-    public BaseRecyclerViewAdapter<MealWithRecipe>.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new MealPlanListAdapter.ViewHolder(
+    public BaseRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new ViewHolder(
                 RecyclerviewMealPlanMealBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false),
                 mealPlanClickListener
         );
@@ -227,4 +227,5 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
         void onRemoveRecipeClicked(int position);
         void onDeleteMealClicked(int position);
     }
+
 }
