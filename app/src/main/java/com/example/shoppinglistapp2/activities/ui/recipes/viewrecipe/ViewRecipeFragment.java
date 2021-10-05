@@ -258,13 +258,14 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             binding.editTextServes.setText(lastServesVal);
         }
         else if (newServes != lastServesVal){
+            int oldServes = lastServesVal;
             //prompt user if they want to increase ingredients qtys in proportion
             new AlertDialog.Builder(requireContext())
                 .setTitle(R.string.change_serves_dialog_title)
-                .setMessage(getString(R.string.change_serves_dialog_message, lastServesVal, newServes))
+                .setMessage(getString(R.string.change_serves_dialog_message, oldServes, newServes))
                 .setPositiveButton(R.string.yes, (dialogInterface, i) ->
                     Futures.addCallback(backgroundExecutor.submit(
-                        () -> viewModel.changeAllQtys(lastServesVal, newServes)),
+                        () -> viewModel.changeAllQtys(oldServes, newServes)),
                         new FutureCallback<Object>() {
                             @Override
                             public void onSuccess(@Nullable Object result) {
@@ -448,6 +449,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //swap serves textView to editText
         binding.editTextServes.setVisibility(View.VISIBLE);
         binding.textViewServes.setVisibility(View.GONE);
+        binding.servesHint.setVisibility(View.VISIBLE);
 
         //swap prep and cook time textViews to editTexts
         binding.editTextPrepTime.setVisibility(View.VISIBLE);
@@ -506,6 +508,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //swap serves editText to textview
         binding.editTextServes.setVisibility(View.GONE);
         binding.textViewServes.setVisibility(View.VISIBLE);
+        binding.servesHint.setVisibility(View.GONE);
 
         //swap prep and cook time editTexts to textViews
         binding.editTextPrepTime.setVisibility(View.GONE);

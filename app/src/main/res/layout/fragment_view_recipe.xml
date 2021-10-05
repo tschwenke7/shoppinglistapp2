@@ -211,6 +211,14 @@
                 android:textSize="18sp"
                 tools:text="20" />
         </LinearLayout>
+        <TextView
+            android:id="@+id/serves_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/hintText"
+            android:textAlignment="center"
+            android:text="@string/change_serves_hint"
+            />
 
         <LinearLayout
             android:id="@+id/prep_and_cook_time_container"

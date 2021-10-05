@@ -199,4 +199,5 @@
     <string name="no">No</string>
     <string name="yes">Yes</string>
     <string name="error_serves_cant_be_negative">Number of serves cannot be 0 or negative.</string>
+    <string name="change_serves_hint">Changing serves will ask if you also want to change all ingredients\' quantities to match.</string>
 </resources>
