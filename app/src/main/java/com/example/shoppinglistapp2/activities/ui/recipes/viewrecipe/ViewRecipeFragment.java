@@ -142,10 +142,14 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             if(list == null || list.size() == 0){
                 binding.recipeIngredientsList.setVisibility(View.GONE);
                 binding.textviewNoIngredientsPlaceholder.setVisibility(View.VISIBLE);
+                binding.editIngredientsHint.setVisibility(View.GONE);
             }
             else{
                 binding.recipeIngredientsList.setVisibility(View.VISIBLE);
                 binding.textviewNoIngredientsPlaceholder.setVisibility(View.GONE);
+                if (editingFlag) {
+                    binding.editIngredientsHint.setVisibility(View.VISIBLE);
+                }
                 adapter.submitList(list);
             }
 
@@ -251,16 +255,27 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
                 .setMessage(R.string.error_serves_cant_be_negative)
                 .setPositiveButton(R.string.ok, null)
                 .show();
+            binding.editTextServes.setText(lastServesVal);
         }
-        else {
+        else if (newServes != lastServesVal){
             //prompt user if they want to increase ingredients qtys in proportion
             new AlertDialog.Builder(requireContext())
                 .setTitle(R.string.change_serves_dialog_title)
                 .setMessage(getString(R.string.change_serves_dialog_message, lastServesVal, newServes))
-                .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
-                    backgroundExecutor.submit(() -> viewModel.changeAllQtys(lastServesVal, newServes));
-                    lastServesVal = newServes;
-                })
+                .setPositiveButton(R.string.yes, (dialogInterface, i) ->
+                    Futures.addCallback(backgroundExecutor.submit(
+                        () -> viewModel.changeAllQtys(lastServesVal, newServes)),
+                        new FutureCallback<Object>() {
+                            @Override
+                            public void onSuccess(@Nullable Object result) {
+                                lastServesVal = newServes;
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+
+                            }
+                        },uiExecutor))
                 //otherwise don't do anything
                 .setNegativeButton(R.string.no, null)
                 .show();

@@ -107,6 +107,7 @@ public class CreateRecipeViewModel extends AndroidViewModel {
         //create the recipe
         Recipe newRecipe = new Recipe();
         newRecipe.setName(recipeName);
+        newRecipe.setServes(1);
 
 
 

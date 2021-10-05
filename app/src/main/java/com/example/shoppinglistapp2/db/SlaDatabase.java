@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.room.AutoMigration;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -25,11 +26,15 @@ import com.example.shoppinglistapp2.db.tables.Tag;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Database(entities = {Recipe.class, IngList.class, IngListItem.class, Tag.class, MealPlan.class, Meal.class},
-        version = 15, exportSchema = true)
+        version = 16,
+        exportSchema = true,
+        autoMigrations = {
+                @AutoMigration(from = 15,to = 16)
+        }
+)
 public abstract class SlaDatabase extends RoomDatabase {
     public abstract RecipeDao recipeDao();
     public abstract IngListItemDao ingListItemDao();
@@ -51,7 +56,7 @@ public abstract class SlaDatabase extends RoomDatabase {
                             SlaDatabase.class, "sla_database")
                             .addCallback(sRoomDatabaseCallback)
                             .addMigrations(MIGRATION_10_11, MIGRATION_11_12)
-                            .fallbackToDestructiveMigration()
+//                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

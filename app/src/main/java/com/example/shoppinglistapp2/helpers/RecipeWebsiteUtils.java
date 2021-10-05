@@ -114,6 +114,7 @@ public class RecipeWebsiteUtils {
         RecipeWithTagsAndIngredients populatedRecipe = new RecipeWithTagsAndIngredients();
 
         Recipe recipe = new Recipe();
+        recipe.setServes(1);//default value for serves should be 1
 
         /* get url */
         recipe.setUrl(url);
@@ -327,6 +328,7 @@ public class RecipeWebsiteUtils {
         RecipeWithTagsAndIngredients populatedRecipe = new RecipeWithTagsAndIngredients();
 
         Recipe recipe = new Recipe();
+        recipe.setServes(1);//default value for serves should be 1
 
         /* get url */
         recipe.setUrl(url);

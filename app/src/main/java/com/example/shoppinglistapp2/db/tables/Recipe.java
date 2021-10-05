@@ -31,13 +31,17 @@ public class Recipe {
     @ColumnInfo(name = "cook_time")
     private int cookTime;
 
-    private int serves;
+    @ColumnInfo(defaultValue = "1")
+    private int serves = 1;
 
     private String url;
     private String notes;
 
     private int tom_rating;
     private int tier_rating;
+
+    public Recipe() {
+    }
 
     public int getId() {
         return id;

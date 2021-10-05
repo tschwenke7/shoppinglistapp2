@@ -31,7 +31,7 @@ ext {
     coreTestingVersion = '2.1.0'
     lifecycleVersion = '2.2.0'
     materialVersion = '1.2.1'
-    roomVersion = '2.2.6'
+    roomVersion = '2.4.0-alpha01'
     // testing
     junitVersion = '4.13.1'
     espressoVersion = '3.1.0'
