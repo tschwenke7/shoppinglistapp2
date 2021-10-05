@@ -33,6 +33,7 @@ import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
 import com.example.shoppinglistapp2.databinding.FragmentSelectMealBinding;
+import com.example.shoppinglistapp2.helpers.RecursiveViewClickable;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -190,6 +191,10 @@ public class SelectMealFragment extends Fragment implements MealSelectionAdapter
 
     private void emphasiseThenNav() {
         showSuccessToast();
+        //prevent user from clicking anything while the delay expires
+        //set clickable to false for all elements of recyclerview
+        RecursiveViewClickable.setClickable(binding.selectMealRecyclerview, false);
+
         Handler handler = new Handler();
         //return to ViewRecipe page after 1000 millis
         handler.postDelayed(() -> {
