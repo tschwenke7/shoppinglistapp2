@@ -73,6 +73,8 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     private String pageTitle;
     private ViewPagerNavigationCallback callback;
 
+    private int lastServesVal;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         viewModel =
@@ -210,6 +212,14 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             uiExecutor
         );
 
+        //setup serves editor
+        binding.editTextServes.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                changeServes();
+            }
+        });
+
+
 
         //configure either in edit mode or view only mode
         if(editingFlag){
@@ -229,6 +239,32 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         };
 
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
+    }
+
+    private void changeServes() {
+        int newServes = Integer.parseInt(binding.editTextServes.getText().toString());
+
+        //validate that serves is not 0 or negative
+        if(newServes < 1) {
+            new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.error_title)
+                .setMessage(R.string.error_serves_cant_be_negative)
+                .setPositiveButton(R.string.ok, null)
+                .show();
+        }
+        else {
+            //prompt user if they want to increase ingredients qtys in proportion
+            new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.change_serves_dialog_title)
+                .setMessage(getString(R.string.change_serves_dialog_message, lastServesVal, newServes))
+                .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
+                    backgroundExecutor.submit(() -> viewModel.changeAllQtys(lastServesVal, newServes));
+                    lastServesVal = newServes;
+                })
+                //otherwise don't do anything
+                .setNegativeButton(R.string.no, null)
+                .show();
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -254,6 +290,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         //number of serves
         binding.editTextServes.setText(Integer.toString(recipe.getServes()));
         binding.textViewServes.setText(Integer.toString(recipe.getServes()));
+        lastServesVal = recipe.getServes();
 
         //prep and cook times
         binding.editTextPrepTime.setText(Integer.toString(recipe.getPrepTime()));

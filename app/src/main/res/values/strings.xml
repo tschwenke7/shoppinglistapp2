@@ -194,4 +194,9 @@
     <string name="error_removing_recipe_from_meal">Error - something went wrong when removing the recipe from this meal.</string>
     <string name="error_getting_suggestions">Error while generating recipe suggestions. Try adding or removing recipes from the meal plan.</string>
     <string name="select_meal_title">Select a meal</string>
+    <string name="change_serves_dialog_message">You changed the number of serves from %1$d to %2$d. Do you want to update the quantity of all ingredients to match this?</string>
+    <string name="change_serves_dialog_title">Update ingredient qunatities</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="error_serves_cant_be_negative">Number of serves cannot be 0 or negative.</string>
 </resources>

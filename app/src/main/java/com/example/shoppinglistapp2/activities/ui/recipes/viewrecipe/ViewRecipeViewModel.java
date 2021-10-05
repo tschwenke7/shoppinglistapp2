@@ -182,4 +182,16 @@ public class ViewRecipeViewModel extends AndroidViewModel {
         slaRepository.insertTags(backupTags);
     }
 
+    public void changeAllQtys(int oldVal, int newVal) {
+        List<IngListItem> ingredients =
+                slaRepository.getIngredientsByRecipeIdNonLive(backup.getRecipe().getId());
+        for (IngListItem ing : ingredients) {
+            ing.setMassQty(ing.getMassQty() * newVal / oldVal);
+            ing.setVolumeQty(ing.getVolumeQty() * newVal / oldVal);
+            ing.setWholeItemQty(ing.getWholeItemQty() * newVal / oldVal);
+            ing.setOtherQty(ing.getOtherQty() * newVal / oldVal);
+
+            slaRepository.updateOrDeleteIfEmptyIngListItem(ing);
+        }
+    }
 }

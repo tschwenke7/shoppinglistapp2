@@ -23,10 +23,6 @@ import java.util.List;
 
 
 public class RecipeWebsiteUtils {
-    private static List<String> supportedWebsites = Arrays.asList(
-            "recipetineats.com"
-    );
-
     /**
      * Enum of supported domains for recipe website conversion
      */
@@ -436,10 +432,10 @@ public class RecipeWebsiteUtils {
                 }
             }
         }
-        if (origin.parent() != null && currentElement == null) {
+        if (origin.parent() != null) {
             return selectNthElementAfter(origin.parent(), query, count);
         }
-        return currentElement;
+        return null;
     }
 
 
