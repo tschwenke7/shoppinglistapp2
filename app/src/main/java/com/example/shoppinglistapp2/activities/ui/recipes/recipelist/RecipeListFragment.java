@@ -366,7 +366,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                     public void onSuccess(@Nullable Object result) {
                         //navigate back to meal plan tab
                         actionMode.finish();
-                        callback.setViewpagerTo(0);
+                        callback.setViewpagerTo(MainActivity.MEAL_PLAN_VIEWPAGER_INDEX);
                     }
 
                     @Override
