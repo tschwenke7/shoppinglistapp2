@@ -5,13 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_marginBottom="8dp">
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/background_select_meal"
+    android:padding="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:layout_marginBottom="4dp">
+        android:minHeight="32dp"
+        >
 
         <EditText
             android:id="@+id/day_title"
@@ -22,7 +25,9 @@
             android:textColor="@color/day_title_edittext_font_color"
             android:textSize="20sp"
             android:textStyle="bold"
-            tools:text="Monday" />
+            tools:text="Monday"
+            android:layout_gravity="center_vertical"
+            />
 
         <ImageView
             android:id="@+id/plus_icon"
@@ -30,75 +35,83 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             app:srcCompat="@drawable/add_icon_black_24dp"
-            app:tint="@color/colorPrimary"/>
+            app:tint="@color/colorPrimary"
+            tools:visibility="gone" />
 
         <TextView
             android:id="@+id/choose_recipe_button"
-            android:textSize="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"
-            android:padding="4dp"
-            android:paddingEnd="6dp"
-            android:paddingStart="6dp"
-            android:paddingBottom="4dp"
-            android:paddingTop="4dp"
+            android:layout_marginEnd="4dp"
             android:background="@drawable/button_choose_recipe_2"
+            android:padding="4dp"
+            android:paddingStart="6dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="6dp"
+            android:paddingBottom="4dp"
+            android:text="@string/choose_plan_recipe_button"
             android:textColor="@color/primary_text_selected"
-            android:text="@string/choose_plan_recipe_button" />
+            android:textSize="16dp"
+            tools:visibility="gone" />
+
         <TextView
             android:id="@+id/add_plan_notes_button"
-            android:textSize="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginEnd="4dp"
-            android:padding="4dp"
-            android:paddingEnd="6dp"
-            android:paddingStart="6dp"
-            android:paddingBottom="4dp"
-            android:paddingTop="4dp"
             android:background="@drawable/button_choose_recipe_2"
+            android:padding="4dp"
+            android:paddingStart="6dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="6dp"
+            android:paddingBottom="4dp"
+            android:text="@string/add_plan_notes_button"
             android:textColor="@color/primary_text_selected"
-            android:text="@string/add_plan_notes_button" />
+            android:textSize="16dp"
+            tools:visibility="gone" />
 
         <ImageView
             android:id="@+id/edit_day_title_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:srcCompat="@drawable/ic_tick"
+            android:layout_marginEnd="8dp"
             android:visibility="gone"
-            android:layout_marginEnd="8dp"/>
+            app:srcCompat="@drawable/ic_tick"
+            tools:visibility="visible" />
 
         <ImageView
             android:id="@+id/delete_meal_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
             android:layout_gravity="center_vertical"
-            android:layout_marginEnd="8dp"
-            app:srcCompat="@drawable/ic_baseline_delete_24" />
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_baseline_delete_24"
+            tools:visibility="visible" />
     </LinearLayout>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/recipe_cardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/recipe_item_background"
+        android:layout_marginBottom="4dp"
+        app:cardBackgroundColor="@color/recipe_item_background_light"
         app:cardCornerRadius="4dp"
-        app:cardElevation="2dp"
-        android:layout_marginBottom="4dp">
+        app:cardElevation="10dp"
+        android:layout_marginTop="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="8dp"
             android:orientation="horizontal">
 
             <LinearLayout
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="9"
@@ -176,10 +189,10 @@
             <ImageView
                 android:id="@+id/delete_icon"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/ic_baseline_delete_24" />
+                app:srcCompat="@drawable/ic_baseline_delete_24"
+                android:paddingEnd="8dp"/>
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
@@ -187,7 +200,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        >
 
         <EditText
             android:id="@+id/meal_plan_notes"
@@ -195,10 +209,12 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:background="@null"
-            android:gravity="start|top"
+            android:gravity="start|center_vertical"
             android:hint="@string/plan_notes_hint"
             android:layout_weight="1"
-            android:inputType="textMultiLine|textAutoCorrect|textCapSentences"/>
+            android:minHeight="32dp"
+            android:inputType="textMultiLine|textAutoCorrect|textCapSentences"
+            android:layout_marginTop="8dp"/>
 
         <ImageView
             android:id="@+id/edit_notes_confirm"
@@ -219,12 +235,4 @@
             tools:visibility="visible"
             app:srcCompat="@drawable/ic_baseline_delete_24" />
     </LinearLayout>
-
-    <View
-        android:id="@+id/divider5"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider"
-        android:layout_marginTop="8dp"/>
-
 </LinearLayout>

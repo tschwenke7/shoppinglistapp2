@@ -72,7 +72,6 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
             View addNotesButton = binding.addPlanNotesButton;
             View chooseRecipeButton = binding.chooseRecipeButton;
             View plusIcon = binding.plusIcon;
-            CardView cardView = binding.recipeCardview;
             EditText notesView = binding.mealPlanNotes;
 
             /* set day name */
@@ -105,7 +104,7 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
                 binding.deleteMealIcon.setVisibility(View.GONE);
 
                 //restore applicable buttons in title row
-                if(cardView.getVisibility() == View.GONE){
+                if(binding.recipeCardview.getVisibility() == View.GONE){
                     chooseRecipeButton.setVisibility(View.VISIBLE);
                 }
                 if(notesView.getVisibility() == View.GONE){
@@ -125,7 +124,7 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
             /* set recipe details if provided - otherwise hide recipe cardview */
             if (null != recipe){
                 chooseRecipeButton.setVisibility(View.GONE);
-                cardView.setVisibility(View.VISIBLE);
+                binding.recipeCardview.setVisibility(View.VISIBLE);
 
                 //recipe name
                 binding.recipeTitle.setText(recipe.getName());
@@ -147,12 +146,12 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
                 }
             }
             else{
-                cardView.setVisibility(View.GONE);
+                binding.recipeCardview.setVisibility(View.GONE);
                 chooseRecipeButton.setVisibility(View.VISIBLE);
             }
 
             // set click listener for recipe
-            cardView.setOnClickListener(v -> mealPlanClickListener.onRecipeClicked(getAdapterPosition()));
+            binding.recipeCardview.setOnClickListener(v -> mealPlanClickListener.onRecipeClicked(getAdapterPosition()));
             // set click listener for choose recipe button
             chooseRecipeButton
                     .setOnClickListener(v -> mealPlanClickListener.onChooseRecipeClicked(getAdapterPosition()));
