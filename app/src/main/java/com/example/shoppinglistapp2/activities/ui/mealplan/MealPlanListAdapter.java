@@ -133,10 +133,10 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
                 String timeUnit = itemView.getContext().getString(R.string.abbreviated_time_unit);
 
                 if(0 != recipe.getPrepTime()){
-                    binding.editTextPrepTime.setText(String.format("%d %s",recipe.getPrepTime(), timeUnit));
+                    binding.prepTime.setText(String.format("%d %s",recipe.getPrepTime(), timeUnit));
                 }
                 else{
-                    binding.editTextPrepTime.setText("-");
+                    binding.prepTime.setText("-");
                 }
                 if(0 != recipe.getCookTime()){
                     binding.cookTime.setText(String.format("%d %s",recipe.getCookTime(),timeUnit));

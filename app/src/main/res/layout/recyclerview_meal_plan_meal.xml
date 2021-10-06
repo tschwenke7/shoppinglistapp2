@@ -1,230 +1,273 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:layout_marginBottom="8dp"
-    android:background="@drawable/background_select_meal"
+    android:orientation="vertical"
     android:padding="8dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:minHeight="32dp"
-        >
+    <EditText
+        android:id="@+id/day_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="8dp"
+        android:layout_weight="1"
+        android:background="@null"
+        android:textColor="@color/day_title_edittext_font_color"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/plus_icon"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/delete_meal_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginEnd="4dp"
+        tools:text="Monday" />
 
-        <EditText
-            android:id="@+id/day_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@null"
-            android:textColor="@color/day_title_edittext_font_color"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            tools:text="Monday"
-            android:layout_gravity="center_vertical"
-            />
+    <ImageView
+        android:id="@+id/plus_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="@id/day_title"
+        app:layout_constraintEnd_toStartOf="@+id/choose_recipe_button"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/day_title"
+        app:layout_constraintTop_toTopOf="@id/day_title"
+        app:srcCompat="@drawable/add_icon_black_24dp"
+        app:tint="@color/colorPrimary"
+        tools:visibility="gone" />
 
-        <ImageView
-            android:id="@+id/plus_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            app:srcCompat="@drawable/add_icon_black_24dp"
-            app:tint="@color/colorPrimary"
-            tools:visibility="gone" />
+    <TextView
+        android:id="@+id/choose_recipe_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/button_choose_recipe_2"
+        android:padding="4dp"
+        android:paddingStart="6dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="6dp"
+        android:paddingBottom="4dp"
+        android:text="@string/choose_plan_recipe_button"
+        android:textColor="@color/primary_text_selected"
+        android:textSize="16dp"
 
-        <TextView
-            android:id="@+id/choose_recipe_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/button_choose_recipe_2"
-            android:padding="4dp"
-            android:paddingStart="6dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="6dp"
-            android:paddingBottom="4dp"
-            android:text="@string/choose_plan_recipe_button"
-            android:textColor="@color/primary_text_selected"
-            android:textSize="16dp"
-            tools:visibility="gone" />
+        app:layout_constraintBottom_toBottomOf="@id/day_title"
+        app:layout_constraintEnd_toStartOf="@+id/add_plan_notes_button"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/plus_icon"
+        app:layout_constraintTop_toTopOf="@id/day_title"
+        tools:visibility="gone" />
 
-        <TextView
-            android:id="@+id/add_plan_notes_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/button_choose_recipe_2"
-            android:padding="4dp"
-            android:paddingStart="6dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="6dp"
-            android:paddingBottom="4dp"
-            android:text="@string/add_plan_notes_button"
-            android:textColor="@color/primary_text_selected"
-            android:textSize="16dp"
-            tools:visibility="gone" />
+    <TextView
+        android:id="@+id/add_plan_notes_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/button_choose_recipe_2"
+        android:padding="4dp"
+        android:paddingStart="6dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="6dp"
+        android:paddingBottom="4dp"
+        android:text="@string/add_plan_notes_button"
+        android:textColor="@color/primary_text_selected"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toBottomOf="@id/day_title"
+        app:layout_constraintEnd_toStartOf="@+id/edit_day_title_confirm"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/choose_recipe_button"
+        app:layout_constraintTop_toTopOf="@id/day_title"
+        tools:visibility="gone" />
 
-        <ImageView
-            android:id="@+id/edit_day_title_confirm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginEnd="8dp"
-            android:visibility="gone"
-            app:srcCompat="@drawable/ic_tick"
-            tools:visibility="visible" />
+    <ImageView
+        android:id="@+id/edit_day_title_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/day_title"
+        app:layout_constraintEnd_toStartOf="@+id/delete_meal_icon"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/add_plan_notes_button"
+        app:layout_constraintTop_toTopOf="@id/day_title"
+        app:srcCompat="@drawable/ic_tick"
+        tools:visibility="visible" />
 
-        <ImageView
-            android:id="@+id/delete_meal_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:visibility="gone"
-            app:srcCompat="@drawable/ic_baseline_delete_24"
-            tools:visibility="visible" />
-    </LinearLayout>
+    <ImageView
+        android:id="@+id/delete_meal_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/day_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/edit_day_title_confirm"
+        app:layout_constraintTop_toTopOf="@id/day_title"
+        app:srcCompat="@drawable/ic_baseline_delete_24"
+        tools:visibility="visible" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/recipe_cardview"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        app:cardBackgroundColor="@color/recipe_item_background_light"
-        app:cardCornerRadius="4dp"
-        app:cardElevation="10dp"
+        android:background="@drawable/background_select_meal"
+        android:minHeight="32dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/day_title"
         android:layout_marginTop="8dp">
 
-        <LinearLayout
+        <androidx.cardview.widget.CardView
+            android:id="@+id/recipe_cardview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:layout_goneMarginBottom="0dp"
+            app:cardBackgroundColor="@color/recipe_item_background_light"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/meal_plan_notes"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible">
 
-            <LinearLayout
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:layout_marginStart="8dp"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="9"
-                android:orientation="vertical">
+                android:layout_height="match_parent">
 
                 <TextView
                     android:id="@+id/recipe_title"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:gravity="center_vertical"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
                     android:textColor="@color/recipe_item_text_primary"
                     android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@id/delete_icon"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:layout_editor_absoluteX="8dp"
+                    tools:layout_editor_absoluteY="8dp"
                     tools:text="Curried Sausages" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                <ImageView
+                    android:id="@+id/delete_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_gravity="center_vertical"
+                    android:paddingEnd="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_baseline_delete_24" />
 
-                    <ImageView
-                        android:id="@+id/clock_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_baseline_access_time_24"
-                        app:tint="@color/recipe_item_text_secondary" />
-
-                    <TextView
-                        android:id="@+id/prep_time_heading"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="4dp"
-                        android:text="@string/prep_time_heading_short"
-                        android:textColor="@color/recipe_item_text_secondary"
-                        app:layout_constraintBottom_toBottomOf="@+id/clock_icon"
-                        app:layout_constraintStart_toEndOf="@+id/clock_icon"
-                        app:layout_constraintTop_toTopOf="@+id/clock_icon" />
-
-                    <TextView
-                        android:id="@+id/edit_text_prep_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="2dp"
-                        android:textColor="@color/recipe_item_text_secondary"
-                        tools:text="15 mins" />
-
-                    <TextView
-                        android:id="@+id/cook_time_heading"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="6dp"
-                        android:text="@string/cook_time_heading_short"
-                        android:textColor="@color/recipe_item_text_secondary" />
-
-                    <TextView
-                        android:id="@+id/cook_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="2dp"
-                        android:textColor="@color/recipe_item_text_secondary"
-                        tools:text="180 mins" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/recipe_ingredients"
+                <ImageView
+                    android:id="@+id/clock_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/recipe_title"
+                    app:layout_constraintTop_toBottomOf="@id/recipe_title"
+                    app:srcCompat="@drawable/ic_baseline_access_time_24"
+                    app:tint="@color/recipe_item_text_secondary" />
+
+                <TextView
+                    android:id="@+id/prep_time_heading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/prep_time_heading_short"
                     android:textColor="@color/recipe_item_text_secondary"
-                    android:visibility="gone"
-                    tools:text="curry powder, sausages, beef stock, cheese, onions, broccoli, cabbage, sardines" />
-            </LinearLayout>
+                    app:layout_constraintBottom_toBottomOf="@+id/clock_icon"
+                    app:layout_constraintStart_toEndOf="@+id/clock_icon"
+                    app:layout_constraintTop_toTopOf="@+id/clock_icon" />
 
-            <ImageView
-                android:id="@+id/delete_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                app:srcCompat="@drawable/ic_baseline_delete_24"
-                android:paddingEnd="8dp"/>
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/prep_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="2dp"
+                    android:textColor="@color/recipe_item_text_secondary"
+                    app:layout_constraintBottom_toBottomOf="@id/clock_icon"
+                    app:layout_constraintStart_toEndOf="@id/prep_time_heading"
+                    app:layout_constraintTop_toTopOf="@id/clock_icon"
+                    tools:text="15 mins" />
 
-    </androidx.cardview.widget.CardView>
+                <TextView
+                    android:id="@+id/cook_time_heading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/cook_time_heading_short"
+                    android:textColor="@color/recipe_item_text_secondary"
+                    app:layout_constraintBottom_toBottomOf="@id/clock_icon"
+                    app:layout_constraintStart_toEndOf="@id/prep_time"
+                    app:layout_constraintTop_toTopOf="@id/clock_icon" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        >
+                <TextView
+                    android:id="@+id/cook_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="2dp"
+                    android:textColor="@color/recipe_item_text_secondary"
+                    app:layout_constraintBottom_toBottomOf="@id/clock_icon"
+                    app:layout_constraintStart_toEndOf="@id/cook_time_heading"
+                    app:layout_constraintTop_toTopOf="@id/clock_icon"
+                    tools:text="180 mins" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
 
         <EditText
             android:id="@+id/meal_plan_notes"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:layout_weight="1"
             android:background="@null"
             android:gravity="start|center_vertical"
             android:hint="@string/plan_notes_hint"
-            android:layout_weight="1"
-            android:minHeight="32dp"
             android:inputType="textMultiLine|textAutoCorrect|textCapSentences"
-            android:layout_marginTop="8dp"/>
+            android:minHeight="48dp"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/edit_notes_confirm"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/recipe_cardview"
+            tools:text="Testing 123jhbhjk hjbk jhbk  jhbkn jbk hjbk hjbk bhjk bhjk hjb bhj"
+            tools:visibility="visible" />
 
         <ImageView
             android:id="@+id/edit_notes_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="gone"
-            tools:visibility="visible"
             android:layout_marginEnd="6dp"
-            app:srcCompat="@drawable/ic_tick" />
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/meal_plan_notes"
+            app:layout_constraintEnd_toStartOf="@id/delete_notes"
+            app:layout_constraintTop_toTopOf="@id/meal_plan_notes"
+            app:srcCompat="@drawable/ic_tick"
+            tools:visibility="gone" />
 
         <ImageView
             android:id="@+id/delete_notes"
@@ -232,7 +275,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:visibility="gone"
-            tools:visibility="visible"
-            app:srcCompat="@drawable/ic_baseline_delete_24" />
-    </LinearLayout>
-</LinearLayout>
+            app:layout_constraintBottom_toBottomOf="@id/meal_plan_notes"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/meal_plan_notes"
+            app:srcCompat="@drawable/ic_baseline_delete_24"
+            tools:visibility="gone" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

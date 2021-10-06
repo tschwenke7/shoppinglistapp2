@@ -10,7 +10,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.ActionMode;
@@ -39,6 +41,7 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -51,6 +54,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     private FragmentMealPlanBinding binding;
 
     private SuggestedRecipesListAdapter suggestionsAdapter;
+    private MealPlanListAdapter mealsAdapter;
     private Executor uiExecutor;
     private ListeningExecutorService backgroundExecutor;
 
@@ -98,9 +102,12 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
         this.setHasOptionsMenu(true);
 
         //setup meal plan recyclerview
-        final MealPlanListAdapter mealPlanListAdapter = new MealPlanListAdapter(this);
-        binding.planRecipesRecyclerview.setAdapter(mealPlanListAdapter);
+        mealsAdapter = new MealPlanListAdapter(this);
+        binding.planRecipesRecyclerview.setAdapter(mealsAdapter);
         binding.planRecipesRecyclerview.setLayoutManager(new LinearLayoutManager((this.getContext())));
+        //allow drag and drop reordering of elements
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(binding.planRecipesRecyclerview);
 
         //listen to meal plan list
         viewModel.getMeals().observe(getViewLifecycleOwner(), (newList) -> {
@@ -111,7 +118,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
             }
             else {
                 binding.noMealsPlaceholder.setVisibility(View.GONE);
-                mealPlanListAdapter.submitList(newList, () -> {
+                mealsAdapter.submitList(newList, () -> {
                     //swap loading spinner for recyclerview once loaded
                     binding.planRecipesRecyclerview.setVisibility(View.VISIBLE);
                     binding.mealsLoadingSpinner.setVisibility(View.GONE);
@@ -491,4 +498,23 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     public interface Callback {
         void setViewpagerTo(int page);
     }
+
+    private ItemTouchHelper.SimpleCallback itemTouchCallback = new ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP | ItemTouchHelper.DOWN |
+                    ItemTouchHelper.START | ItemTouchHelper.END, 0
+    ) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            int fromPos = viewHolder.getAdapterPosition();
+            int toPos = target.getAdapterPosition();
+            Collections.swap(mealsAdapter.getCurrentList(), fromPos, toPos);
+            mealsAdapter.notifyItemMoved(fromPos,toPos);
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+        }
+    };
 }
