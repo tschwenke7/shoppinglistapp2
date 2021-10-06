@@ -9,6 +9,7 @@
         <entry key="..\:/Users/tschw/AndroidStudioProjects/ShoppingListApp2/app/src/main/res/drawable/background_select_meal.xml" value="0.38333333333333336" />
         <entry key="..\:/Users/tschw/AndroidStudioProjects/ShoppingListApp2/app/src/main/res/drawable/ic_add_to_meal_plan.xml" value="0.38333333333333336" />
         <entry key="..\:/Users/tschw/AndroidStudioProjects/ShoppingListApp2/app/src/main/res/drawable/searchview_backgroud.xml" value="0.38333333333333336" />
+        <entry key="..\:/Users/tschw/AndroidStudioProjects/ShoppingListApp2/app/src/main/res/layout/activity_main.xml" value="0.20572916666666666" />
         <entry key="..\:/Users/tschw/AndroidStudioProjects/ShoppingListApp2/app/src/main/res/layout/custom_alert_title.xml" value="0.1796875" />
         <entry key="..\:/Users/tschw/AndroidStudioProjects/ShoppingListApp2/app/src/main/res/layout/fragment_create_recipe.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/tschw/AndroidStudioProjects/ShoppingListApp2/app/src/main/res/layout/fragment_meal_plan.xml" value="0.1796875" />
@@ -17,6 +18,7 @@
         <entry key="..\:/Users/tschw/AndroidStudioProjects/ShoppingListApp2/app/src/main/res/layout/fragment_shopping_list.xml" value="0.22" />
         <entry key="..\:/Users/tschw/AndroidStudioProjects/ShoppingListApp2/app/src/main/res/layout/fragment_view_recipe.xml" value="0.28492239467849223" />
         <entry key="..\:/Users/tschw/AndroidStudioProjects/ShoppingListApp2/app/src/main/res/layout/meal_plan_suggestion_recyclerview_item.xml" value="0.1796875" />
+        <entry key="..\:/Users/tschw/AndroidStudioProjects/ShoppingListApp2/app/src/main/res/layout/meal_slot_content.xml" value="0.3671875" />
         <entry key="..\:/Users/tschw/AndroidStudioProjects/ShoppingListApp2/app/src/main/res/layout/recipe_recyclerview_item.xml" value="0.1796875" />
         <entry key="..\:/Users/tschw/AndroidStudioProjects/ShoppingListApp2/app/src/main/res/layout/recyclerview_item_suggested_recipe.xml" value="0.1796875" />
         <entry key="..\:/Users/tschw/AndroidStudioProjects/ShoppingListApp2/app/src/main/res/layout/recyclerview_meal_pla_meal_select_mode.xml" value="0.3333333333333333" />
