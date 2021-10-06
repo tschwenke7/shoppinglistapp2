@@ -173,7 +173,7 @@
     <string name="delete_meal_option">Delete meal</string>
 
     <string name="add_ingredients_to_list_option">Add all ingredients to shopping list</string>
-    <string name="remove_recipes_option">Clear all meal slots</string>
+    <string name="remove_recipes_option">Clear all recipes and notes</string>
     <string name="remove_recipes_warning">Are you sure? All recipes, notes and ingredients will be removed from your plan, but the meal slots will be kept.</string>
     <string name="remove_recipes_positive_button">Clear</string>
     <string name="clear_meal_plans_option">Reset entire meal plan</string>
