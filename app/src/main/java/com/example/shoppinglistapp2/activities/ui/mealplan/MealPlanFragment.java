@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.ActionMode;
-import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,18 +34,15 @@ import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListAdapter;
 import com.example.shoppinglistapp2.databinding.FragmentMealPlanBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
-import com.example.shoppinglistapp2.db.tables.Meal;
 import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
 import com.example.shoppinglistapp2.db.tables.withextras.PopulatedRecipeWithScore;
-import com.example.shoppinglistapp2.helpers.KeyboardHider;
+import com.example.shoppinglistapp2.helpers.KeyboardHelper;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -154,9 +150,10 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                 binding.planIngredientsRecyclerview.setVisibility(View.GONE);
             }
             else{
-                binding.noPlanIngredientsPlaceholder.setVisibility(View.GONE);
-                binding.planIngredientsRecyclerview.setVisibility(View.VISIBLE);
-                planIngredientAdapter.submitList(newList);
+                planIngredientAdapter.submitList(newList, () -> {
+                    binding.noPlanIngredientsPlaceholder.setVisibility(View.GONE);
+                    binding.planIngredientsRecyclerview.setVisibility(View.VISIBLE);
+                });
             }
 
             //if the list has added/removed ingredients, update the suggested recipes list
@@ -344,7 +341,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     @Override
     public void onTitleConfirmClicked(int position, String newTitle) {
-        KeyboardHider.hideKeyboard(requireActivity());
+        KeyboardHelper.hideKeyboard(requireActivity());
 
         //update title in database
         viewModel.updateDayTitle(position, newTitle);
@@ -352,7 +349,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     @Override
     public void onNotesConfirmClicked(int position, String newNotes) {
-        KeyboardHider.hideKeyboard(requireActivity());
+        KeyboardHelper.hideKeyboard(requireActivity());
 
         //update notes in database
         viewModel.updateNotes(position, newNotes);
@@ -360,7 +357,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     @Override
     public void onDeleteNotesClicked(int position) {
-        KeyboardHider.hideKeyboard(requireActivity());
+        KeyboardHelper.hideKeyboard(requireActivity());
 
         //set notes to be empty
         viewModel.updateNotes(position, "");
@@ -401,7 +398,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     @Override
     public void onDeleteMealClicked(int position) {
-        KeyboardHider.hideKeyboard(requireActivity());
+        KeyboardHelper.hideKeyboard(requireActivity());
         new AlertDialog.Builder(requireContext())
                 .setTitle(R.string.delete_meal_option)
                 .setMessage(R.string.delete_meal_warning)

@@ -7,21 +7,22 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     >
+
     <ImageView
         android:id="@+id/handle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_baseline_drag_indicator_24"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:padding="4dp"
         android:layout_gravity="center"
-        />
+        android:contentDescription="@string/content_description_drag_handle"
+        android:padding="4dp"
+        android:src="@drawable/ic_baseline_drag_indicator_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/content"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/background_select_meal"
         android:minHeight="32dp"
@@ -43,7 +44,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_goneMarginBottom="0dp"
-            tools:visibility="gone">
+            tools:visibility="visible">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -66,12 +67,14 @@
                     tools:layout_editor_absoluteY="8dp"
                     tools:text="Curried Sausages" />
 
-                <ImageView
+                <ImageButton
                     android:id="@+id/delete_icon"
                     android:layout_width="wrap_content"
-                    android:layout_height="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:paddingEnd="8dp"
+                    android:backgroundTint="@color/recipe_item_button_background_light"
+                    android:contentDescription="@string/content_description_delete_recipe_from_meal"
+                    android:minHeight="48dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -151,45 +154,59 @@
             android:minHeight="48dp"
             android:textSize="16sp"
             android:visibility="gone"
-            app:layout_constraintEnd_toStartOf="@id/edit_notes_confirm"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintEnd_toStartOf="@id/edit_notes_button"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/recipe_cardview"
-            tools:text="Testing 123jhbhjk hjbk jhbk  jhbkn jbk hjbk hjbk bhjk bhjk hjb bhj"
-            tools:visibility="gone" />
+            tools:text="Testing 123jhbhjk hj fegbefg jnegrc dfgvfgv greftv gdfvb grtvd dgv dfgv dfgv "
+            tools:visibility="gone"
+            android:importantForAutofill="no" />
 
-        <ImageView
+        <ImageButton
+            android:id="@+id/edit_notes_button"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            app:layout_constraintBottom_toBottomOf="@id/meal_plan_notes"
+            app:layout_constraintEnd_toStartOf="@id/edit_notes_confirm"
+            app:layout_constraintTop_toTopOf="@id/meal_plan_notes"
+            app:srcCompat="@drawable/ic_edit"
+            tools:visibility="gone"
+            android:contentDescription="@string/content_description_edit_notes"/>
+
+        <ImageButton
             android:id="@+id/edit_notes_confirm"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_gravity="center"
-            android:layout_marginEnd="6dp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/meal_plan_notes"
             app:layout_constraintEnd_toStartOf="@id/delete_notes"
             app:layout_constraintTop_toTopOf="@id/meal_plan_notes"
             app:srcCompat="@drawable/ic_tick"
-            tools:visibility="gone" />
+            tools:visibility="visible"
+            android:contentDescription="@string/content_description_save_notes"/>
 
-        <ImageView
+        <ImageButton
             android:id="@+id/delete_notes"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_gravity="center_vertical"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/meal_plan_notes"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/meal_plan_notes"
             app:srcCompat="@drawable/ic_baseline_delete_24"
-            tools:visibility="gone" />
+            tools:visibility="visible"
+            android:contentDescription="@string/content_description_delete_notes"/>
 
         <TextView
             android:id="@+id/add_recipe_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
             android:background="@drawable/button_choose_recipe_2"
-            android:drawableStart="@drawable/add_icon_white_24"
+            android:gravity="center"
             android:minHeight="32dp"
             android:text="@string/choose_plan_recipe_button"
             android:textAlignment="center"
@@ -199,18 +216,19 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/meal_plan_notes"
-            android:layout_marginEnd="4dp"
             app:layout_goneMarginEnd="0dp"
-            tools:visibility="visible"
-            android:gravity="center"/>
+            app:layout_goneMarginTop="0dp"
+            tools:visibility="gone"
+            app:drawableStartCompat="@drawable/add_icon_white_24" />
 
         <TextView
             android:id="@+id/add_notes_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="4dp"
             android:background="@drawable/button_choose_recipe_2"
-            android:drawableStart="@drawable/add_icon_white_24"
+            android:gravity="center"
             android:minHeight="32dp"
             android:text="@string/add_plan_notes_button"
             android:textAlignment="center"
@@ -219,11 +237,11 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/add_recipe_button"
-            app:layout_constraintTop_toBottomOf="@id/meal_plan_notes"
+            app:layout_constraintTop_toBottomOf="@id/recipe_cardview"
+            app:layout_goneMarginStart="0dp"
+            app:layout_goneMarginTop="0dp"
             tools:visibility="visible"
-            android:gravity="center"
-            android:layout_marginStart="4dp"
-            app:layout_goneMarginStart="0dp"/>
+            app:drawableStartCompat="@drawable/add_icon_white_24" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>
 

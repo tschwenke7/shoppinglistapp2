@@ -202,5 +202,10 @@
     <string name="error_sending_ingredients_to_shopping_list">Something went wrong while trying to add these ingredients to the shopping list. Please try again later and report this bug if it continues.</string>
     <string name="error_could_not_add_items">There item you tried to enter was invalid.\nPlease enter the item\'s quantity and unit of measurement (optional) followed by its name.\ne.g. \"500g butter\", \"6 carrots\", or \"avocado\".\n\nNote: for technical reasons, you can\'t use the \"+\" icon in the ingredient\'s name.</string>
     <string name="error_could_not_access_database">Error - could not connect to database. Please try again later.</string>
+    <string name="content_description_save_notes">Save notes</string>
+    <string name="content_description_edit_notes">Edit meal notes</string>
+    <string name="content_description_delete_notes">Delete meal notes</string>
+    <string name="content_description_delete_recipe_from_meal">Remove recipe from this meal</string>
+    <string name="content_description_drag_handle">Drag to move meal content</string>
 
 </resources>

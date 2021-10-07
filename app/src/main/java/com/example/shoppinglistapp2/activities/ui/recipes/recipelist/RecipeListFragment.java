@@ -34,7 +34,7 @@ import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
 import com.example.shoppinglistapp2.activities.ui.ViewPagerNavigationCallback;
 import com.example.shoppinglistapp2.databinding.FragmentRecipeListBinding;
-import com.example.shoppinglistapp2.helpers.KeyboardHider;
+import com.example.shoppinglistapp2.helpers.KeyboardHelper;
 import com.google.common.base.CharMatcher;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -210,7 +210,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         //hide keyboard when enter key pressed when using searchbar, so user can see the results
         binding.searchBar.setOnEditorActionListener((v, actionId, event) -> {
-            KeyboardHider.hideKeyboard(requireActivity());
+            KeyboardHelper.hideKeyboard(requireActivity());
             v.clearFocus();
             return false;
         });

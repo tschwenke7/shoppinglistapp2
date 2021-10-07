@@ -12,7 +12,7 @@ import com.example.shoppinglistapp2.activities.ui.ViewPagerNavigationCallback;
 import com.example.shoppinglistapp2.activities.ui.mealplan.MealPlanFragment;
 import com.example.shoppinglistapp2.activities.ui.recipes.RecipesParentFragment;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListFragment;
-import com.example.shoppinglistapp2.helpers.KeyboardHider;
+import com.example.shoppinglistapp2.helpers.KeyboardHelper;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -56,12 +56,12 @@ public class MainActivity extends AppCompatActivity implements MealPlanFragment.
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                KeyboardHider.hideKeyboard(activity);
+                KeyboardHelper.hideKeyboard(activity);
             }
 
             @Override
             public void onPageSelected(int position) {
-                KeyboardHider.hideKeyboard(activity);
+                KeyboardHelper.hideKeyboard(activity);
             }
 
             @Override
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements MealPlanFragment.
 
         @Override
         public Fragment getItem(int position) {
-            KeyboardHider.hideKeyboard(activity);
+            KeyboardHelper.hideKeyboard(activity);
             Fragment fragment = null;
             switch (position) {
                 case MEAL_PLAN_VIEWPAGER_INDEX:

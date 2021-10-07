@@ -1,10 +1,12 @@
 package com.example.shoppinglistapp2.activities.ui.mealplan;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
@@ -233,6 +235,7 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
                     .setOnClickListener(v -> mealPlanClickListener.onRemoveRecipeClicked((getAdapterPosition()-1)/2));
 
             /* set notes if provided, and edit notes listeners */
+            binding.mealPlanNotes.setFocusable(false);
             //set values of notes
             if (meal.getNotes() != null) {
                 binding.mealPlanNotes.setText(meal.getNotes());
@@ -242,17 +245,13 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
             else{
                 binding.mealPlanNotes.setText("");
                 binding.mealPlanNotes.setVisibility(View.GONE);
+                binding.editNotesButton.setVisibility(View.GONE);
                 binding.addNotesButton.setVisibility(View.VISIBLE);
             }
 
-            //set listener for notes clicked to enable save button
-            binding.mealPlanNotes.setOnTouchListener((v, event) -> {
-                if (MotionEvent.ACTION_UP == event.getAction()) {
-                    binding.editNotesConfirm.setVisibility(View.VISIBLE);
-                    binding.deleteNotes.setVisibility(View.VISIBLE);
-                    v.performClick();
-                }
-                return false;
+            //set listener for edit notes clicked to enable save button
+            binding.editNotesButton.setOnClickListener((v) -> {
+                beginEditingNotes();
             });
 
             binding.editNotesConfirm.setOnClickListener((view) -> {
@@ -260,13 +259,17 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
                 binding.editNotesConfirm.setVisibility(View.GONE);
                 binding.deleteNotes.setVisibility(View.GONE);
                 binding.mealPlanNotes.clearFocus();
+                binding.mealPlanNotes.setFocusable(false);
+                binding.editNotesButton.setVisibility(View.VISIBLE);
                 //set notes for internal list, since livedata update won't trigger here for some reason
-//                getItem(getAdapterPosition()).getMeal().setNotes(binding.mealPlanNotes.getText().toString());
+                getItem(getAdapterPosition()).getMeal().setNotes(binding.mealPlanNotes.getText().toString());
             });
 
             binding.deleteNotes.setOnClickListener((view) -> {
                 mealPlanClickListener.onDeleteNotesClicked((getAdapterPosition()-1)/2);
                 binding.mealPlanNotes.clearFocus();
+                binding.mealPlanNotes.setFocusable(false);
+                binding.mealPlanNotes.setText("");
                 binding.mealPlanNotes.setVisibility(View.GONE);
                 binding.editNotesConfirm.setVisibility(View.GONE);
                 binding.deleteNotes.setVisibility(View.GONE);
@@ -277,12 +280,28 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
             binding.addNotesButton.setOnClickListener((view) -> {
                 binding.addNotesButton.setVisibility(View.GONE);
                 binding.mealPlanNotes.setVisibility(View.VISIBLE);
+
+                beginEditingNotes();
             });
 
             binding.handle.setOnTouchListener((v, event) -> {
                 clickListener.startDragging(this);
                 return true;
             });
+        }
+
+        private void beginEditingNotes() {
+            binding.editNotesConfirm.setVisibility(View.VISIBLE);
+            binding.deleteNotes.setVisibility(View.VISIBLE);
+            binding.mealPlanNotes.setFocusableInTouchMode(true);
+            binding.mealPlanNotes.setFocusable(true);
+            binding.mealPlanNotes.requestFocus();
+            binding.editNotesButton.setVisibility(View.GONE);
+
+            //open keyboard
+            InputMethodManager imm = (InputMethodManager) binding.mealPlanNotes
+                    .getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
         }
 
     }

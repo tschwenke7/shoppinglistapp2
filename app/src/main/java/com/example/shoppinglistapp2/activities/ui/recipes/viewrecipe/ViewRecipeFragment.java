@@ -39,7 +39,7 @@ import com.example.shoppinglistapp2.activities.ui.ViewPagerNavigationCallback;
 import com.example.shoppinglistapp2.databinding.FragmentViewRecipeBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Tag;
-import com.example.shoppinglistapp2.helpers.KeyboardHider;
+import com.example.shoppinglistapp2.helpers.KeyboardHelper;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.google.android.material.chip.Chip;
 import com.google.common.util.concurrent.FutureCallback;
@@ -482,7 +482,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
         editingFlag = false;
 
         //hide keyboard in case it was open
-        KeyboardHider.hideKeyboard(requireActivity());
+        KeyboardHelper.hideKeyboard(requireActivity());
 
         //hide recipe name field
         binding.editTextRecipeName.setVisibility(View.GONE);
@@ -844,7 +844,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
             deleteRecipe();
         }
         //hide keyboard if it was open
-        KeyboardHider.hideKeyboard(requireActivity());
+        KeyboardHelper.hideKeyboard(requireActivity());
     }
 
     private void deleteRecipe() {
