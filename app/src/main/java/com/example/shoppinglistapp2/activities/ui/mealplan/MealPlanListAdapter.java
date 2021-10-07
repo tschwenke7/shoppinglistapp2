@@ -105,6 +105,13 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
         };
     }
 
+    /**
+     * Updates the data of both items and their duplicates in the list to swap the order of the two,
+     * in such a way that when the livedata submits a new list, no further animations will be
+     * necessary.
+     * @param fromPos the adapterPosition to swap from
+     * @param toPos the adapterPosition to swap to
+     */
     public void swap(int fromPos, int toPos) {
         //Change the underlying data of the items so they don't get animated
         //when the updated list is submitted
@@ -153,22 +160,60 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
             binding.editDayTitleConfirm.setVisibility(View.GONE);
             binding.deleteMealIcon.setVisibility(View.GONE);
 
-            /* Listen for click on day name for editing */
-            binding.dayTitle.setOnTouchListener((v, event) -> {
-                if(MotionEvent.ACTION_UP == event.getAction()){
-                    binding.editDayTitleConfirm.setVisibility(View.VISIBLE);
-                    binding.deleteMealIcon.setVisibility(View.VISIBLE);
-                }
+            /* Listen for longclick on day name for editing */
+            binding.dayTitle.setOnLongClickListener((v) -> {
+                //show buttons
+                binding.editDayTitleConfirm.setVisibility(View.VISIBLE);
+                binding.deleteMealIcon.setVisibility(View.VISIBLE);
+
+                //remove background
+                binding.dayTitle.setBackground(null);
+
+                //set focus to edittext
+                binding.dayTitle.setFocusableInTouchMode(true);
+                binding.dayTitle.setFocusable(true);
+                binding.dayTitle.requestFocus();
+
+                //open keyboard
+                InputMethodManager imm = (InputMethodManager) binding.dayTitle
+                        .getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
                 return false;
             });
+
+//            binding.editTitleButton.setOnClickListener((v) -> {
+//                binding.editDayTitleConfirm.setVisibility(View.VISIBLE);
+//                binding.deleteMealIcon.setVisibility(View.VISIBLE);
+//                binding.editTitleButton.setVisibility(View.GONE);
+//
+//                //set focus to edittext
+//                binding.dayTitle.setFocusableInTouchMode(true);
+//                binding.dayTitle.setFocusable(true);
+//                binding.dayTitle.requestFocus();
+//
+//                //open keyboard
+//                InputMethodManager imm = (InputMethodManager) binding.dayTitle
+//                        .getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+//            });
 
             /* Listen for title change confirm "tick icon" clicked, and tell fragment to update */
             binding.editDayTitleConfirm.setOnClickListener(view -> {
                 mealPlanClickListener.onTitleConfirmClicked(
                         getAdapterPosition()/2, binding.dayTitle.getText().toString());
+
+                //disable edit text
                 binding.dayTitle.clearFocus();
+                binding.dayTitle.setFocusable(false);
+
+                //hide editing buttons
                 binding.editDayTitleConfirm.setVisibility(View.GONE);
                 binding.deleteMealIcon.setVisibility(View.GONE);
+
+                //restore background for responsive longclicks
+                binding.dayTitle.setBackgroundResource(R.color.recipe_item_button_background_light);
+
+
             });
 
             /* Listen for delete meal icon click */
@@ -293,10 +338,10 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
         private void beginEditingNotes() {
             binding.editNotesConfirm.setVisibility(View.VISIBLE);
             binding.deleteNotes.setVisibility(View.VISIBLE);
+            binding.editNotesButton.setVisibility(View.GONE);
             binding.mealPlanNotes.setFocusableInTouchMode(true);
             binding.mealPlanNotes.setFocusable(true);
             binding.mealPlanNotes.requestFocus();
-            binding.editNotesButton.setVisibility(View.GONE);
 
             //open keyboard
             InputMethodManager imm = (InputMethodManager) binding.mealPlanNotes

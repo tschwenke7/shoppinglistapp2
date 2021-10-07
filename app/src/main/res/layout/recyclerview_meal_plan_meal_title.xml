@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="4dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <EditText
         android:id="@+id/day_title"
@@ -13,36 +14,52 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
-        android:background="@null"
+
         android:textColor="@color/day_title_edittext_font_color"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/edit_day_title_confirm"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/edit_day_title_confirm"
         android:layout_marginEnd="4dp"
         app:layout_goneMarginEnd="0dp"
         android:layout_marginStart="12dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
-        tools:text="Monday" />
+        tools:text="Monday"
+        android:importantForAutofill="no"
+        android:inputType="textCapWords"
+        android:hint="@string/meal_title_hint"
+        android:background="@color/recipe_item_background_light"/>
 
-    <ImageView
+<!--    <ImageButton-->
+<!--        android:id="@+id/edit_title_button"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/day_title"-->
+<!--        app:layout_constraintEnd_toStartOf="@id/edit_day_title_confirm"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:srcCompat="@drawable/ic_edit"-->
+<!--        android:backgroundTint="@color/recipe_item_button_background_light"-->
+<!--        android:contentDescription="@string/content_description_edit_meal_title"/>-->
+
+    <ImageButton
         android:id="@+id/edit_day_title_confirm"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:backgroundTint="@color/recipe_item_button_background_light"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/day_title"
         app:layout_constraintEnd_toStartOf="@+id/delete_meal_icon"
         app:layout_constraintTop_toTopOf="@id/day_title"
-        android:layout_marginEnd="8dp"
         app:srcCompat="@drawable/ic_tick"
-        tools:visibility="visible" />
+        tools:visibility="visible"
+        android:contentDescription="@string/content_description_save_meal_title"/>
 
-    <ImageView
+    <ImageButton
         android:id="@+id/delete_meal_icon"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:visibility="gone"
@@ -50,6 +67,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/day_title"
         app:srcCompat="@drawable/ic_baseline_delete_24"
-        tools:visibility="visible" />
+        android:backgroundTint="@color/recipe_item_button_background_light"
+        tools:visibility="visible"
+        android:contentDescription="@string/content_description_delete_meal"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

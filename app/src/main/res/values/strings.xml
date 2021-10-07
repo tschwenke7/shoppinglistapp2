@@ -207,5 +207,9 @@
     <string name="content_description_delete_notes">Delete meal notes</string>
     <string name="content_description_delete_recipe_from_meal">Remove recipe from this meal</string>
     <string name="content_description_drag_handle">Drag to move meal content</string>
+    <string name="content_description_edit_meal_title">Edit name of meal</string>
+    <string name="content_description_save_meal_title">Save name of meal</string>
+    <string name="content_description_delete_meal">Delete this meal</string>
+    <string name="meal_title_hint">Name of meal…</string>
 
 </resources>

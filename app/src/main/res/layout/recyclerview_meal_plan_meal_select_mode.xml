@@ -26,6 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
         android:layout_weight="1"
         app:cardBackgroundColor="@color/recipe_item_background_light"
         app:cardCornerRadius="4dp"
