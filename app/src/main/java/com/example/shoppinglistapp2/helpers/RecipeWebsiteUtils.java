@@ -2,7 +2,7 @@ package com.example.shoppinglistapp2.helpers;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
-import com.example.shoppinglistapp2.activities.ui.recipes.creator.InvalidRecipeUrlExeception;
+import com.example.shoppinglistapp2.activities.mainContentFragments.recipes.creator.InvalidRecipeUrlExeception;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;

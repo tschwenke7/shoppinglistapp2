@@ -1,11 +1,8 @@
 package com.example.shoppinglistapp2.db.tables.relations;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.room.Embedded;
 import androidx.room.Relation;
 
-import com.example.shoppinglistapp2.activities.ui.BaseDiffCallback;
 import com.example.shoppinglistapp2.db.tables.IngList;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Recipe;

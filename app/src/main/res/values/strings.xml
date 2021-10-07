@@ -137,7 +137,6 @@
     <string name="select_meal_hint">Choose a meal to add \"%1$s\" to:</string>
 
 
-
     <!-- Shopping list page -->
     <string name="new_list_item_button">Add</string>
     <string name="new_list_item_field_placeholder">New item/s…</string>
@@ -211,5 +210,8 @@
     <string name="content_description_save_meal_title">Save name of meal</string>
     <string name="content_description_delete_meal">Delete this meal</string>
     <string name="meal_title_hint">Name of meal…</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="settings_title">Settings</string>
 
 </resources>
