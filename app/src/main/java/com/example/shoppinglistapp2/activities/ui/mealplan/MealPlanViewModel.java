@@ -196,11 +196,13 @@ public class MealPlanViewModel extends AndroidViewModel {
 
     public void deleteMeal(int position) {
         Meal meal = meals.getValue().get(position).getMeal();
-        int recipeId = meal.getRecipeId();
+        Integer recipeId = meal.getRecipeId();
 
         slaRepository.deleteMeal(meal);
 
-        removeRecipesIngredients(recipeId);
+        if (null != recipeId) {
+            removeRecipesIngredients(recipeId);
+        }
     }
 
     public void removeRecipeFromMealAtPos(int position) {
