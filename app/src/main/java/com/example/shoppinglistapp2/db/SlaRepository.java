@@ -446,7 +446,7 @@ public class SlaRepository {
     }
 
     public LiveData<List<MealWithRecipe>> getMealsByPlanId(int mealPlanId) {
-        return Transformations.distinctUntilChanged(mealDao.getPopulatedById(mealPlanId));
+        return (mealDao.getPopulatedById(mealPlanId));
     }
 
     public ListenableFuture<Integer> getMostRecentMealPlanId() {
@@ -482,5 +482,9 @@ public class SlaRepository {
 
     public int getIngListIdForMealPlan(int mealPlanId) {
         return ingListDao.getIngListIdForMealPlan(mealPlanId);
+    }
+
+    public void updateMeals(List<Meal> meals) {
+        SlaDatabase.databaseWriteExecutor.submit(() -> mealDao.updateAll(meals));
     }
 }

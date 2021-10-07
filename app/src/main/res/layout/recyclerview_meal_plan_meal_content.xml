@@ -1,120 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:orientation="vertical"
-    android:padding="8dp">
-
-    <EditText
-        android:id="@+id/day_title"
-        android:layout_width="0dp"
+    >
+    <ImageView
+        android:id="@+id/handle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="8dp"
-        android:layout_weight="1"
-        android:background="@null"
-        android:textColor="@color/day_title_edittext_font_color"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/plus_icon"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/delete_meal_icon"
+        android:src="@drawable/ic_baseline_drag_indicator_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_goneMarginEnd="4dp"
-        tools:text="Monday" />
-
-    <ImageView
-        android:id="@+id/plus_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        app:layout_constraintBottom_toBottomOf="@id/day_title"
-        app:layout_constraintEnd_toStartOf="@+id/choose_recipe_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/day_title"
-        app:layout_constraintTop_toTopOf="@id/day_title"
-        app:srcCompat="@drawable/add_icon_black_24dp"
-        app:tint="@color/colorPrimary"
-        tools:visibility="gone" />
-
-    <TextView
-        android:id="@+id/choose_recipe_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"
-        android:background="@drawable/button_choose_recipe_2"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:padding="4dp"
-        android:paddingStart="6dp"
-        android:paddingTop="4dp"
-        android:paddingEnd="6dp"
-        android:paddingBottom="4dp"
-        android:text="@string/choose_plan_recipe_button"
-        android:textColor="@color/primary_text_selected"
-        android:textSize="16dp"
-
-        app:layout_constraintBottom_toBottomOf="@id/day_title"
-        app:layout_constraintEnd_toStartOf="@+id/add_plan_notes_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/plus_icon"
-        app:layout_constraintTop_toTopOf="@id/day_title"
-        tools:visibility="gone" />
-
-    <TextView
-        android:id="@+id/add_plan_notes_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginEnd="4dp"
-        android:background="@drawable/button_choose_recipe_2"
-        android:padding="4dp"
-        android:paddingStart="6dp"
-        android:paddingTop="4dp"
-        android:paddingEnd="6dp"
-        android:paddingBottom="4dp"
-        android:text="@string/add_plan_notes_button"
-        android:textColor="@color/primary_text_selected"
-        android:textSize="16dp"
-        app:layout_constraintBottom_toBottomOf="@id/day_title"
-        app:layout_constraintEnd_toStartOf="@+id/edit_day_title_confirm"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/choose_recipe_button"
-        app:layout_constraintTop_toTopOf="@id/day_title"
-        tools:visibility="gone" />
-
-    <ImageView
-        android:id="@+id/edit_day_title_confirm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginEnd="8dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/day_title"
-        app:layout_constraintEnd_toStartOf="@+id/delete_meal_icon"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/add_plan_notes_button"
-        app:layout_constraintTop_toTopOf="@id/day_title"
-        app:srcCompat="@drawable/ic_tick"
-        tools:visibility="visible" />
-
-    <ImageView
-        android:id="@+id/delete_meal_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/day_title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/edit_day_title_confirm"
-        app:layout_constraintTop_toTopOf="@id/day_title"
-        app:srcCompat="@drawable/ic_baseline_delete_24"
-        tools:visibility="visible" />
+        />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/content"
@@ -124,23 +27,23 @@
         android:minHeight="32dp"
         android:orientation="vertical"
         android:padding="8dp"
+        android:layout_weight="1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/day_title"
-        android:layout_marginTop="8dp">
+        app:layout_constraintTop_toBottomOf="@id/day_title">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/recipe_cardview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            app:layout_goneMarginBottom="0dp"
             app:cardBackgroundColor="@color/recipe_item_background_light"
             app:cardCornerRadius="4dp"
             app:cardElevation="10dp"
             app:layout_constraintBottom_toTopOf="@+id/meal_plan_notes"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="visible">
+            app:layout_goneMarginBottom="0dp"
+            tools:visibility="gone">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -248,13 +151,12 @@
             android:minHeight="48dp"
             android:textSize="16sp"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/edit_notes_confirm"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/recipe_cardview"
             tools:text="Testing 123jhbhjk hjbk jhbk  jhbkn jbk hjbk hjbk bhjk bhjk hjb bhj"
-            tools:visibility="visible" />
+            tools:visibility="gone" />
 
         <ImageView
             android:id="@+id/edit_notes_confirm"
@@ -280,5 +182,48 @@
             app:layout_constraintTop_toTopOf="@id/meal_plan_notes"
             app:srcCompat="@drawable/ic_baseline_delete_24"
             tools:visibility="gone" />
+
+        <TextView
+            android:id="@+id/add_recipe_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/button_choose_recipe_2"
+            android:drawableStart="@drawable/add_icon_white_24"
+            android:minHeight="32dp"
+            android:text="@string/choose_plan_recipe_button"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/add_notes_button"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/meal_plan_notes"
+            android:layout_marginEnd="4dp"
+            app:layout_goneMarginEnd="0dp"
+            tools:visibility="visible"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/add_notes_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/button_choose_recipe_2"
+            android:drawableStart="@drawable/add_icon_white_24"
+            android:minHeight="32dp"
+            android:text="@string/add_plan_notes_button"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/add_recipe_button"
+            app:layout_constraintTop_toBottomOf="@id/meal_plan_notes"
+            tools:visibility="visible"
+            android:gravity="center"
+            android:layout_marginStart="4dp"
+            app:layout_goneMarginStart="0dp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
+

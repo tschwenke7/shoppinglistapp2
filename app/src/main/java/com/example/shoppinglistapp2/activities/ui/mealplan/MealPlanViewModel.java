@@ -22,6 +22,7 @@ import com.example.shoppinglistapp2.helpers.InvalidIngredientStringException;
 import com.example.shoppinglistapp2.helpers.MealPlanUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -311,5 +312,9 @@ public class MealPlanViewModel extends AndroidViewModel {
         }
 
         return null;
+    }
+
+    public void updateMeals(List<Meal> mealsToPersist) {
+        slaRepository.updateMeals(mealsToPersist);
     }
 }

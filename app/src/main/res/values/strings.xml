@@ -171,8 +171,8 @@
     <string name="suggestions_heading">Suggested Recipes</string>
     <string name="meal_plan_notes_placeholder">Add notes…</string>
     <string name="add_day_button_text">Add meal…</string>
-    <string name="choose_plan_recipe_button">Recipe</string>
-    <string name="add_plan_notes_button">Notes</string>
+    <string name="choose_plan_recipe_button">Add Recipe</string>
+    <string name="add_plan_notes_button">Add Notes</string>
     <string name="plan_notes_hint">Click to add notes…</string>
     <string name="delete_meal_warning">Are you sure you want to delete this meal?</string>
     <string name="delete_meal_option">Delete meal</string>

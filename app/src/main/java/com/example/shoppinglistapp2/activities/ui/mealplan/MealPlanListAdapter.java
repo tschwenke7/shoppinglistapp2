@@ -8,17 +8,20 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
+import androidx.annotation.Nullable;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ui.BaseDiffCallback;
 import com.example.shoppinglistapp2.activities.ui.BaseRecyclerViewAdapter;
-import com.example.shoppinglistapp2.databinding.RecyclerviewMealPlanMealBinding;
+import com.example.shoppinglistapp2.databinding.RecyclerviewMealPlanMealContentBinding;
+import com.example.shoppinglistapp2.databinding.RecyclerviewMealPlanMealTitleBinding;
 import com.example.shoppinglistapp2.db.tables.Meal;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>{
@@ -30,13 +33,59 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
         this.mealPlanClickListener = mealPlanClickListener;
     }
 
+    @Override
+    public void submitList(List<MealWithRecipe> newItems, @Nullable Runnable callback) {
+        //duplicate each item. We will inflate 2 viewholders for each item -
+        // 1st as the header, 2nd as the content using getItemViewType
+        List<MealWithRecipe> doubledUpList = new ArrayList<>();
+        for (MealWithRecipe item : newItems) {
+            doubledUpList.add(item);
+            doubledUpList.add(item);
+        }
+
+        super.submitList(doubledUpList, callback);
+    }
+
+    /**
+     * Collapse doubled up list back into list of meals to return
+     * with any reordering that might have happened, reading to be updated in the db.
+     * @return the list of Meals represented by this adapter.
+     */
+    public List<Meal> getMealsToPersist() {
+        List<MealWithRecipe> doubledUpList = getCurrentList();
+        List<Meal> mealsList = new ArrayList<>();
+
+        //iterate through each pair of meal header/content viewholders
+        for (int i = 0; i < doubledUpList.size(); i+=2) {
+            mealsList.add(doubledUpList.get(i).getMeal());
+        }
+
+        return mealsList;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position % 2;
+    }
+
     @NonNull
     @Override
     public BaseRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(
-                RecyclerviewMealPlanMealBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false),
-                mealPlanClickListener
-        );
+        switch (viewType) {
+            //Render a title element
+            case 0:
+                return new TitleViewHolder(
+                        RecyclerviewMealPlanMealTitleBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false),
+                        mealPlanClickListener
+                );
+            //render a content element
+            case 1:
+            default:
+                return new ContentViewHolder(
+                        RecyclerviewMealPlanMealContentBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false),
+                        mealPlanClickListener
+                );
+        }
     }
 
     @Override
@@ -54,11 +103,38 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
         };
     }
 
-    public class ViewHolder extends BaseRecyclerViewAdapter<MealWithRecipe>.ViewHolder {
-        private final RecyclerviewMealPlanMealBinding binding;
+    public void swap(int fromPos, int toPos) {
+        //Change the underlying data of the items so they don't get animated
+        //when the updated list is submitted
+        MealWithRecipe fromMeal = getItem(fromPos);
+        MealWithRecipe toMeal = getItem(toPos);
+
+        MealWithRecipe swappedMealTo = new MealWithRecipe();
+        swappedMealTo.setMeal(toMeal.getMeal().deepCopy());
+        swappedMealTo.getMeal().setRecipeId(fromMeal.getMeal().getRecipeId());
+        swappedMealTo.setRecipe(fromMeal.getRecipe());
+        swappedMealTo.getMeal().setNotes(fromMeal.getMeal().getNotes());
+
+        MealWithRecipe swappedMealFrom = new MealWithRecipe();
+        swappedMealFrom.setMeal(fromMeal.getMeal().deepCopy());
+        swappedMealFrom.getMeal().setRecipeId(toMeal.getMeal().getRecipeId());
+        swappedMealFrom.setRecipe(toMeal.getRecipe());
+        swappedMealFrom.getMeal().setNotes(toMeal.getMeal().getNotes());
+
+        getCurrentList().set(toPos, swappedMealTo);
+        getCurrentList().set(toPos - 1, swappedMealTo);
+
+        getCurrentList().set(fromPos, swappedMealFrom);
+        getCurrentList().set(fromPos - 1, swappedMealFrom);
+
+        notifyItemMoved(fromPos,toPos);
+    }
+
+    public class TitleViewHolder extends BaseRecyclerViewAdapter<MealWithRecipe>.ViewHolder {
+        private final RecyclerviewMealPlanMealTitleBinding binding;
         private final MealPlanClickListener mealPlanClickListener;
 
-        public ViewHolder(@NonNull RecyclerviewMealPlanMealBinding binding, MealPlanClickListener mealPlanClickListener) {
+        public TitleViewHolder(@NonNull RecyclerviewMealPlanMealTitleBinding binding, MealPlanClickListener mealPlanClickListener) {
             super(binding.getRoot());
             this.binding = binding;
             this.mealPlanClickListener = mealPlanClickListener;
@@ -67,18 +143,11 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
         @SuppressLint("ClickableViewAccessibility")
         public void bind(MealWithRecipe mealWithRecipe) {
             Meal meal = mealWithRecipe.getMeal();
-            Recipe recipe = mealWithRecipe.getRecipe();
-
-            View addNotesButton = binding.addPlanNotesButton;
-            View chooseRecipeButton = binding.chooseRecipeButton;
-            View plusIcon = binding.plusIcon;
-            EditText notesView = binding.mealPlanNotes;
 
             /* set day name */
             binding.dayTitle.setText(meal.getDayTitle());
 
             /* Set default visibilities */
-            plusIcon.setVisibility(View.VISIBLE);
             binding.editDayTitleConfirm.setVisibility(View.GONE);
             binding.deleteMealIcon.setVisibility(View.GONE);
 
@@ -87,44 +156,46 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
                 if(MotionEvent.ACTION_UP == event.getAction()){
                     binding.editDayTitleConfirm.setVisibility(View.VISIBLE);
                     binding.deleteMealIcon.setVisibility(View.VISIBLE);
-
-                    //hide other buttons in title row
-                    plusIcon.setVisibility(View.GONE);
-                    chooseRecipeButton.setVisibility(View.GONE);
-                    addNotesButton.setVisibility(View.GONE);
                 }
                 return false;
             });
 
             /* Listen for title change confirm "tick icon" clicked, and tell fragment to update */
             binding.editDayTitleConfirm.setOnClickListener(view -> {
-                mealPlanClickListener.onTitleConfirmClicked(getAdapterPosition(), binding.dayTitle.getText().toString());
+                mealPlanClickListener.onTitleConfirmClicked(
+                        getAdapterPosition()/2, binding.dayTitle.getText().toString());
                 binding.dayTitle.clearFocus();
                 binding.editDayTitleConfirm.setVisibility(View.GONE);
                 binding.deleteMealIcon.setVisibility(View.GONE);
-
-                //restore applicable buttons in title row
-                if(binding.recipeCardview.getVisibility() == View.GONE){
-                    chooseRecipeButton.setVisibility(View.VISIBLE);
-                }
-                if(notesView.getVisibility() == View.GONE){
-                    addNotesButton.setVisibility(View.VISIBLE);
-                }
-                if(chooseRecipeButton.getVisibility() == View.VISIBLE || addNotesButton.getVisibility() == View.VISIBLE){
-                    plusIcon.setVisibility(View.VISIBLE);
-                }
             });
 
             /* Listen for delete meal icon click */
             binding.deleteMealIcon.setOnClickListener((view) -> {
-                mealPlanClickListener.onDeleteMealClicked(getAdapterPosition());
+                mealPlanClickListener.onDeleteMealClicked(getAdapterPosition()/2);
                 binding.dayTitle.clearFocus();
             });
+        }
+    }
+
+    public class ContentViewHolder extends BaseRecyclerViewAdapter<MealWithRecipe>.ViewHolder {
+        private final MealPlanClickListener clickListener;
+        private final RecyclerviewMealPlanMealContentBinding binding;
+
+        public ContentViewHolder(RecyclerviewMealPlanMealContentBinding binding, MealPlanClickListener clickListener) {
+            super(binding.getRoot());
+            this.clickListener = clickListener;
+            this.binding = binding;
+        }
+
+        @Override
+        public void bind(MealWithRecipe mealWithRecipe) {
+            Meal meal = mealWithRecipe.getMeal();
+            Recipe recipe = mealWithRecipe.getRecipe();
 
             /* set recipe details if provided - otherwise hide recipe cardview */
             if (null != recipe){
-                chooseRecipeButton.setVisibility(View.GONE);
                 binding.recipeCardview.setVisibility(View.VISIBLE);
+                binding.addRecipeButton.setVisibility(View.GONE);
 
                 //recipe name
                 binding.recipeTitle.setText(recipe.getName());
@@ -147,74 +218,73 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
             }
             else{
                 binding.recipeCardview.setVisibility(View.GONE);
-                chooseRecipeButton.setVisibility(View.VISIBLE);
+                binding.addRecipeButton.setVisibility(View.VISIBLE);
             }
 
+            binding.addRecipeButton.setOnClickListener((v) -> {
+                clickListener.onChooseRecipeClicked((getAdapterPosition()-1)/2);
+            });
+
             // set click listener for recipe
-            binding.recipeCardview.setOnClickListener(v -> mealPlanClickListener.onRecipeClicked(getAdapterPosition()));
-            // set click listener for choose recipe button
-            chooseRecipeButton
-                    .setOnClickListener(v -> mealPlanClickListener.onChooseRecipeClicked(getAdapterPosition()));
+            binding.recipeCardview.setOnClickListener(v -> mealPlanClickListener.onRecipeClicked((getAdapterPosition()-1)/2));
+
             //set click listener for delete recipe icon
             binding.deleteIcon
-                    .setOnClickListener(v -> mealPlanClickListener.onRemoveRecipeClicked(getAdapterPosition()));
+                    .setOnClickListener(v -> mealPlanClickListener.onRemoveRecipeClicked((getAdapterPosition()-1)/2));
 
             /* set notes if provided, and edit notes listeners */
             //set values of notes
             if (meal.getNotes() != null) {
-                notesView.setText(meal.getNotes());
-
-                notesView.setVisibility(View.VISIBLE);
-                addNotesButton.setVisibility(View.GONE);
+                binding.mealPlanNotes.setText(meal.getNotes());
+                binding.mealPlanNotes.setVisibility(View.VISIBLE);
+                binding.addNotesButton.setVisibility(View.GONE);
             }
             else{
-                notesView.setText("");
-                notesView.setVisibility(View.GONE);
-                addNotesButton.setVisibility(View.VISIBLE);
+                binding.mealPlanNotes.setText("");
+                binding.mealPlanNotes.setVisibility(View.GONE);
+                binding.addNotesButton.setVisibility(View.VISIBLE);
             }
 
             //set listener for notes clicked to enable save button
-            notesView.setOnTouchListener((v, event) -> {
+            binding.mealPlanNotes.setOnTouchListener((v, event) -> {
                 if (MotionEvent.ACTION_UP == event.getAction()) {
                     binding.editNotesConfirm.setVisibility(View.VISIBLE);
                     binding.deleteNotes.setVisibility(View.VISIBLE);
+                    v.performClick();
                 }
                 return false;
             });
 
             binding.editNotesConfirm.setOnClickListener((view) -> {
-                mealPlanClickListener.onNotesConfirmClicked(getAdapterPosition(), notesView.getText().toString());
+                mealPlanClickListener.onNotesConfirmClicked((getAdapterPosition()-1)/2, binding.mealPlanNotes.getText().toString());
                 binding.editNotesConfirm.setVisibility(View.GONE);
                 binding.deleteNotes.setVisibility(View.GONE);
-                notesView.clearFocus();
+                binding.mealPlanNotes.clearFocus();
+                //set notes for internal list, since livedata update won't trigger here for some reason
+//                getItem(getAdapterPosition()).getMeal().setNotes(binding.mealPlanNotes.getText().toString());
             });
 
             binding.deleteNotes.setOnClickListener((view) -> {
-                mealPlanClickListener.onDeleteNotesClicked(getAdapterPosition());
-                notesView.clearFocus();
-                notesView.setVisibility(View.GONE);
+                mealPlanClickListener.onDeleteNotesClicked((getAdapterPosition()-1)/2);
+                binding.mealPlanNotes.clearFocus();
+                binding.mealPlanNotes.setVisibility(View.GONE);
                 binding.editNotesConfirm.setVisibility(View.GONE);
                 binding.deleteNotes.setVisibility(View.GONE);
-                addNotesButton.setVisibility(View.VISIBLE);
-                plusIcon.setVisibility(View.VISIBLE);
+                binding.addNotesButton.setVisibility(View.VISIBLE);
             });
 
             //listen to add notes button
-            addNotesButton.setOnClickListener((view) -> {
-                addNotesButton.setVisibility(View.GONE);
-                notesView.setVisibility(View.VISIBLE);
-
-                //if recipe and notes are both provided, we can remove the plus icon too
-                if(chooseRecipeButton.getVisibility() == View.GONE && addNotesButton.getVisibility() == View.GONE){
-                    binding.plusIcon.setVisibility(View.GONE);
-                }
+            binding.addNotesButton.setOnClickListener((view) -> {
+                binding.addNotesButton.setVisibility(View.GONE);
+                binding.mealPlanNotes.setVisibility(View.VISIBLE);
             });
 
-            //if recipe and notes are both provided, we can remove the plus icon too
-            if(chooseRecipeButton.getVisibility() == View.GONE && addNotesButton.getVisibility() == View.GONE){
-                binding.plusIcon.setVisibility(View.GONE);
-            }
+            binding.handle.setOnTouchListener((v, event) -> {
+                clickListener.startDragging(this);
+                return true;
+            });
         }
+
     }
 
     public interface MealPlanClickListener {
@@ -225,6 +295,7 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
         void onRecipeClicked(int position);
         void onRemoveRecipeClicked(int position);
         void onDeleteMealClicked(int position);
+        void startDragging(ViewHolder viewHolder);
     }
 
 }

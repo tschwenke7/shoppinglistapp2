@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,10 +30,13 @@ import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 
+import com.example.shoppinglistapp2.activities.ui.BaseRecyclerViewAdapter;
 import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListAdapter;
 import com.example.shoppinglistapp2.databinding.FragmentMealPlanBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
+import com.example.shoppinglistapp2.db.tables.Meal;
+import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
 import com.example.shoppinglistapp2.db.tables.withextras.PopulatedRecipeWithScore;
 import com.example.shoppinglistapp2.helpers.KeyboardHider;
 import com.google.common.util.concurrent.FutureCallback;
@@ -41,6 +45,7 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -65,6 +70,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     private int currentMPId;
     private int previousIngListSize;
+    private ItemTouchHelper itemTouchHelper;
 
     public static MealPlanFragment newInstance() {
         return new MealPlanFragment();
@@ -106,7 +112,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
         binding.planRecipesRecyclerview.setAdapter(mealsAdapter);
         binding.planRecipesRecyclerview.setLayoutManager(new LinearLayoutManager((this.getContext())));
         //allow drag and drop reordering of elements
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
+        itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
         itemTouchHelper.attachToRecyclerView(binding.planRecipesRecyclerview);
 
         //listen to meal plan list
@@ -196,15 +202,6 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                 //otherwise don't do anything
                 .setNegativeButton(R.string.cancel, null)
                 .show());
-    }
-
-    private void enterChooseMealMode() {
-        //hide ingredients and suggestions sections
-        //modify meal slot views to selection mode
-    }
-
-    private void exitChooseMealMode() {
-
     }
 
     private void reloadSuggestedRecipes() {
@@ -504,17 +501,46 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                     ItemTouchHelper.START | ItemTouchHelper.END, 0
     ) {
         @Override
-        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-            int fromPos = viewHolder.getAdapterPosition();
-            int toPos = target.getAdapterPosition();
-            Collections.swap(mealsAdapter.getCurrentList(), fromPos, toPos);
-            mealsAdapter.notifyItemMoved(fromPos,toPos);
-            return false;
+        public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+
+            if(viewHolder.getItemViewType() == 1) {
+                return super.getMovementFlags(recyclerView,viewHolder);
+            }
+            return 0;
         }
 
         @Override
-        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            int fromPos = viewHolder.getAdapterPosition();
+            int toPos = target.getAdapterPosition();
+            mealsAdapter.swap(fromPos, toPos);
+//            Collections.swap(mealsAdapter.getCurrentList(), fromPos, toPos);
+//            mealsAdapter.notifyItemMoved(fromPos,toPos);
+            return false;
+        }
 
+        /**
+         * Triggers when drag is stopped. Here we will update the db backing of this recyclerview
+         * @param recyclerView
+         * @param viewHolder
+         */
+        @Override
+        public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+            viewModel.updateMeals(mealsAdapter.getMealsToPersist());
+            super.clearView(recyclerView, viewHolder);
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {}
+
+        @Override
+        public boolean canDropOver(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder current, @NonNull RecyclerView.ViewHolder target) {
+            return current.getItemViewType() == target.getItemViewType();
         }
     };
+
+    @Override
+    public void startDragging(BaseRecyclerViewAdapter<MealWithRecipe>.ViewHolder viewHolder) {
+        itemTouchHelper.startDrag(viewHolder);
+    }
 }
