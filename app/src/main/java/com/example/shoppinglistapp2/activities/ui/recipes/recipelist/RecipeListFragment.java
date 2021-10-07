@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -26,6 +27,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.shoppinglistapp2.App;
@@ -79,7 +81,7 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         binding = FragmentRecipeListBinding.inflate(inflater, container, false);
 
-        callback = (ViewPagerNavigationCallback) getActivity();
+        callback = (ViewPagerNavigationCallback) requireActivity();
 
         backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
         uiExecutor = ContextCompat.getMainExecutor(requireContext());
@@ -218,6 +220,15 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         //configure autocomplete to consider comma separated phrases as separate tokens
         setAutoCompleteSuggestions();
 
+        //make back button go back to meal plan fragment if the "choose a recipe" actionmode was on
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if(actionMode != null && sharedViewModel.getSelectingForMeal() != null)
+                    //navigate back to meal plan tab
+                    ((ViewPagerNavigationCallback) requireActivity()).setViewpagerTo(MainActivity.MEAL_PLAN_VIEWPAGER_INDEX);
+            }
+        };
 
     }
 
@@ -542,18 +553,20 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             adapter.clearSelections();
-            //if we were selecting for a meal, navigate back to meal plan tab
-            if (sharedViewModel.getSelectingForMeal() != null) {
-                //navigate back to meal plan tab
+            if(sharedViewModel.getSelectingForMeal() != null) {
                 callback.setViewpagerTo(MainActivity.MEAL_PLAN_VIEWPAGER_INDEX);
+                sharedViewModel.clearSelectingForMeal();
             }
-            sharedViewModel.clearSelectingForMeal();
             actionMode = null;
         }
     }
 
     @Override
     public void onPause() {
+        //close action bar if user navigates away
+        if(null != actionMode){
+            actionMode.finish();
+        }
         super.onPause();
     }
 

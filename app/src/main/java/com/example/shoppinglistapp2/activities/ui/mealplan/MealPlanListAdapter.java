@@ -349,6 +349,14 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
             imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
         }
 
+        public void setSelected(boolean selected) {
+            if (selected) {
+                itemView.setAlpha(0.7f);
+            }
+            else{
+                itemView.setAlpha(1.0f);
+            }
+        }
     }
 
     public interface MealPlanClickListener {

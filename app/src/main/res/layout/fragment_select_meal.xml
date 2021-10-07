@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activities.ui.recipes.selectmeal.SelectMealFragment"
+    tools:context=".activities.ui.recipes.recipelist.selectmeal.SelectMealFragment"
     android:layout_margin="16dp"
     android:animateLayoutChanges="true">
 

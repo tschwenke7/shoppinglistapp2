@@ -159,12 +159,6 @@ public class MealPlanViewModel extends AndroidViewModel {
         slaRepository.updateMeal(meal);
     }
 
-    public void removeRecipe(Meal meal) {
-        //remove the recipe from this meal
-        meal.setRecipeId(null);
-        slaRepository.updateMeal(meal);
-    }
-
     /** Clears all recipes, notes and ingredients from meals, but doesn't delete the meals themselves. */
     public void clearAllMeals(){
         for(MealWithRecipe m : meals.getValue()){
@@ -202,25 +196,34 @@ public class MealPlanViewModel extends AndroidViewModel {
 
     public void deleteMeal(int position) {
         Meal meal = meals.getValue().get(position).getMeal();
+        int recipeId = meal.getRecipeId();
+
         slaRepository.deleteMeal(meal);
+
+        removeRecipesIngredients(recipeId);
     }
 
     public void removeRecipeFromMealAtPos(int position) {
         Meal meal = getMeals().getValue().get(position).getMeal();
+        int recipeId = meal.getRecipeId();
 
+        //remove the recipe from the meal plan slot
+        meal.setRecipeId(null);
+        slaRepository.updateMeal(meal);
+
+        //remove its ingredients from the ingredients needed list
+        removeRecipesIngredients(recipeId);
+    }
+
+    private void removeRecipesIngredients(int recipeId) {
         int ingListId = mealPlanIngListDb.getValue().getIngList().getId();
 
         //remove ingredients used by this recipe by adding a negative qty of each ingredient
         //opposite to the amount used by the recipe
-        for(IngListItem item : slaRepository.getIngredientsByRecipeIdNonLive(meal.getRecipeId())){
+        for(IngListItem item : slaRepository.getIngredientsByRecipeIdNonLive(recipeId)){
             item.negateQuantities();
             slaRepository.insertOrMergeItem(ingListId, item);
         }
-
-        //remove the recipe from the meal plan slot
-        //remove the recipe from this meal
-        meal.setRecipeId(null);
-        slaRepository.updateMeal(meal);
     }
 
     public boolean exportToShoppingList() {

@@ -78,19 +78,6 @@ public class SlaRepository {
         return ingListItemDao.getAllFromRecipeNonLive(id);
     }
 
-    public List<IngListItem> getIngListItemsByRecipeIdNonLive(int id){
-        Callable<List<IngListItem>> insertCallable = () -> ingListItemDao.getIngredientsByListIdNonLive(id);
-        Future<List<IngListItem>> future = SlaDatabase.databaseWriteExecutor.submit(insertCallable);
-
-        try{
-            return future.get();
-        }
-        catch (InterruptedException | ExecutionException e1) {
-            e1.printStackTrace();
-            return null;
-        }
-    }
-
     public ListenableFuture<Integer> deleteRecipes(List<Recipe> recipe){
         return SlaDatabase.databaseWriteExecutor.submit(() -> recipeDao.deleteAll(recipe));
     }

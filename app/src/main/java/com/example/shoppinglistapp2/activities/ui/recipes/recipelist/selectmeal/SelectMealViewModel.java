@@ -1,13 +1,13 @@
-package com.example.shoppinglistapp2.activities.ui.recipes.selectmeal;
+package com.example.shoppinglistapp2.activities.ui.recipes.recipelist.selectmeal;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.example.shoppinglistapp2.db.SlaRepository;
+import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Meal;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
@@ -66,8 +66,31 @@ public class SelectMealViewModel extends AndroidViewModel {
 
     public void addRecipeToMealAtPos(int pos) {
         Meal meal = meals.getValue().get(pos).getMeal();
+
+        //get the recipeId we're replacing if one was already present in this meal
+        Integer oldRecipeId = meals.getValue().get(pos).getMeal().getRecipeId();
+
+        //update the meal in db
         meal.setRecipeId(recipeId);
         slaRepository.updateMeal(meal);
+
+        //get the ingredient list for the meal plan this meal was part of
+        int ingListId = slaRepository.getIngListIdForMealPlan(mealPlanId);
+
+        //add all items from the selected recipe to the mealPlan's ingList
+        List<IngListItem> items = slaRepository.getIngredientsByRecipeIdNonLive(recipeId);
+        for (IngListItem item : items) {
+            slaRepository.insertOrMergeItem(ingListId, item);
+        }
+
+        //if we are replacing an existing recipe, delete its ingredients from the meal plan list
+        if(oldRecipeId != null) {
+            List<IngListItem> itemsToRemove = slaRepository.getIngredientsByRecipeIdNonLive(oldRecipeId);
+            for (IngListItem item : itemsToRemove) {
+                item.negateQuantities();
+                slaRepository.insertOrMergeItem(ingListId, item);
+            }
+        }
     }
 
     public String getMealNameAtPos(int pos) {

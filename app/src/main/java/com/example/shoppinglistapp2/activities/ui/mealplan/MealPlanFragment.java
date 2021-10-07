@@ -34,6 +34,7 @@ import com.example.shoppinglistapp2.activities.ui.SharedViewModel;
 import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListAdapter;
 import com.example.shoppinglistapp2.databinding.FragmentMealPlanBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
+import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
 import com.example.shoppinglistapp2.db.tables.withextras.PopulatedRecipeWithScore;
 import com.example.shoppinglistapp2.helpers.KeyboardHelper;
@@ -400,15 +401,25 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     public void onDeleteMealClicked(int position) {
         KeyboardHelper.hideKeyboard(requireActivity());
         new AlertDialog.Builder(requireContext())
-                .setTitle(R.string.delete_meal_option)
-                .setMessage(R.string.delete_meal_warning)
-                .setPositiveButton(R.string.delete, (dialogInterface, i) -> {
-                    //delete all recipes and ingredients
-                    viewModel.deleteMeal(position);
-                })
-                //otherwise don't do anything
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+            .setTitle(R.string.delete_meal_option)
+            .setMessage(R.string.delete_meal_warning)
+            .setPositiveButton(R.string.delete, (dialogInterface, i) -> {
+                //delete all recipes and ingredients
+                Futures.addCallback(backgroundExecutor.submit(() -> viewModel.deleteMeal(position)),
+                    new FutureCallback<Object>() {
+                        @Override
+                        public void onSuccess(@Nullable Object result) {}
+
+                        @Override
+                        public void onFailure(Throwable t) {
+                            Toast.makeText(requireContext(), getString(R.string.unknown_error), Toast.LENGTH_LONG).show();
+                        }
+                    },
+                    uiExecutor);
+            })
+            //otherwise don't do anything
+            .setNegativeButton(R.string.cancel, null)
+            .show();
     }
 
     @Override
@@ -524,7 +535,20 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
         @Override
         public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
             viewModel.updateMeals(mealsAdapter.getMealsToPersist());
+            ((MealPlanListAdapter.ContentViewHolder) viewHolder).setSelected(false);
             super.clearView(recyclerView, viewHolder);
+        }
+
+        @Override
+        public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
+            switch (actionState) {
+                case ItemTouchHelper.ACTION_STATE_DRAG:
+                    ((MealPlanListAdapter.ContentViewHolder) viewHolder).setSelected(true);
+                    break;
+                case ItemTouchHelper.ACTION_STATE_IDLE:
+                    break;
+            }
+            super.onSelectedChanged(viewHolder, actionState);
         }
 
         @Override

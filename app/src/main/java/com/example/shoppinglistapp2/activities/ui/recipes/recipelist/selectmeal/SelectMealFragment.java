@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2.activities.ui.recipes.selectmeal;
+package com.example.shoppinglistapp2.activities.ui.recipes.recipelist.selectmeal;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.ActionBar;
@@ -12,7 +12,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -184,7 +183,7 @@ public class SelectMealFragment extends Fragment implements MealSelectionAdapter
         //otherwise just add the recipe
         else {
 
-            viewModel.addRecipeToMealAtPos(pos);
+            backgroundExecutor.submit(() -> viewModel.addRecipeToMealAtPos(pos));
             emphasiseThenNav();
         }
     }
