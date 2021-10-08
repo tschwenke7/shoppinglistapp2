@@ -53,6 +53,17 @@
         tools:listitem="@layout/recyclerview_shopping_list_item"
         tools:visibility="gone"/>
 
+    <ProgressBar
+        android:id="@+id/shopping_list_progress_bar"
+        android:layout_width="0dp"
+        android:layout_height="96dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider3"
+        tools:listitem="@layout/recyclerview_shopping_list_item"
+        tools:visibility="visible"/>
+
     <TextView
         android:id="@+id/textview_no_sl_items"
         android:layout_width="match_parent"

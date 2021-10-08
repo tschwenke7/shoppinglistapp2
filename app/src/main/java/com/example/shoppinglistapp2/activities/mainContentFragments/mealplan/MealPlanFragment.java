@@ -137,7 +137,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
         binding.suggestedRecipesRecyclerview.setLayoutManager(new LinearLayoutManager((this.getContext())));
 
         //setup ingredients recyclerview
-        final ShoppingListAdapter planIngredientAdapter = new ShoppingListAdapter(this);
+        final ShoppingListAdapter planIngredientAdapter = new ShoppingListAdapter(this, backgroundExecutor);
         binding.planIngredientsRecyclerview.setAdapter(planIngredientAdapter);
         binding.planIngredientsRecyclerview.setLayoutManager(new LinearLayoutManager((this.getContext())));
 

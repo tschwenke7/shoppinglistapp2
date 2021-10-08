@@ -10,44 +10,72 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.mainContentFragments.BaseDiffCallback;
+import com.example.shoppinglistapp2.activities.mainContentFragments.BaseRecyclerViewAdapter;
+import com.example.shoppinglistapp2.databinding.RecyclerviewShoppingListItemBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
+import com.google.common.util.concurrent.ListeningExecutorService;
+
+import java.util.Collections;
+import java.util.List;
 
 
-public class ShoppingListAdapter extends ListAdapter<IngListItem, ShoppingListAdapter.ViewHolder> {
+public class ShoppingListAdapter extends BaseRecyclerViewAdapter<IngListItem> {
     private final SlItemClickListener slItemClickListener;
 
-    public ShoppingListAdapter(SlItemClickListener slItemClickListener){
-        super(new IngListItem.DiffCallback());
-
+    public ShoppingListAdapter(SlItemClickListener slItemClickListener, ListeningExecutorService backgroundExecutor){
+        super(backgroundExecutor);
         this.slItemClickListener = slItemClickListener;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (getItem(position).isChecked()) {
+            return 2;
+        }
+        else {
+            return 1;
+        }
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.recyclerview_shopping_list_item, parent, false);
-        return new ShoppingListAdapter.ViewHolder(view, slItemClickListener);
+    public BaseRecyclerViewAdapter<IngListItem>.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new ShoppingListAdapter.ViewHolder(RecyclerviewShoppingListItemBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false), slItemClickListener);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        IngListItem current = getItem(position);
-        holder.bind(current);
+    protected BaseDiffCallback<IngListItem> createDiffCallback(List<IngListItem> newList, List<IngListItem> oldList) {
+        return new BaseDiffCallback<IngListItem>(newList, oldList) {
+            @Override
+            public boolean areItemsTheSame(IngListItem oldItem, IngListItem newItem) {
+                return oldItem.getId() == newItem.getId();
+            }
+
+            @Override
+            public boolean areContentsTheSame(IngListItem oldItem, IngListItem newItem) {
+                return oldItem.equals(newItem);
+            }
+        };
+    }
+
+    public void swap(int fromPos, int toPos) {
+        Collections.swap(getCurrentList(), fromPos, toPos);
+        notifyItemMoved(fromPos, toPos);
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private View itemView;
+    public class ViewHolder extends BaseRecyclerViewAdapter<IngListItem>.ViewHolder {
         private SlItemClickListener slItemClickListener;
+        private RecyclerviewShoppingListItemBinding binding;
 
-        public ViewHolder(@NonNull View itemView, SlItemClickListener slItemClickListener) {
-            super(itemView);
-            this.itemView = itemView;
+        public ViewHolder(RecyclerviewShoppingListItemBinding binding, SlItemClickListener slItemClickListener) {
+            super(binding.getRoot());
+            this.binding = binding;
             this.slItemClickListener = slItemClickListener;
         }
 
@@ -71,16 +99,21 @@ public class ShoppingListAdapter extends ListAdapter<IngListItem, ShoppingListAd
             }
 
             //set click listener to toggle this item checked/unchecked from list
-            textView.setOnClickListener(v -> slItemClickListener.onSlItemClick(getAdapterPosition()));
-
-            //set long click listener to enable editing
-            textView.setOnLongClickListener(v -> {
-                //hide textview, show edittext instead
+            textView.setOnClickListener(v ->
+            {
                 textView.setVisibility(View.GONE);
                 editItemContainer.setVisibility(View.VISIBLE);
                 editText.requestFocus();
-                return true;
             });
+
+            //set long click listener to enable editing
+//            textView.setOnLongClickListener(v -> {
+//                //hide textview, show edittext instead
+//                textView.setVisibility(View.GONE);
+//                editItemContainer.setVisibility(View.VISIBLE);
+//                editText.requestFocus();
+//                return true;
+//            });
 
             //set listener to edit item when edit confirm clicked
             confirmEditItemButton.setOnClickListener(v -> {
@@ -97,6 +130,23 @@ public class ShoppingListAdapter extends ListAdapter<IngListItem, ShoppingListAd
                 imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
             });
 
+        }
+
+        public void setSelected(boolean selected) {
+            if(selected) {
+//                binding.divider2.setVisibility(View.INVISIBLE);
+                itemView.setBackgroundColor(itemView.getContext().getResources().getColor(R.color.card_background_extra_light));
+                binding.itemName.setAlpha(0.4f);
+                binding.editItemContainer.setAlpha(0.4f);
+                itemView.setRotation(2f);
+            }
+            else {
+//                binding.divider2.setVisibility(View.VISIBLE);
+                itemView.setBackgroundColor(itemView.getContext().getResources().getColor(R.color.recipe_item_background));
+                binding.itemName.setAlpha(1f);
+                binding.editItemContainer.setAlpha(1f);
+                itemView.setRotation(0f);
+            }
         }
     }
 

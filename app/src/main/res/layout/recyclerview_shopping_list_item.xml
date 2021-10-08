@@ -18,19 +18,24 @@
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:paddingStart="16dp"
-            android:paddingEnd="16dp"/>
+            android:paddingTop="8dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="8dp"
+            android:textSize="18sp"
+            tools:text="50g ingredient"
+            tools:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/edit_item_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
             android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="8dp"
             android:visibility="gone"
-            tools:visibility="gone">
+            tools:visibility="visible">
 
                 <EditText
                     android:id="@+id/edit_text_item_name"
@@ -38,29 +43,30 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
-                    android:inputType="textAutoCorrect"
-                    tools:text="50g ingredient"
+                    android:hint="@string/edit_ing_list_item_hint"
                     android:importantForAutofill="no"
-                    android:hint="@string/edit_ing_list_item_hint"/>
+                    android:inputType="textMultiLine|textAutoCorrect"
+                    tools:text="50g ingredient dfsghbdfggdrs dfgbhj dfgyhukbdgrf bhukd rfgbuykgers hbuk ueygrbkdgs bfrhukgdrs hbukdgrs hubkergy ubdgr suybh dfg" />
                 <!--                android:background="@null"-->
 
                 <ImageButton
                     android:id="@+id/confirm_edit_item_button"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    app:srcCompat="@drawable/ic_tick"
+                    android:minWidth="32dp"
                     android:background="@color/clickable_item_background_light"
-                    android:contentDescription="@string/content_description_save_ingredient_button" />
+                    android:contentDescription="@string/content_description_save_ingredient_button"
+                    app:srcCompat="@drawable/ic_tick" />
         </LinearLayout>
 
-        <View
-            android:id="@+id/divider2"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?android:attr/listDivider"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"/>
+<!--        <View-->
+<!--            android:id="@+id/divider2"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="1dp"-->
+<!--            android:background="?android:attr/listDivider"-->
+<!--            android:layout_marginStart="16dp"-->
+<!--            android:layout_marginEnd="16dp"/>-->
 
 
 </LinearLayout>

@@ -27,6 +27,7 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         tools:text="Monday"
+        android:focusable="false"
         android:importantForAutofill="no"
         android:inputType="textCapWords"
         android:hint="@string/meal_title_hint"

@@ -289,6 +289,7 @@ public class SlaRepository {
         newItem.setId(oldItem.getId());
         newItem.setListId(oldItem.getListId());
         newItem.setChecked(oldItem.isChecked());
+        newItem.setListOrder(oldItem.getListOrder());
 
         //if name of ingredient has been changed to one which already exists,
         //we need to merge it with an existing item.

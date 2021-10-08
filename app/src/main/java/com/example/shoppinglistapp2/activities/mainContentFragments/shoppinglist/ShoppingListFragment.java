@@ -3,6 +3,10 @@ package com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglis
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -74,6 +78,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
             if(items == null || items.size() == 0){
                 binding.textviewNoSlItems.setVisibility(View.VISIBLE);
                 binding.shoppingListRecyclerview.setVisibility(View.GONE);
+                binding.shoppingListProgressBar.setVisibility(View.GONE);
             }
             else{
                 //hide placeholder text
@@ -83,6 +88,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                 Parcelable recyclerViewState = binding.shoppingListRecyclerview.getLayoutManager().onSaveInstanceState();
                 adapter.submitList(items, () -> {
                     binding.shoppingListRecyclerview.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+                    binding.shoppingListProgressBar.setVisibility(View.GONE);
                 });
             }
         });
