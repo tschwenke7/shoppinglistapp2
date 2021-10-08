@@ -48,7 +48,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:backgroundTint="@color/recipe_item_button_background_light"
+        android:backgroundTint="@color/clickable_item_background_light"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/day_title"
         app:layout_constraintEnd_toStartOf="@+id/delete_meal_icon"
@@ -67,7 +67,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/day_title"
         app:srcCompat="@drawable/ic_baseline_delete_24"
-        android:backgroundTint="@color/recipe_item_button_background_light"
+        android:backgroundTint="@color/clickable_item_background_light"
         tools:visibility="visible"
         android:contentDescription="@string/content_description_delete_meal"/>
 

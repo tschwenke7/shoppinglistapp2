@@ -1,9 +1,11 @@
 package com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglist;
 
+import android.content.Context;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -87,6 +89,12 @@ public class ShoppingListAdapter extends ListAdapter<IngListItem, ShoppingListAd
                 //swap editing view back to plain textview
                 textView.setVisibility(View.VISIBLE);
                 editItemContainer.setVisibility(View.GONE);
+
+                editItemContainer.clearFocus();
+                //hide keyboard
+                InputMethodManager imm = (InputMethodManager)textView.getContext().getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
             });
 
         }

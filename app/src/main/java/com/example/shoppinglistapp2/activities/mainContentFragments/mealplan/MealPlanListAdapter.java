@@ -208,7 +208,7 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
                 binding.deleteMealIcon.setVisibility(View.GONE);
 
                 //restore background for responsive longclicks
-                binding.dayTitle.setBackgroundResource(R.color.recipe_item_button_background_light);
+                binding.dayTitle.setBackgroundResource(R.color.clickable_item_background_light);
 
 
             });

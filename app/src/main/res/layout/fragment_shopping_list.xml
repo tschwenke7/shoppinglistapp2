@@ -16,9 +16,11 @@
         android:ems="10"
         android:hint="@string/new_list_item_field_placeholder"
         android:inputType="textMultiLine|text"
+        android:minHeight="48dp"
         app:layout_constraintEnd_toStartOf="@+id/button_new_list_item"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:importantForAutofill="no" />
 
     <View
         android:id="@+id/divider3"
@@ -49,7 +51,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider3"
         tools:listitem="@layout/recyclerview_shopping_list_item"
-        tools:visibility="gone" />
+        tools:visibility="gone"/>
 
     <TextView
         android:id="@+id/textview_no_sl_items"

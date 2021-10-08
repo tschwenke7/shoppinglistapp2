@@ -5,9 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_marginStart="16dp"
-    android:layout_marginEnd="16dp"
-    android:layout_marginTop="6dp">
+    >
 
 
         <TextView
@@ -15,41 +13,54 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            tools:text="50g ingredient"/>
+            tools:text="50g ingredient"
+            android:background="@color/clickable_item_background_light"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"/>
 
         <LinearLayout
             android:id="@+id/edit_item_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             android:visibility="gone"
-            tools:visibility="visible">
+            tools:visibility="gone">
 
                 <EditText
                     android:id="@+id/edit_text_item_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:ems="10"
                     android:layout_weight="1"
+                    android:ems="10"
                     android:inputType="textAutoCorrect"
-                    tools:text="50g ingredient"/>
-<!--                android:background="@null"-->
+                    tools:text="50g ingredient"
+                    android:importantForAutofill="no"
+                    android:hint="@string/edit_ing_list_item_hint"/>
+                <!--                android:background="@null"-->
 
-                <ImageView
+                <ImageButton
                     android:id="@+id/confirm_edit_item_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     app:srcCompat="@drawable/ic_tick"
-                    />
+                    android:background="@color/clickable_item_background_light"
+                    android:contentDescription="@string/content_description_save_ingredient_button" />
         </LinearLayout>
 
         <View
             android:id="@+id/divider2"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="6dp"
-            android:background="?android:attr/listDivider" />
+            android:background="?android:attr/listDivider"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"/>
 
 
 </LinearLayout>
