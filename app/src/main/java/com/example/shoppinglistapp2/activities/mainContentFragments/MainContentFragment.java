@@ -184,7 +184,7 @@ public class MainContentFragment extends Fragment {
         inflater.inflate(menuResourceIds[viewPager.getCurrentItem()], menu);
 
         //inflate settings icon
-        inflater.inflate(R.menu.main_content_menu, menu);
+//        inflater.inflate(R.menu.main_content_menu, menu);
     }
     /** Respond to menu items from action bar being pressed */
     @Override

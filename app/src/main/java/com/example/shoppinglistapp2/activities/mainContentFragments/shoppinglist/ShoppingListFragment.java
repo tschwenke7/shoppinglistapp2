@@ -166,7 +166,10 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                             ClipData clip = ClipData.newPlainText("shopping_list",
                                     shoppingListViewModel.getAllItemsAsString(true));
                             clipboard.setPrimaryClip(clip);
-                            Toast.makeText(requireContext(), R.string.export_ingredients_toast, Toast.LENGTH_LONG).show();
+                            new AlertDialog.Builder(requireContext())
+                                    .setTitle(R.string.copy_to_clipboard_dialog_title)
+                                    .setMessage(R.string.share_shopping_list_success)
+                                    .setPositiveButton(R.string.ok, null).show();
                         })
                         //negative button corresponds to "don't include"
                         .setNegativeButton(R.string.copy_to_clipboard_dialog_negative_button, ((dialog, which) -> {
@@ -175,7 +178,10 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                             ClipData clip = ClipData.newPlainText("shopping_list",
                                     shoppingListViewModel.getAllItemsAsString(false));
                             clipboard.setPrimaryClip(clip);
-                            Toast.makeText(requireContext(), R.string.export_ingredients_toast, Toast.LENGTH_LONG).show();
+                            new AlertDialog.Builder(requireContext())
+                                    .setTitle(R.string.copy_to_clipboard_dialog_title)
+                                    .setMessage(R.string.share_shopping_list_success)
+                                    .setPositiveButton(R.string.ok, null).show();
                         }))
                         .show();
                 break;

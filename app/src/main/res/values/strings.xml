@@ -156,10 +156,10 @@
     <string name="export_ingredients_positive">Confirm</string>
     <string name="export_ingredients_success">Ingredients added to shopping list</string>
     <string name="copy_list_to_clipboard">Copy list to clipboard</string>
-    <string name="export_ingredients_toast">Shopping list copied to clipboard.\nYou can now paste wherever you want.</string>
+    <string name="share_shopping_list_success">Your shopping list has been copied to the clipboard.\nYou can now paste it wherever you want, e.g. in a text message or email.</string>
 
-    <string name="copy_to_clipboard_dialog_title">Include crossed off items?</string>
-    <string name="copy_to_clipboard_dialog_message">Do you want to include crossed-off items?</string>
+    <string name="copy_to_clipboard_dialog_title">Share shopping list</string>
+    <string name="copy_to_clipboard_dialog_message">Do you want to include items you have crossed-off?</string>
     <string name="copy_to_clipboard_dialog_positive_button">Yes</string>
     <string name="copy_to_clipboard_dialog_negative_button">Don\'t Include</string>
 
