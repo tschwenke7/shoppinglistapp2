@@ -81,7 +81,6 @@ public class ShoppingListAdapter extends BaseRecyclerViewAdapter<IngListItem> {
 
         public void bind (IngListItem item){
             TextView textView = (TextView) itemView.findViewById(R.id.item_name);
-            View editItemContainer = itemView.findViewById(R.id.edit_item_container);
             EditText editText = itemView.findViewById(R.id.edit_text_item_name);
             View confirmEditItemButton = itemView.findViewById(R.id.confirm_edit_item_button);
             //set text to contents of slItem
@@ -101,10 +100,14 @@ public class ShoppingListAdapter extends BaseRecyclerViewAdapter<IngListItem> {
             //set click listener to toggle this item checked/unchecked from list
             textView.setOnClickListener(v ->
             {
-                textView.setVisibility(View.GONE);
-                editItemContainer.setVisibility(View.VISIBLE);
-                editText.requestFocus();
+                slItemClickListener.onSlItemClick(getAdapterPosition());
             });
+
+            //enable editing of item
+//            textView.setVisibility(View.GONE);
+//            editText.setVisibility(View.VISIBLE);
+//            confirmEditItemButton.setVisibility(View.VISIBLE);
+//            editText.requestFocus();
 
             //set long click listener to enable editing
 //            textView.setOnLongClickListener(v -> {
@@ -121,9 +124,11 @@ public class ShoppingListAdapter extends BaseRecyclerViewAdapter<IngListItem> {
                 slItemClickListener.onSlItemEditConfirm(item, editText.getText().toString());
                 //swap editing view back to plain textview
                 textView.setVisibility(View.VISIBLE);
-                editItemContainer.setVisibility(View.GONE);
+                binding.itemMenuButton.setVisibility(View.VISIBLE);
+                editText.setVisibility(View.GONE);
+                confirmEditItemButton.setVisibility(View.GONE);
 
-                editItemContainer.clearFocus();
+                editText.clearFocus();
                 //hide keyboard
                 InputMethodManager imm = (InputMethodManager)textView.getContext().getSystemService(
                         Context.INPUT_METHOD_SERVICE);
@@ -134,17 +139,15 @@ public class ShoppingListAdapter extends BaseRecyclerViewAdapter<IngListItem> {
 
         public void setSelected(boolean selected) {
             if(selected) {
-//                binding.divider2.setVisibility(View.INVISIBLE);
-                itemView.setBackgroundColor(itemView.getContext().getResources().getColor(R.color.card_background_extra_light));
+                itemView.setBackgroundColor(itemView.getContext().getResources().getColor(R.color.recipe_item_background_light));
                 binding.itemName.setAlpha(0.4f);
-                binding.editItemContainer.setAlpha(0.4f);
+                binding.itemContainer.setAlpha(0.4f);
                 itemView.setRotation(2f);
             }
             else {
-//                binding.divider2.setVisibility(View.VISIBLE);
-                itemView.setBackgroundColor(itemView.getContext().getResources().getColor(R.color.recipe_item_background));
+                itemView.setBackgroundColor(itemView.getContext().getResources().getColor(R.color.recipe_item_background_light));
                 binding.itemName.setAlpha(1f);
-                binding.editItemContainer.setAlpha(1f);
+                binding.itemContainer.setAlpha(1f);
                 itemView.setRotation(0f);
             }
         }
