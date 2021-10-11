@@ -9,14 +9,12 @@ import android.util.Log;
 
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.importRecipes.ImportRecipesFragmentDirections;
-import com.example.shoppinglistapp2.activities.mainContentFragments.MainContentFragmentDirections;
-import com.example.shoppinglistapp2.activities.settingsFragments.RootSettingsFragmentDirections;
-import com.example.shoppinglistapp2.databinding.FragmentRootSettingsBinding;
 import com.google.common.io.Files;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -40,11 +38,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d(TAG, "onCreate: " + getIntent().toString());
+        if(getIntent() != null) {
+            handleIntent(getIntent());
+        }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    public void handleIntent(Intent intent) {
         String action = intent.getAction();
 
         if(Intent.ACTION_VIEW.equals(action)) {
@@ -70,7 +76,11 @@ public class MainActivity extends AppCompatActivity {
                     NavDirections navAction = ImportRecipesFragmentDirections
                             .actionGlobalImportRecipesFragment(builder.toString());
 
-                    Navigation.findNavController(findViewById(R.id.fragmentContainerView))
+                    NavHostFragment navHostFragment =
+                            (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentContainerView);
+                    NavController navController = navHostFragment.getNavController();
+
+                    navController
                             .navigate(navAction);
 
                 } catch (IOException ioException) {

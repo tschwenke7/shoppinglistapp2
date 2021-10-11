@@ -33,7 +33,4 @@
     <action
         android:id="@+id/action_global_importRecipesFragment"
         app:destination="@id/importRecipesFragment" />
-    <action
-        android:id="@+id/action_global_rootSettingsFragment"
-        app:destination="@id/rootSettingsFragment" />
 </navigation>
