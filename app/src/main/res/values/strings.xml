@@ -217,5 +217,8 @@
     <string name="edit_ing_list_item_hint">Item...</string>
     <string name="content_description_ingredient_options">Options</string>
     <string name="edit">Edit</string>
+    <string name="edit_meal_name">Edit meal name</string>
+    <string name="add_to_shopping_list">Add to shopping list</string>
+    <string name="add_to_meal_plan">Add to meal plan</string>
 
 </resources>

@@ -2,10 +2,12 @@ package com.example.shoppinglistapp2.activities.mainContentFragments.mealplan;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +23,7 @@ import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
 import com.example.shoppinglistapp2.helpers.KeyboardHelper;
 
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -153,47 +156,42 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
 
             /* set day name */
             binding.dayTitle.setText(meal.getDayTitle());
+            Drawable defaultBackground = binding.dayTitle.getBackground();
+            binding.dayTitle.setBackground(null);
 
-            /* Set default visibilities */
-            binding.editDayTitleConfirm.setVisibility(View.GONE);
-            binding.deleteMealIcon.setVisibility(View.GONE);
+            binding.mealTitleMenuButton.setOnClickListener((v) -> {
+                PopupMenu popup = new PopupMenu(binding.mealTitleMenuButton.getContext(), binding.mealTitleMenuButton);
+                popup.inflate(R.menu.shopping_list_item_context_menu);
 
-            /* Listen for longclick on day name for editing */
-            binding.dayTitle.setOnLongClickListener((v) -> {
-                //show buttons
-                binding.editDayTitleConfirm.setVisibility(View.VISIBLE);
-                binding.deleteMealIcon.setVisibility(View.VISIBLE);
+                popup.setOnMenuItemClickListener((menuItem) -> {
+                    switch (menuItem.getItemId()) {
+                        case R.id.edit_item_action:
+                            //switch out default  views for editing views
+                            //show buttons
+                            binding.editDayTitleConfirm.setVisibility(View.VISIBLE);
+                            binding.mealTitleMenuButton.setVisibility(View.GONE);
 
-                //remove background
-                binding.dayTitle.setBackground(null);
+                            //remove background
+                            binding.dayTitle.setBackground(defaultBackground);
 
-                //set focus to edittext
-                binding.dayTitle.setFocusableInTouchMode(true);
-                binding.dayTitle.setFocusable(true);
-                binding.dayTitle.requestFocus();
+                            //set focus to edittext
+//                            binding.dayTitle.setBackgroundResource(android.R.drawable.editbox_background);
+                            binding.dayTitle.setFocusableInTouchMode(true);
+                            binding.dayTitle.setFocusable(true);
+                            binding.dayTitle.requestFocus();
 
-                //open keyboard
-                InputMethodManager imm = (InputMethodManager) binding.dayTitle
-                        .getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                return false;
+                            //open keyboard
+                            KeyboardHelper.showKeyboard(binding.dayTitle);
+
+                            return true;
+                        case R.id.delete_item_action:
+                            mealPlanClickListener.onDeleteMealClicked(getAdapterPosition()/2);
+                        default:
+                            return false;
+                    }
+                });
+                popup.show();
             });
-
-//            binding.editTitleButton.setOnClickListener((v) -> {
-//                binding.editDayTitleConfirm.setVisibility(View.VISIBLE);
-//                binding.deleteMealIcon.setVisibility(View.VISIBLE);
-//                binding.editTitleButton.setVisibility(View.GONE);
-//
-//                //set focus to edittext
-//                binding.dayTitle.setFocusableInTouchMode(true);
-//                binding.dayTitle.setFocusable(true);
-//                binding.dayTitle.requestFocus();
-//
-//                //open keyboard
-//                InputMethodManager imm = (InputMethodManager) binding.dayTitle
-//                        .getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-//                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-//            });
 
             /* Listen for title change confirm "tick icon" clicked, and tell fragment to update */
             binding.editDayTitleConfirm.setOnClickListener(view -> {
@@ -206,18 +204,9 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
 
                 //hide editing buttons
                 binding.editDayTitleConfirm.setVisibility(View.GONE);
-                binding.deleteMealIcon.setVisibility(View.GONE);
+                binding.mealTitleMenuButton.setVisibility(View.VISIBLE);
 
-                //restore background for responsive longclicks
-                binding.dayTitle.setBackgroundResource(R.color.clickable_item_background_light);
-
-
-            });
-
-            /* Listen for delete meal icon click */
-            binding.deleteMealIcon.setOnClickListener((view) -> {
-                mealPlanClickListener.onDeleteMealClicked(getAdapterPosition()/2);
-                binding.dayTitle.clearFocus();
+                binding.dayTitle.setBackground(null);
             });
         }
     }

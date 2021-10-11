@@ -77,7 +77,7 @@
     </fragment>
     <fragment
         android:id="@+id/selectMealFragment"
-        android:name="com.example.shoppinglistapp2.activities.mainContentFragments.recipes.recipelist.selectmeal.SelectMealFragment"
+        android:name="com.example.shoppinglistapp2.activities.mainContentFragments.recipes.viewrecipe.selectmeal.SelectMealFragment"
         android:label="fragment_select_meal"
         tools:layout="@layout/fragment_select_meal" >
         <argument

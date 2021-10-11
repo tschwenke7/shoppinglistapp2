@@ -13,16 +13,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_weight="1"
-
         android:textColor="@color/day_title_edittext_font_color"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/edit_day_title_confirm"
+        app:layout_constraintEnd_toStartOf="@id/meal_title_menu_button"
         android:layout_marginEnd="4dp"
-        app:layout_goneMarginEnd="0dp"
         android:layout_marginStart="12dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
@@ -31,18 +28,20 @@
         android:importantForAutofill="no"
         android:inputType="textCapWords"
         android:hint="@string/meal_title_hint"
-        android:background="@color/recipe_item_background_light"/>
+        />
 
-<!--    <ImageButton-->
-<!--        android:id="@+id/edit_title_button"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/day_title"-->
-<!--        app:layout_constraintEnd_toStartOf="@id/edit_day_title_confirm"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:srcCompat="@drawable/ic_edit"-->
-<!--        android:backgroundTint="@color/recipe_item_button_background_light"-->
-<!--        android:contentDescription="@string/content_description_edit_meal_title"/>-->
+    <ImageButton
+        android:id="@+id/meal_title_menu_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:backgroundTint="@color/clickable_item_background_light"
+        android:contentDescription="@string/content_description_save_meal_title"
+        app:layout_constraintBottom_toBottomOf="@id/day_title"
+        app:layout_constraintEnd_toStartOf="@+id/edit_day_title_confirm"
+        app:layout_constraintTop_toTopOf="@id/day_title"
+        app:srcCompat="@drawable/ic_baseline_more_vert_24"
+        tools:visibility="visible" />
 
     <ImageButton
         android:id="@+id/edit_day_title_confirm"
@@ -50,26 +49,13 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:backgroundTint="@color/clickable_item_background_light"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/day_title"
-        app:layout_constraintEnd_toStartOf="@+id/delete_meal_icon"
-        app:layout_constraintTop_toTopOf="@id/day_title"
-        app:srcCompat="@drawable/ic_tick"
-        tools:visibility="visible"
-        android:contentDescription="@string/content_description_save_meal_title"/>
-
-    <ImageButton
-        android:id="@+id/delete_meal_icon"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:contentDescription="@string/content_description_save_meal_title"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/day_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/day_title"
-        app:srcCompat="@drawable/ic_baseline_delete_24"
-        android:backgroundTint="@color/clickable_item_background_light"
-        tools:visibility="visible"
-        android:contentDescription="@string/content_description_delete_meal"/>
+        app:srcCompat="@drawable/ic_tick"
+        tools:visibility="gone" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

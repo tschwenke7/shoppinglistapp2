@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2.activities.mainContentFragments.recipes.recipelist.selectmeal;
+package com.example.shoppinglistapp2.activities.mainContentFragments.recipes.viewrecipe.selectmeal;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.ActionBar;
