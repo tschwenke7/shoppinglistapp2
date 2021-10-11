@@ -24,6 +24,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
@@ -40,21 +41,30 @@ import com.example.shoppinglistapp2.activities.mainContentFragments.SharedViewMo
 import com.example.shoppinglistapp2.databinding.FragmentViewRecipeBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Tag;
+import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
+import com.example.shoppinglistapp2.helpers.ErrorsUI;
 import com.example.shoppinglistapp2.helpers.KeyboardHelper;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.google.android.material.chip.Chip;
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.gson.Gson;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 public class ViewRecipeFragment extends Fragment implements IngredientListAdapter.IngredientClickListener {
-    private static final String TAG = "TDB_VIEW_REC_FRAG";
+    private static final String TAG = "T_DBG_VIEW_REC_FRAG";
     private ViewRecipeViewModel viewModel;
     private SharedViewModel sharedViewModel;
     private FragmentViewRecipeBinding binding;
@@ -771,12 +781,45 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
                 enterEditMode();
                 return true;
 
-//            case R.id.action_add_all_to_list:
-//                promptSendIngredientsToShoppingList();
-//                return true;
+            case R.id.export_recipe:
+                shareRecipe();
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void shareRecipe() {
+        RecipeWithTagsAndIngredients recipe = viewModel.getBackup();
+        Gson gson = new Gson();
+        String json = gson.toJson(recipe);
+
+        File file = new File(requireContext().getCacheDir(), recipe.getRecipe().getName() + ".pmsr");
+        file.deleteOnExit();
+
+        //write json to file
+        try {
+            Files.asCharSink(file, Charsets.UTF_8).write(json);
+        } catch (IOException ioException) {
+            ErrorsUI.showToast(requireContext(), R.string.error_sharing_file);
+        }
+
+        //open chooser to choose a method to share the json with
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        if(file.exists()) {
+            Uri contentUri = FileProvider.getUriForFile(requireContext(), "com.package.example", file);
+
+            intent.setType("text/json");
+            intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+
+            intent.putExtra(Intent.EXTRA_SUBJECT, requireContext().getString(R.string.share_recipe_subject));
+            intent.putExtra(Intent.EXTRA_TEXT, requireContext().getString(R.string.share_recipe_body_text));
+
+            startActivity(Intent.createChooser(intent, requireContext().getString(R.string.share_recipe_prompt_title)));
+        }
+        else {
+            ErrorsUI.showToast(requireContext(), R.string.error_sharing_file);
         }
     }
 

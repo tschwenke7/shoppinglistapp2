@@ -194,4 +194,8 @@ public class ViewRecipeViewModel extends AndroidViewModel {
             slaRepository.updateOrDeleteIfEmptyIngListItem(ing);
         }
     }
+
+    public RecipeWithTagsAndIngredients getBackup() {
+        return backup;
+    }
 }
