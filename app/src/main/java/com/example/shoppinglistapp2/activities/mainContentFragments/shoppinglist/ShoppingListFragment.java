@@ -25,13 +25,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.databinding.FragmentShoppingListBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
+import com.example.shoppinglistapp2.helpers.ErrorsUI;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -39,7 +42,7 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import java.util.concurrent.Executor;
 
 public class ShoppingListFragment extends Fragment implements ShoppingListAdapter.SlItemClickListener {
-    private ShoppingListViewModel shoppingListViewModel;
+    private ShoppingListViewModel viewModel;
     private ListeningExecutorService backgroundExecutor;
     private Executor uiExecutor;
     private FragmentShoppingListBinding binding;
@@ -49,7 +52,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         //get viewModel
-        shoppingListViewModel =
+        viewModel =
                 new ViewModelProvider(requireActivity()).get(ShoppingListViewModel.class);
 
         //inflate fragment
@@ -68,12 +71,15 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
         this.setHasOptionsMenu(true);
 
         //setup shopping list recyclerview
-        final ShoppingListAdapter adapter = new ShoppingListAdapter(this);
+        final ShoppingListAdapter adapter = new ShoppingListAdapter(this, backgroundExecutor);
         binding.shoppingListRecyclerview.setAdapter(adapter);
         binding.shoppingListRecyclerview.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        ShoppingListTouchCallback itemTouchCallback = new ShoppingListTouchCallback(adapter, requireContext());
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(binding.shoppingListRecyclerview);
 
         //set observer to update shopping list when it changes
-        shoppingListViewModel.getSlItems().observe(getViewLifecycleOwner(), items -> {
+        viewModel.getSlItems().observe(getViewLifecycleOwner(), items -> {
             //if the list is empty, show placeholder text instead
             if(items == null || items.size() == 0){
                 binding.textviewNoSlItems.setVisibility(View.VISIBLE);
@@ -105,7 +111,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
         }
         else{
             Futures.addCallback(
-                backgroundExecutor.submit(() -> shoppingListViewModel.addItems(inputText)),
+                backgroundExecutor.submit(() -> viewModel.addItems(inputText)),
                 new FutureCallback<Object>() {
                     @Override
                     public void onSuccess(@Nullable Object result) {
@@ -145,7 +151,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_clear_checked_list_items:
-                shoppingListViewModel.deleteCheckedSlItems();
+                viewModel.deleteCheckedSlItems();
                 break;
             case R.id.action_clear_all_list_items:
                 //prompt for confirmation first
@@ -154,7 +160,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                         .setMessage(R.string.clear_list_warning_message)
                         .setPositiveButton(R.string.clear_list_positive_button, (dialogInterface, i) -> {
                             //delete all items from the shopping list
-                            shoppingListViewModel.clearShoppingList();
+                            viewModel.clearShoppingList();
                         })
                         //otherwise don't do anything
                         .setNegativeButton(R.string.clear_list_negative_button, null)
@@ -170,7 +176,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                             ClipboardManager clipboard = (ClipboardManager) requireActivity()
                                     .getSystemService(Context.CLIPBOARD_SERVICE);
                             ClipData clip = ClipData.newPlainText("shopping_list",
-                                    shoppingListViewModel.getAllItemsAsString(true));
+                                    viewModel.getAllItemsAsString(true));
                             clipboard.setPrimaryClip(clip);
                             new AlertDialog.Builder(requireContext())
                                     .setTitle(R.string.copy_to_clipboard_dialog_title)
@@ -182,7 +188,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                             ClipboardManager clipboard = (ClipboardManager) requireActivity()
                                     .getSystemService(Context.CLIPBOARD_SERVICE);
                             ClipData clip = ClipData.newPlainText("shopping_list",
-                                    shoppingListViewModel.getAllItemsAsString(false));
+                                    viewModel.getAllItemsAsString(false));
                             clipboard.setPrimaryClip(clip);
                             new AlertDialog.Builder(requireContext())
                                     .setTitle(R.string.copy_to_clipboard_dialog_title)
@@ -212,7 +218,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
     @Override
     public void onSlItemClick(int position) {
         Futures.addCallback(
-            backgroundExecutor.submit(() -> shoppingListViewModel.toggleChecked(position)),
+            backgroundExecutor.submit(() -> viewModel.toggleChecked(position)),
             new FutureCallback<Object>() {
                 @Override
                 public void onSuccess(@Nullable Object result) {
@@ -231,7 +237,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
 
     @Override
     public void onSlItemEditConfirm(IngListItem oldItem, String newItemString) {
-        Futures.addCallback(backgroundExecutor.submit(() -> shoppingListViewModel.editItem(oldItem, newItemString)),
+        Futures.addCallback(backgroundExecutor.submit(() -> viewModel.editItem(oldItem, newItemString)),
             new FutureCallback<Object>() {
                 @Override
                 public void onSuccess(@Nullable Object result) {
@@ -255,5 +261,98 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
             },
             uiExecutor
         );
+    }
+
+    @Override
+    public void onSlItemDeleteClicked(IngListItem item) {
+        Futures.addCallback(backgroundExecutor.submit(() -> viewModel.deleteItem(item)),
+            new FutureCallback<Object>() {
+                @Override
+                public void onSuccess(@Nullable Object result) {
+
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    ErrorsUI.showDefaultToast(requireContext());
+                }
+            }, uiExecutor);
+    }
+
+    public class ShoppingListTouchCallback extends ItemTouchHelper.SimpleCallback {
+        private final ShoppingListAdapter adapter;
+
+        public ShoppingListTouchCallback(ShoppingListAdapter adapter, Context context) {
+            super(ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.START | ItemTouchHelper.END ,0);
+            this.adapter = adapter;
+        }
+
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            int fromPos = viewHolder.getAdapterPosition();
+            int toPos = target.getAdapterPosition();
+
+            //prevent extra scrolling if moving top item
+            LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
+            int firstPos = manager.findFirstCompletelyVisibleItemPosition();
+            int offsetTop = 0;
+            if(firstPos >= 0) {
+                View firstView = manager.findViewByPosition(firstPos);
+                offsetTop = manager.getDecoratedTop(firstView) - manager.getTopDecorationHeight(firstView);
+            }
+
+            adapter.swap(fromPos,toPos);
+
+            if (firstPos >= 0) {
+                manager.scrollToPositionWithOffset(firstPos, offsetTop);
+            }
+
+            return false;
+        }
+
+        @Override
+        public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+            return super.getMovementFlags(recyclerView,viewHolder);
+        }
+
+        /**
+         * Triggers when drag is stopped. Here we will update the db backing of this recyclerview
+         * @param recyclerView
+         * @param viewHolder
+         */
+        @Override
+        public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+            viewModel.updateListPositions(adapter.getCurrentList());
+            ((ShoppingListAdapter.ViewHolder) viewHolder).setSelected(false);
+            super.clearView(recyclerView, viewHolder);
+        }
+
+        @Override
+        public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
+            switch (actionState) {
+                case ItemTouchHelper.ACTION_STATE_DRAG:
+                    ((ShoppingListAdapter.ViewHolder) viewHolder).setSelected(true);
+                    break;
+                case ItemTouchHelper.ACTION_STATE_IDLE:
+                    break;
+            }
+            super.onSelectedChanged(viewHolder, actionState);
+        }
+
+        @Override
+        public int interpolateOutOfBoundsScroll(@NonNull RecyclerView recyclerView, int viewSize, int viewSizeOutOfBounds, int totalSize, long msSinceStartScroll) {
+            final int direction = (int) Math.signum(viewSizeOutOfBounds);
+            return 12 * direction;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+        }
+
+        @Override
+        public boolean canDropOver(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder current, @NonNull RecyclerView.ViewHolder target) {
+            return current.getItemViewType() == target.getItemViewType();
+        }
     }
 }

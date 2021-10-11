@@ -58,6 +58,9 @@ public class IngListItem {
     @ColumnInfo(defaultValue = "0")
     private boolean checked;
 
+    @ColumnInfo(name = "list_order", defaultValue = "0")
+    private int listOrder;
+
     public IngListItem(){}
 
     @Ignore
@@ -164,6 +167,14 @@ public class IngListItem {
         this.listId = listId;
     }
 
+    public int getListOrder() {
+        return listOrder;
+    }
+
+    public void setListOrder(int listOrder) {
+        this.listOrder = listOrder;
+    }
+
     @Ignore
     public IngListItem deepCopy() {
         IngListItem copy = new IngListItem();
@@ -177,22 +188,21 @@ public class IngListItem {
         copy.setOtherQty(this.getOtherQty());
         copy.setChecked(this.isChecked());
         copy.setName(this.getName());
+        copy.setListOrder(this.getListOrder());
         return copy;
     }
-
-
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         IngListItem that = (IngListItem) o;
-        return id == that.id && listId == that.listId && Double.compare(that.volumeQty, volumeQty) == 0 && Double.compare(that.massQty, massQty) == 0 && Double.compare(that.wholeItemQty, wholeItemQty) == 0 && Double.compare(that.otherQty, otherQty) == 0 && checked == that.checked && Objects.equals(name, that.name) && Objects.equals(volumeUnit, that.volumeUnit) && Objects.equals(massUnit, that.massUnit) && Objects.equals(otherUnit, that.otherUnit);
+        return id == that.id && listId == that.listId && Double.compare(that.volumeQty, volumeQty) == 0 && Double.compare(that.massQty, massQty) == 0 && Double.compare(that.wholeItemQty, wholeItemQty) == 0 && Double.compare(that.otherQty, otherQty) == 0 && checked == that.checked && listOrder == that.listOrder && Objects.equals(name, that.name) && Objects.equals(volumeUnit, that.volumeUnit) && Objects.equals(massUnit, that.massUnit) && Objects.equals(otherUnit, that.otherUnit);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, listId, volumeUnit, volumeQty, massUnit, massQty, wholeItemQty, otherUnit, otherQty, checked);
+        return Objects.hash(id, name, listId, volumeUnit, volumeQty, massUnit, massQty, wholeItemQty, otherUnit, otherQty, checked, listOrder);
     }
 
     @Ignore

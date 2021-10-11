@@ -91,4 +91,16 @@ public class ShoppingListViewModel extends AndroidViewModel {
             return "";
         }
     }
+
+    public void updateListPositions(List<IngListItem> currentList) {
+        for (int i = 0; i < currentList.size(); i++) {
+            currentList.get(i).setListOrder(i);
+        }
+        slaRepository.updateIngListItems(currentList);
+    }
+
+
+    public void deleteItem(IngListItem item) {
+        slaRepository.deleteIngListItem(item);
+    }
 }

@@ -29,10 +29,11 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.Executors;
 
 @Database(entities = {Recipe.class, IngList.class, IngListItem.class, Tag.class, MealPlan.class, Meal.class},
-        version = 16,
+        version = 17,
         exportSchema = true,
         autoMigrations = {
-                @AutoMigration(from = 15,to = 16)
+                @AutoMigration(from = 15,to = 16),
+                @AutoMigration(from = 16, to = 17)
         }
 )
 public abstract class SlaDatabase extends RoomDatabase {

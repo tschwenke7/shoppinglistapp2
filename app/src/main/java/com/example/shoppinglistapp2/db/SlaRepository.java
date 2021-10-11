@@ -475,4 +475,8 @@ public class SlaRepository {
     public void updateMeals(List<Meal> meals) {
         SlaDatabase.databaseWriteExecutor.submit(() -> mealDao.updateAll(meals));
     }
+
+    public void updateIngListItems(List<IngListItem> currentList) {
+        SlaDatabase.databaseWriteExecutor.submit(() -> ingListItemDao.updateAll(currentList));
+    }
 }
