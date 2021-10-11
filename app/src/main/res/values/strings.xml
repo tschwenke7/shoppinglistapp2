@@ -222,8 +222,10 @@
     <string name="add_to_meal_plan">Add to meal plan</string>
     <string name="share_recipe">Share recipe</string>
     <string name="error_sharing_file">Error - could not share recipe/s. Please try again later.</string>
-    <string name="share_recipe_body_text">Your friend has shared some recipes with you! If you have the \"Plan MY Shop\" app installed, you can open the attached file to automatically add them to your recipe book.</string>
+    <string name="share_recipe_body_text">Your friend has shared some recipes with you! If you have the \"Plan My Shop\" app installed on this device, you can open the attached file to automatically add them to your recipe book.</string>
     <string name="share_recipe_prompt_title">Share recipe</string>
     <string name="share_recipe_subject">Add these recipes to your Plan My Shop app!</string>
+    <string name="share_recipe_success">Recipe shared successfully.</string>
+    <string name="share_recipe_default_filename">Shared recipes</string>
 
 </resources>

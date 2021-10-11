@@ -21,4 +21,19 @@
         android:name="com.example.shoppinglistapp2.activities.settingsFragments.RootSettingsFragment"
         android:label="@string/settings_title"
         tools:layout="@layout/fragment_root_settings" />
+    <fragment
+        android:id="@+id/importRecipesFragment"
+        android:name="com.example.shoppinglistapp2.activities.importRecipes.ImportRecipesFragment"
+        android:label="fragment_import_recipes"
+        tools:layout="@layout/fragment_import_recipes">
+        <argument
+            android:name="jsonRecipes"
+            app:argType="string" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_importRecipesFragment"
+        app:destination="@id/importRecipesFragment" />
+    <action
+        android:id="@+id/action_global_rootSettingsFragment"
+        app:destination="@id/rootSettingsFragment" />
 </navigation>

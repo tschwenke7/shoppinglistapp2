@@ -1,6 +1,7 @@
 package com.example.shoppinglistapp2.activities.mainContentFragments.recipes.viewrecipe;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -45,6 +46,7 @@ import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredi
 import com.example.shoppinglistapp2.helpers.ErrorsUI;
 import com.example.shoppinglistapp2.helpers.KeyboardHelper;
 import com.example.shoppinglistapp2.db.tables.Recipe;
+import com.example.shoppinglistapp2.helpers.RecipeSharer;
 import com.google.android.material.chip.Chip;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -59,6 +61,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -782,44 +785,11 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
                 return true;
 
             case R.id.export_recipe:
-                shareRecipe();
+                RecipeSharer.launchSharingIntent(requireContext(), Arrays.asList(viewModel.getBackup()));
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void shareRecipe() {
-        RecipeWithTagsAndIngredients recipe = viewModel.getBackup();
-        Gson gson = new Gson();
-        String json = gson.toJson(recipe);
-
-        File file = new File(requireContext().getCacheDir(), recipe.getRecipe().getName() + ".pmsr");
-        file.deleteOnExit();
-
-        //write json to file
-        try {
-            Files.asCharSink(file, Charsets.UTF_8).write(json);
-        } catch (IOException ioException) {
-            ErrorsUI.showToast(requireContext(), R.string.error_sharing_file);
-        }
-
-        //open chooser to choose a method to share the json with
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        if(file.exists()) {
-            Uri contentUri = FileProvider.getUriForFile(requireContext(), "com.package.example", file);
-
-            intent.setType("text/json");
-            intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-
-            intent.putExtra(Intent.EXTRA_SUBJECT, requireContext().getString(R.string.share_recipe_subject));
-            intent.putExtra(Intent.EXTRA_TEXT, requireContext().getString(R.string.share_recipe_body_text));
-
-            startActivity(Intent.createChooser(intent, requireContext().getString(R.string.share_recipe_prompt_title)));
-        }
-        else {
-            ErrorsUI.showToast(requireContext(), R.string.error_sharing_file);
         }
     }
 
