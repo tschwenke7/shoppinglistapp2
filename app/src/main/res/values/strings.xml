@@ -216,5 +216,6 @@
     <string name="content_description_save_ingredient_button">Save ingredient</string>
     <string name="edit_ing_list_item_hint">Item...</string>
     <string name="content_description_ingredient_options">Options</string>
+    <string name="edit">Edit</string>
 
 </resources>

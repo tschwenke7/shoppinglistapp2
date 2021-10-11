@@ -18,6 +18,7 @@ import com.example.shoppinglistapp2.databinding.RecyclerviewMealPlanMealTitleBin
 import com.example.shoppinglistapp2.db.tables.Meal;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
+import com.example.shoppinglistapp2.helpers.KeyboardHelper;
 
 
 import java.util.ArrayList;
@@ -341,9 +342,7 @@ public class MealPlanListAdapter extends BaseRecyclerViewAdapter<MealWithRecipe>
             binding.mealPlanNotes.requestFocus();
 
             //open keyboard
-            InputMethodManager imm = (InputMethodManager) binding.mealPlanNotes
-                    .getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+            KeyboardHelper.showKeyboard(binding.mealPlanNotes);
         }
 
         public void setSelected(boolean selected) {

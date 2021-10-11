@@ -27,4 +27,16 @@ public class KeyboardHelper {
             inputManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
         }
     }
+
+    public static void hideKeyboard(View fromView) {
+        InputMethodManager imm = (InputMethodManager) fromView.getContext().getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(fromView.getWindowToken(), 0);
+    }
+
+    public static void showKeyboard(View forView) {
+        InputMethodManager imm = (InputMethodManager) forView
+                .getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+    }
 }
