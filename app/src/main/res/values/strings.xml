@@ -227,12 +227,18 @@
     <string name="share_recipe_subject">Add these recipes to your Plan My Shop app!</string>
     <string name="share_recipe_success">Recipe shared successfully.</string>
     <string name="share_recipe_default_filename">Shared recipes</string>
-    <string name="import_recipes_title">Import Recipes</string>
+    <string name="import_recipes_title_single">Import Recipe</string>
+    <string name="import_recipes_title_multiple">Import %1$d Recipes</string>
     <string name="error_importing_recipes">Error - the recipes file you tried to read was invalid.\nPlease ask the sender to try sharing again.</string>
     <string name="save_all_to_recipe_book_button">Save all to recipe book</string>
     <string name="import_recipes_help">The recipes below have been shared with you. To add them to your recipe book, simply click the \"Save All\" button below.\n\nIf you want to add any custom tags to these recipes to help identify them, enter them below BEFORE clicking ths \"Save All\" button.</string>
     <string name="import_tags_heading">These tags will be added to all recipes below:</string>
     <string name="no_tags_placeholder">No tags set.</string>
     <string name="shared_recipes_heading">Shared Recipes</string>
+    <string name="import_meal_conflict_title">A recipe with name \"%1$s\" already exists in your recipe book. What would you like to do?</string>
+    <string name="import_conflict_delete_old">Delete the old recipe</string>
+    <string name="import_conflict_delete_new">Discard the new recipe</string>
+    <string name="import_conflict_keep_both">Keep both recipes</string>
+    <string name="imported_successfully">Recipes imported succsessfully!</string>
 
 </resources>

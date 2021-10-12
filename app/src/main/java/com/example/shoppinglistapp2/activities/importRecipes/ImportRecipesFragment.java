@@ -1,5 +1,6 @@
 package com.example.shoppinglistapp2.activities.importRecipes;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
@@ -9,6 +10,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavAction;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
@@ -19,11 +22,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
+import com.example.shoppinglistapp2.activities.mainContentFragments.MainContentFragment;
+import com.example.shoppinglistapp2.activities.mainContentFragments.MainContentFragmentDirections;
 import com.example.shoppinglistapp2.databinding.FragmentImportRecipesBinding;
+import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
 import com.example.shoppinglistapp2.helpers.Animations;
 import com.example.shoppinglistapp2.helpers.ErrorsUI;
 import com.google.android.material.chip.Chip;
@@ -33,6 +41,8 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 public class ImportRecipesFragment extends Fragment implements ImportListAdapter.ClickListener {
@@ -41,6 +51,8 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
     private FragmentImportRecipesBinding binding;
     private ListeningExecutorService backgroundExecutor;
     private Executor uiExecutor;
+
+    private int conflictStrategy = ImportRecipesViewModel.NOT_SET;
 
     public static ImportRecipesFragment newInstance() {
         return new ImportRecipesFragment();
@@ -67,9 +79,6 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
     public void setupViews() {
         setHasOptionsMenu(true);
 //        ((MainActivity) requireActivity()).showUpButton();
-
-        ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar()
-        .setTitle(R.string.import_recipes_title);
 
         String json = getArguments().getString("jsonRecipes");
         //parse the json recipes so they can be displayed in the ui
@@ -103,6 +112,17 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
                         binding.importRecyclerview.setLayoutManager(new LinearLayoutManager(requireContext()));
 
                         viewModel.getRecipesToImport().observe(getViewLifecycleOwner(), (list) -> {
+                            //set title
+                            if(list.size() == 1) {
+                                ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar()
+                                        .setTitle(R.string.import_recipes_title_single);
+                            }
+                            else {
+                                ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar()
+                                        .setTitle(getString(R.string.import_recipes_title_multiple, list.size()));
+                            }
+
+                            //populate recyclerview
                             adapter.submitList(list, () -> {
                                 if (binding.contentContainer.getVisibility() == View.GONE) {
                                     Animations.fadeSwap(binding.importProgressBar, binding.contentContainer);
@@ -173,6 +193,74 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
     @Override
     public void onSaveAllClicked() {
 
+        Futures.addCallback(backgroundExecutor.submit(() -> {
+                try {
+                    //update ui to reflect what's going on
+
+                    //attempt to save each recipe
+                    for (RecipeWithTagsAndIngredients recipe : viewModel.getRecipesToImport().getValue()) {
+                        try {
+                            viewModel.saveRecipe(recipe);
+                        } catch (ImportRecipesViewModel.DuplicateRecipeNameException e) {
+                            //the latch blocks continuation of saving until user picks an option
+                            // from the conflict resolution dialog
+                            final CountDownLatch latch = new CountDownLatch(1);
+                            promptConflictStrategy(recipe, latch);
+                            latch.await();
+                        }
+                    }
+                } catch (ExecutionException | InterruptedException e) {
+                    uiExecutor.execute(() -> ErrorsUI.showDefaultToast(requireContext()));
+                }
+            }),
+            new FutureCallback<Object>() {
+                @Override
+                public void onSuccess(@Nullable Object result) {
+                    //restore UI
+
+                    //show success message
+                    Toast.makeText(requireContext(), R.string.imported_successfully, Toast.LENGTH_LONG).show();
+
+                    //navigate to recipe book
+                    ImportRecipesFragmentDirections.ActionImportToMainContent action
+                            = ImportRecipesFragmentDirections.actionImportToMainContent();
+                    action.setSetViewpagerTo(MainContentFragment.RECIPE_LIST_VIEWPAGER_INDEX);
+                    Navigation.findNavController(requireView()).navigate(action);
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    ErrorsUI.showDefaultToast(requireContext());
+                }
+            },
+            uiExecutor);
+    }
+
+    private void promptConflictStrategy(RecipeWithTagsAndIngredients recipe, CountDownLatch latch) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        TextView titleView = (TextView) getLayoutInflater().inflate(R.layout.custom_alert_title, null);
+        titleView.setText(getString(R.string.import_meal_conflict_title, recipe.getRecipe().getName()));
+        builder.setCustomTitle(titleView);
+
+        builder.setItems(new CharSequence[]{
+                        getString(R.string.import_conflict_delete_old),
+                        getString(R.string.import_conflict_delete_new),
+                        getString(R.string.import_conflict_keep_both)
+                },
+                (dialog, which) -> {
+                    // The 'which' argument contains the index position
+                    // of the selected item
+                    conflictStrategy = which;
+                    try {
+                        viewModel.saveRecipe(recipe, conflictStrategy);
+                    } catch (ExecutionException | InterruptedException e) {
+                        ErrorsUI.showDefaultToast(requireContext());
+                    }
+                    finally {
+                        latch.countDown();
+                    }
+                });
+        uiExecutor.execute(() -> builder.create().show());
     }
 
     @Override

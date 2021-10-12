@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.db.SlaRepository;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Recipe;
@@ -25,8 +26,12 @@ public class ImportRecipesViewModel extends AndroidViewModel {
 
     private final MutableLiveData<List<RecipeWithTagsAndIngredients>> recipesToImport = new MutableLiveData<>();
     private final List<Tag> customTags = new ArrayList<>();
-    private final MutableLiveData<List<Tag>> customTagsLive = new MutableLiveData<>();
     private SlaRepository slaRepository;
+
+    public static final int DELETE_OLD = 0;
+    public static final int DELETE_NEW = 1;
+    public static final int KEEP_BOTH = 2;
+    public static final int NOT_SET = -1;
 
     public ImportRecipesViewModel(@NonNull Application application) {
         super(application);
@@ -51,14 +56,36 @@ public class ImportRecipesViewModel extends AndroidViewModel {
         return recipesToImport;
     }
 
-    public LiveData<List<Tag>> getCustomTags() {
-        return customTagsLive;
+    public void saveRecipe(RecipeWithTagsAndIngredients r) throws ExecutionException, InterruptedException, DuplicateRecipeNameException {
+        if (!slaRepository.recipeNameIsUnique(r.getRecipe().getName())) {
+            throw new DuplicateRecipeNameException();
+        }
+        saveRecipe(r, NOT_SET);
     }
 
-    private void saveRecipe(RecipeWithTagsAndIngredients r) throws ExecutionException, InterruptedException {
+    public void saveRecipe(RecipeWithTagsAndIngredients r, int conflictStrategy) throws ExecutionException, InterruptedException {
         Recipe recipe = r.getRecipe();
         List<IngListItem> ingredients = r.getIngredients();
         List<Tag> tags = r.getTags();
+
+        //check if recipe name is unique
+        if (!slaRepository.recipeNameIsUnique(recipe.getName())) {
+            switch (conflictStrategy) {
+                case DELETE_OLD:
+                    slaRepository.deleteRecipe(slaRepository.getRecipeByName(recipe.getName())).get();
+                    break;
+                case DELETE_NEW:
+                    return;
+                case KEEP_BOTH:
+                    String originalName = recipe.getName();
+                    int i = 2;
+                    do {
+                        recipe.setName(String.format("%s (%d)", originalName, i));
+                        i++;
+                    } while(!slaRepository.recipeNameIsUnique(recipe.getName()));
+                    break;
+            }
+        }
 
         //unset recipe id
         recipe.setId(0);
@@ -90,12 +117,17 @@ public class ImportRecipesViewModel extends AndroidViewModel {
             tag.setRecipeId((int) recipeId);
         }
 
+        //add extra tags if provided
+        for (Tag tag: customTags) {
+            tag.setRecipeId((int) recipeId);
+        }
+
         slaRepository.insertTags(tags);
+        slaRepository.insertTags(customTags);
     }
 
     public void addTag(String tagName) {
         customTags.add(new Tag(tagName));
-        customTagsLive.postValue(customTags);
     }
 
     public void deleteTag(String tagName) {
@@ -105,10 +137,11 @@ public class ImportRecipesViewModel extends AndroidViewModel {
                 break;
             }
         }
-        customTagsLive.postValue(customTags);
     }
 
     public ListenableFuture<List<String>> getDistinctTagNames() {
         return slaRepository.getDistinctTagNames();
     }
+
+    public class DuplicateRecipeNameException extends Exception {}
 }

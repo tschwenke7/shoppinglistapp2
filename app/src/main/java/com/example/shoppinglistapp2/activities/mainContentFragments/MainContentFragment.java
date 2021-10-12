@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.mainContentFragments.mealplan.MealPlanFragment;
 import com.example.shoppinglistapp2.activities.mainContentFragments.recipes.RecipesParentFragment;
 import com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglist.ShoppingListFragment;
@@ -127,6 +128,12 @@ public class MainContentFragment extends Fragment {
                         handler.postDelayed(() -> tabLayout.setVisibility(View.VISIBLE), 100);
                     }
                 });
+
+        //swap viewpager to given page if specified in args
+        int goToIndex = getArguments().getInt("setViewpagerTo");
+        if (goToIndex != -1) {
+            viewPager.setCurrentItem(goToIndex);
+        }
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
