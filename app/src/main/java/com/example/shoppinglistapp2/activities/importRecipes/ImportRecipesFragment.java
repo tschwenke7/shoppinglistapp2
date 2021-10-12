@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +35,7 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-public class ImportRecipesFragment extends Fragment implements ImportListHeaderAdapter.ClickListener {
+public class ImportRecipesFragment extends Fragment implements ImportListAdapter.ClickListener {
 
     private ImportRecipesViewModel viewModel;
     private FragmentImportRecipesBinding binding;
@@ -64,7 +66,7 @@ public class ImportRecipesFragment extends Fragment implements ImportListHeaderA
 
     public void setupViews() {
         setHasOptionsMenu(true);
-        ((MainActivity) requireActivity()).showUpButton();
+//        ((MainActivity) requireActivity()).showUpButton();
 
         ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar()
         .setTitle(R.string.import_recipes_title);
@@ -85,7 +87,7 @@ public class ImportRecipesFragment extends Fragment implements ImportListHeaderA
                 uiExecutor);
 
         //setup tag input autocomplete
-        ImportListHeaderAdapter.ClickListener fragment = this;
+        ImportListAdapter.ClickListener fragment = this;
         Futures.addCallback(
                 viewModel.getDistinctTagNames(),
                 new FutureCallback<List<String>>() {
@@ -96,7 +98,7 @@ public class ImportRecipesFragment extends Fragment implements ImportListHeaderA
                                 getContext(), android.R.layout.simple_dropdown_item_1line, result);
 
                         //setup recyclerview
-                        ImportListHeaderAdapter adapter = new ImportListHeaderAdapter(backgroundExecutor, fragment, tagsAdapter);
+                        ImportListAdapter adapter = new ImportListAdapter(backgroundExecutor, fragment, tagsAdapter);
                         binding.importRecyclerview.setAdapter(adapter);
                         binding.importRecyclerview.setLayoutManager(new LinearLayoutManager(requireContext()));
 
@@ -119,21 +121,13 @@ public class ImportRecipesFragment extends Fragment implements ImportListHeaderA
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                requireActivity().onBackPressed();
-        }
-        return true;
-    }
-
-    @Override
     public void onRecipeClick(int position) {
-
+        //unused
     }
 
     @Override
     public boolean onRecipeLongPress(View view, int position) {
+        //unused
         return false;
     }
 
@@ -179,5 +173,19 @@ public class ImportRecipesFragment extends Fragment implements ImportListHeaderA
     @Override
     public void onSaveAllClicked() {
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                requireActivity().onBackPressed();
+        }
+        return true;
     }
 }

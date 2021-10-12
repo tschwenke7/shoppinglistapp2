@@ -8,7 +8,9 @@ import android.widget.AutoCompleteTextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 
+import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.mainContentFragments.BaseRecyclerViewAdapter;
 import com.example.shoppinglistapp2.activities.mainContentFragments.recipes.recipelist.RecipeListAdapter;
@@ -20,10 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-public class ImportListHeaderAdapter extends RecipeListAdapter {
+public class ImportListAdapter extends RecipeListAdapter {
     private final ClickListener clickListener;
     private final ArrayAdapter<String> tagsAdapter;
-    public ImportListHeaderAdapter(Executor listUpdateExecutor, ClickListener clickListener, ArrayAdapter<String> tagsAdapter) {
+    public ImportListAdapter(Executor listUpdateExecutor, ClickListener clickListener, ArrayAdapter<String> tagsAdapter) {
         super(listUpdateExecutor, clickListener);
         this.clickListener = clickListener;
         this.tagsAdapter = tagsAdapter;
@@ -39,17 +41,19 @@ public class ImportListHeaderAdapter extends RecipeListAdapter {
 
     @Override
     public void submitList(List<RecipeWithTagsAndIngredients> newItems, @Nullable Runnable callback) {
-
         super.submitList(newItems, callback);
     }
 
     @Override
     public int getItemCount() {
-        return items.size() + 2;
+        return super.getItemCount() + 1;
     }
 
     @Override
     public RecipeWithTagsAndIngredients getItem(int position) {
+        if(items == null) {
+            return null;
+        }
         return items.get(position - 1);
     }
 
@@ -76,7 +80,18 @@ public class ImportListHeaderAdapter extends RecipeListAdapter {
             holder.bind(null);
         }
         else {
-            super.onBindViewHolder(holder, position);
+            holder.bind(getItem(position));
+
+            //stop background from changing on touch, since these functionalities aren't available
+            CardView cardView = holder.itemView.findViewById(R.id.card_view);
+            cardView.setCardBackgroundColor(cardView.getContext().getResources().getColor(R.color.card_background_default));
+
+            //hide ratings, since they're ignored on import
+            holder.itemView.findViewById(R.id.star_icon).setVisibility(View.GONE);
+            holder.itemView.findViewById(R.id.tiernan_face).setVisibility(View.GONE);
+            holder.itemView.findViewById(R.id.tier_rating).setVisibility(View.GONE);
+            holder.itemView.findViewById(R.id.tom_face).setVisibility(View.GONE);
+            holder.itemView.findViewById(R.id.tom_rating).setVisibility(View.GONE);
         }
     }
 

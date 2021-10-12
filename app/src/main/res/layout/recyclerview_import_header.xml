@@ -2,8 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginBottom="8dp"
+    >
 
     <TextView
         android:layout_width="match_parent"
@@ -34,7 +36,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/no_tags_placeholder"
-        android:textAlignment="center" />
+        android:textAlignment="center"
+        android:textSize="16sp"/>
 
 
     <LinearLayout
@@ -67,4 +70,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/save_all_to_recipe_book_button" />
+
+    <TextView
+        android:id="@+id/shared_recipes_heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/shared_recipes_heading"
+        android:textSize="18sp"
+        android:layout_marginTop="12dp"
+        android:layout_gravity="center_vertical"
+        android:textStyle="bold" />
 </LinearLayout>

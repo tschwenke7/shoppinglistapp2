@@ -413,6 +413,8 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             actionMode.invalidate();
         }
 
+        view.setSelected(!view.isSelected());
+
         return true;
     }
 

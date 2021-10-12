@@ -527,12 +527,12 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
             //if this item was already selected, deselect
             if(selectedPositions.contains(getAdapterPosition())){
                 selectedPositions.remove((Integer) getAdapterPosition());
-                itemView.setSelected(false);
+//                itemView.setSelected(false);
             }
             //otherwise select this item
             else{
                 selectedPositions.add(getAdapterPosition());
-                itemView.setSelected(true);
+//                itemView.setSelected(true);
             }
 
             //call owner's click handler

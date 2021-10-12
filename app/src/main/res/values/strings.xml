@@ -233,5 +233,6 @@
     <string name="import_recipes_help">The recipes below have been shared with you. To add them to your recipe book, simply click the \"Save All\" button below.\n\nIf you want to add any custom tags to these recipes to help identify them, enter them below BEFORE clicking ths \"Save All\" button.</string>
     <string name="import_tags_heading">These tags will be added to all recipes below:</string>
     <string name="no_tags_placeholder">No tags set.</string>
+    <string name="shared_recipes_heading">Shared Recipes</string>
 
 </resources>
