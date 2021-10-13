@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavAction;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -51,6 +52,7 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
     private FragmentImportRecipesBinding binding;
     private ListeningExecutorService backgroundExecutor;
     private Executor uiExecutor;
+    private ImportListAdapter adapter;
 
     private int conflictStrategy = ImportRecipesViewModel.NOT_SET;
 
@@ -107,7 +109,7 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
                                 getContext(), android.R.layout.simple_dropdown_item_1line, result);
 
                         //setup recyclerview
-                        ImportListAdapter adapter = new ImportListAdapter(backgroundExecutor, fragment, tagsAdapter);
+                        adapter = new ImportListAdapter(backgroundExecutor, fragment, tagsAdapter);
                         binding.importRecyclerview.setAdapter(adapter);
                         binding.importRecyclerview.setLayoutManager(new LinearLayoutManager(requireContext()));
 
@@ -157,6 +159,7 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
         if (!tagName.isEmpty()){
             //add to viewmodel
             viewModel.addTag(tagName);
+            adapter.notifyDataSetChanged();
 
             //add a tag to UI
             chipGroup.post(() -> {
@@ -166,10 +169,10 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
                 //show close icon only if we are in editing mode
                 chip.setCloseIconVisible(true);
 
-
                 chip.setOnCloseIconClickListener((view -> {
                     viewModel.deleteTag(tagName);
                     chipGroup.removeView(view);
+                    adapter.notifyDataSetChanged();
 
                     //show placeholder again if all tags deleted
                     if(chipGroup.getChildCount() == 0) {
@@ -261,6 +264,11 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
                     }
                 });
         uiExecutor.execute(() -> builder.create().show());
+    }
+
+    @Override
+    public void onKeepRatingsToggled(boolean isChecked) {
+        viewModel.setKeepRatings(isChecked);
     }
 
     @Override

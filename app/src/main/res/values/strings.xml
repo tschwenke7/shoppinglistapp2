@@ -244,5 +244,6 @@
     <string name="select_all">Select all</string>
     <string name="one_recipe_selected">1 recipe selected</string>
     <string name="many_recipes_selected">%1$d recipes selected</string>
+    <string name="keep_senders_ratings_label">Keep sharer\'s person 1 &amp; 2 recipe ratings</string>
 
 </resources>

@@ -65,6 +65,15 @@
             android:layout_height="wrap_content"
             android:text="@string/add_ingredient_button"/>
     </LinearLayout>
+
+    <Switch
+        android:id="@+id/keep_ratings_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/keep_senders_ratings_label"
+        android:textSize="16sp"
+        android:minHeight="48dp"/>
+
     <Button
         android:id="@+id/button_save_all"
         android:layout_width="match_parent"

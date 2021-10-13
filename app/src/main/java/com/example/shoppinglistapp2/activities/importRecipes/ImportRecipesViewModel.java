@@ -27,6 +27,7 @@ public class ImportRecipesViewModel extends AndroidViewModel {
     private final MutableLiveData<List<RecipeWithTagsAndIngredients>> recipesToImport = new MutableLiveData<>();
     private final List<Tag> customTags = new ArrayList<>();
     private SlaRepository slaRepository;
+    private boolean keepRatings = false;
 
     public static final int DELETE_OLD = 0;
     public static final int DELETE_NEW = 1;
@@ -42,13 +43,6 @@ public class ImportRecipesViewModel extends AndroidViewModel {
         Gson gson = new Gson();
         Type listType = new TypeToken<List<RecipeWithTagsAndIngredients>>(){}.getType();
         List<RecipeWithTagsAndIngredients> recipes = gson.fromJson(jsonRecipes, listType);
-
-        //remove rating data from imported recipes - user will set that themselves
-        for (RecipeWithTagsAndIngredients recipe : recipes) {
-            recipe.getRecipe().setTom_rating(0);
-            recipe.getRecipe().setTier_rating(0);
-        }
-
         recipesToImport.postValue(recipes);
     }
 
@@ -90,6 +84,12 @@ public class ImportRecipesViewModel extends AndroidViewModel {
         //unset recipe id
         recipe.setId(0);
 
+        //remove rating data from imported recipes if user doesn't want it
+        if (!keepRatings) {
+            recipe.setTom_rating(0);
+            recipe.setTier_rating(0);
+        }
+
         //insert the recipe and get its id
         long recipeId = slaRepository.insertRecipe(recipe).get();
 
@@ -117,30 +117,49 @@ public class ImportRecipesViewModel extends AndroidViewModel {
             tag.setRecipeId((int) recipeId);
         }
 
-        //add extra tags if provided
-        for (Tag tag: customTags) {
-            tag.setRecipeId((int) recipeId);
-        }
-
         slaRepository.insertTags(tags);
-        slaRepository.insertTags(customTags);
     }
 
     public void addTag(String tagName) {
-        customTags.add(new Tag(tagName));
+        Tag newTag = new Tag(tagName);
+        customTags.add(newTag);
+
+        List<RecipeWithTagsAndIngredients> allRecipes = recipesToImport.getValue();
+        for (RecipeWithTagsAndIngredients recipe : allRecipes) {
+            recipe.getTags().add(newTag);
+        }
+
+        recipesToImport.postValue(allRecipes);
     }
 
     public void deleteTag(String tagName) {
+        Tag tagToRemove = null;
         for (Tag tag: customTags) {
             if (tag.getName().equals(tagName)) {
                 customTags.remove(tag);
+                tagToRemove = tag;
                 break;
             }
+        }
+
+        //update recipe list accordingly
+        if(tagToRemove != null) {
+            List<RecipeWithTagsAndIngredients> allRecipes = recipesToImport.getValue();
+            for (RecipeWithTagsAndIngredients recipe : allRecipes) {
+                List<Tag> tags = recipe.getTags();
+                tags.remove(tagToRemove);
+            }
+
+            recipesToImport.postValue(allRecipes);
         }
     }
 
     public ListenableFuture<List<String>> getDistinctTagNames() {
         return slaRepository.getDistinctTagNames();
+    }
+
+    public void setKeepRatings(boolean keepRatings) {
+        this.keepRatings = keepRatings;
     }
 
     public static class DuplicateRecipeNameException extends Exception {}

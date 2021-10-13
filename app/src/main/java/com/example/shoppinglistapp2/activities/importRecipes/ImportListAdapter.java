@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 
-import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.mainContentFragments.BaseRecyclerViewAdapter;
 import com.example.shoppinglistapp2.activities.mainContentFragments.recipes.recipelist.RecipeListAdapter;
@@ -18,13 +17,13 @@ import com.example.shoppinglistapp2.databinding.RecyclerviewImportHeaderBinding;
 import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
 import com.google.android.material.chip.ChipGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
 public class ImportListAdapter extends RecipeListAdapter {
     private final ClickListener clickListener;
     private final ArrayAdapter<String> tagsAdapter;
+    private boolean showRatings = false;
     public ImportListAdapter(Executor listUpdateExecutor, ClickListener clickListener, ArrayAdapter<String> tagsAdapter) {
         super(listUpdateExecutor, clickListener);
         this.clickListener = clickListener;
@@ -88,12 +87,26 @@ public class ImportListAdapter extends RecipeListAdapter {
             holder.itemView.setOnLongClickListener(null);
 
             //hide ratings, since they're ignored on import
-            holder.itemView.findViewById(R.id.star_icon).setVisibility(View.GONE);
-            holder.itemView.findViewById(R.id.tiernan_face).setVisibility(View.GONE);
-            holder.itemView.findViewById(R.id.tier_rating).setVisibility(View.GONE);
-            holder.itemView.findViewById(R.id.tom_face).setVisibility(View.GONE);
-            holder.itemView.findViewById(R.id.tom_rating).setVisibility(View.GONE);
+            if (!showRatings) {
+                holder.itemView.findViewById(R.id.star_icon).setVisibility(View.GONE);
+                holder.itemView.findViewById(R.id.tiernan_face).setVisibility(View.GONE);
+                holder.itemView.findViewById(R.id.tier_rating).setVisibility(View.GONE);
+                holder.itemView.findViewById(R.id.tom_face).setVisibility(View.GONE);
+                holder.itemView.findViewById(R.id.tom_rating).setVisibility(View.GONE);
+            }
+            else {
+                holder.itemView.findViewById(R.id.star_icon).setVisibility(View.VISIBLE);
+                holder.itemView.findViewById(R.id.tiernan_face).setVisibility(View.VISIBLE);
+                holder.itemView.findViewById(R.id.tier_rating).setVisibility(View.VISIBLE);
+                holder.itemView.findViewById(R.id.tom_face).setVisibility(View.VISIBLE);
+                holder.itemView.findViewById(R.id.tom_rating).setVisibility(View.VISIBLE);
+            }
         }
+    }
+
+    public void setShowRatings(boolean showRatings) {
+        this.showRatings = showRatings;
+        notifyDataSetChanged();
     }
 
     public class HeaderViewHolder extends BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients>.ViewHolder {
@@ -115,11 +128,18 @@ public class ImportListAdapter extends RecipeListAdapter {
             });
 
             binding.buttonSaveAll.setOnClickListener((v) -> clickListener.onSaveAllClicked());
+
+            binding.keepRatingsSwitch.setOnCheckedChangeListener((v, isChecked) -> {
+                clickListener.onKeepRatingsToggled(isChecked);
+                setShowRatings(isChecked);
+            });
+
         }
     }
 
     public interface ClickListener extends RecipeListAdapter.OnRecipeClickListener {
         void onAddTagClicked(AutoCompleteTextView tagInputField, ChipGroup chipGroup, View noTagPlaceholder);
         void onSaveAllClicked();
+        void onKeepRatingsToggled(boolean isChecked);
     }
 }
