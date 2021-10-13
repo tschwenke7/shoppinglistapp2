@@ -239,7 +239,7 @@
     <string name="import_conflict_delete_old">Delete the old recipe</string>
     <string name="import_conflict_delete_new">Discard the new recipe</string>
     <string name="import_conflict_keep_both">Keep both recipes</string>
-    <string name="imported_successfully">Recipes imported succsessfully!</string>
+    <string name="imported_successfully">Finished importing recipes.</string>
     <string name="share_recipes">Share recipes</string>
     <string name="select_all">Select all</string>
     <string name="one_recipe_selected">1 recipe selected</string>

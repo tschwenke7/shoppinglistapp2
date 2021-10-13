@@ -15,6 +15,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +42,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -48,6 +50,7 @@ import java.util.concurrent.Executor;
 
 public class ImportRecipesFragment extends Fragment implements ImportListAdapter.ClickListener {
 
+    private static final String TAG = "T_DBG_IMPORT_FRAG";
     private ImportRecipesViewModel viewModel;
     private FragmentImportRecipesBinding binding;
     private ListeningExecutorService backgroundExecutor;
@@ -201,7 +204,8 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
                     //update ui to reflect what's going on
 
                     //attempt to save each recipe
-                    for (RecipeWithTagsAndIngredients recipe : viewModel.getRecipesToImport().getValue()) {
+                    List<RecipeWithTagsAndIngredients> recipes = new ArrayList<>(viewModel.getRecipesToImport().getValue());
+                    for (RecipeWithTagsAndIngredients recipe : recipes) {
                         try {
                             viewModel.saveRecipe(recipe);
                         } catch (ImportRecipesViewModel.DuplicateRecipeNameException e) {
@@ -234,6 +238,7 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
                 @Override
                 public void onFailure(Throwable t) {
                     ErrorsUI.showDefaultToast(requireContext());
+                    Log.e(TAG, "saving imported recipes: ", t);
                 }
             },
             uiExecutor);

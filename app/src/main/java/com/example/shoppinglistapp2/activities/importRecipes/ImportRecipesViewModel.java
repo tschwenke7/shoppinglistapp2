@@ -69,6 +69,9 @@ public class ImportRecipesViewModel extends AndroidViewModel {
                     slaRepository.deleteRecipe(slaRepository.getRecipeByName(recipe.getName())).get();
                     break;
                 case DELETE_NEW:
+                    List<RecipeWithTagsAndIngredients> remaining = recipesToImport.getValue();
+                    remaining.remove(r);
+                    recipesToImport.postValue(remaining);
                     return;
                 case KEEP_BOTH:
                     String originalName = recipe.getName();
@@ -118,6 +121,10 @@ public class ImportRecipesViewModel extends AndroidViewModel {
         }
 
         slaRepository.insertTags(tags);
+
+        List<RecipeWithTagsAndIngredients> remaining = recipesToImport.getValue();
+        remaining.remove(r);
+        recipesToImport.postValue(remaining);
     }
 
     public void addTag(String tagName) {
