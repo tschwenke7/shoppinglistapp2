@@ -37,6 +37,7 @@ import com.example.shoppinglistapp2.activities.mainContentFragments.MainContentF
 import com.example.shoppinglistapp2.activities.mainContentFragments.SharedViewModel;
 import com.example.shoppinglistapp2.databinding.FragmentRecipeListBinding;
 import com.example.shoppinglistapp2.helpers.KeyboardHelper;
+import com.example.shoppinglistapp2.helpers.RecipeSharer;
 import com.google.common.base.CharMatcher;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -407,13 +408,16 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             actionMode.finish();
         }
         //otherwise update the heading
-        else {
+        else if (adapter.getSelectedItemCount() == 1){
             //change the title to say how many recipes are selected
-            actionMode.setTitle(String.format("%d recipe/s selected",adapter.getSelectedItemCount()));
+            actionMode.setTitle(R.string.one_recipe_selected);
             actionMode.invalidate();
         }
-
-        view.setSelected(!view.isSelected());
+        else {
+            //change the title to say how many recipes are selected
+            actionMode.setTitle(getString((R.string.many_recipes_selected), adapter.getSelectedItemCount()));
+            actionMode.invalidate();
+        }
 
         return true;
     }
@@ -546,6 +550,15 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
                     actionMode.finish();
                     return true;
 
+                case R.id.action_export_recipe:
+                    RecipeSharer.launchSharingIntent(requireContext(), adapter.getSelectedItems());
+                    return true;
+
+                case R.id.action_select_all:
+                    adapter.selectAll();
+                    //change the title to say how many recipes are selected
+                    actionMode.setTitle(getString((R.string.many_recipes_selected), adapter.getSelectedItemCount()));
+                    actionMode.invalidate();
                 default:
                     return false;
             }

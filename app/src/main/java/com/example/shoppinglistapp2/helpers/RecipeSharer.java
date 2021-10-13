@@ -52,7 +52,6 @@ public class RecipeSharer {
             intent.putExtra(Intent.EXTRA_TEXT, context.getString(R.string.share_recipe_body_text));
 
             context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_recipe_prompt_title)));
-            Toast.makeText(context, R.string.share_recipe_success, Toast.LENGTH_LONG).show();
         }
         else {
             ErrorsUI.showToast(context, R.string.error_sharing_file);

@@ -85,6 +85,7 @@ public class ImportListAdapter extends RecipeListAdapter {
             //stop background from changing on touch, since these functionalities aren't available
             CardView cardView = holder.itemView.findViewById(R.id.card_view);
             cardView.setCardBackgroundColor(cardView.getContext().getResources().getColor(R.color.card_background_default));
+            holder.itemView.setOnLongClickListener(null);
 
             //hide ratings, since they're ignored on import
             holder.itemView.findViewById(R.id.star_icon).setVisibility(View.GONE);

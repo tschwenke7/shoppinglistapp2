@@ -143,5 +143,5 @@ public class ImportRecipesViewModel extends AndroidViewModel {
         return slaRepository.getDistinctTagNames();
     }
 
-    public class DuplicateRecipeNameException extends Exception {}
+    public static class DuplicateRecipeNameException extends Exception {}
 }

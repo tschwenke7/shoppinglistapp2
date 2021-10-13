@@ -1,7 +1,6 @@
 package com.example.shoppinglistapp2.activities.mainContentFragments.recipes.viewrecipe;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -25,7 +24,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
@@ -42,25 +40,17 @@ import com.example.shoppinglistapp2.activities.mainContentFragments.SharedViewMo
 import com.example.shoppinglistapp2.databinding.FragmentViewRecipeBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Tag;
-import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
-import com.example.shoppinglistapp2.helpers.ErrorsUI;
 import com.example.shoppinglistapp2.helpers.KeyboardHelper;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.helpers.RecipeSharer;
 import com.google.android.material.chip.Chip;
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.gson.Gson;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -784,7 +774,7 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
                 enterEditMode();
                 return true;
 
-            case R.id.export_recipe:
+            case R.id.action_export_recipe:
                 RecipeSharer.launchSharingIntent(requireContext(), Arrays.asList(viewModel.getBackup()));
                 return true;
 

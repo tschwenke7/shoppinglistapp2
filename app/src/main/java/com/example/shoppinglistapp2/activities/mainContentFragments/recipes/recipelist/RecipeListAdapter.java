@@ -443,6 +443,14 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         return true;
     }
 
+    public void selectAll() {
+        selectedPositions.clear();
+        for(int i = 0; i < getCurrentList().size(); i++) {
+            selectedPositions.add(i);
+        }
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder extends BaseRecyclerViewAdapter<RecipeWithTagsAndIngredients>.ViewHolder {
         private final View itemView;
         private OnRecipeClickListener onRecipeClickListener;
@@ -527,12 +535,12 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
             //if this item was already selected, deselect
             if(selectedPositions.contains(getAdapterPosition())){
                 selectedPositions.remove((Integer) getAdapterPosition());
-//                itemView.setSelected(false);
+                itemView.setSelected(false);
             }
             //otherwise select this item
             else{
                 selectedPositions.add(getAdapterPosition());
-//                itemView.setSelected(true);
+                itemView.setSelected(true);
             }
 
             //call owner's click handler

@@ -16,7 +16,7 @@
     <!-- Recipe list page -->
     <string name="add_recipe_action_title">Add new recipe</string>
     <string name="add_all_to_list_action_title">Add all ingredients to list</string>
-    <string name="delete_recipe_action_title">Delete recipe</string>
+    <string name="delete_recipe_action_title">Delete recipes</string>
     <string name="default_rating">0</string>
     <string name="show_advanced_search_prompt">Advanced search ▼</string>
     <string name="hide_advanced_search_prompt">Hide ▲</string>
@@ -240,5 +240,9 @@
     <string name="import_conflict_delete_new">Discard the new recipe</string>
     <string name="import_conflict_keep_both">Keep both recipes</string>
     <string name="imported_successfully">Recipes imported succsessfully!</string>
+    <string name="share_recipes">Share recipes</string>
+    <string name="select_all">Select all</string>
+    <string name="one_recipe_selected">1 recipe selected</string>
+    <string name="many_recipes_selected">%1$d recipes selected</string>
 
 </resources>

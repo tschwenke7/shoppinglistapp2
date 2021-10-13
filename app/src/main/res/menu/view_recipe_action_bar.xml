@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/export_recipe"
+        android:id="@+id/action_export_recipe"
         android:icon="@drawable/ic_baseline_share_24"
         android:title="@string/share_recipe"
         app:showAsAction="ifRoom"
