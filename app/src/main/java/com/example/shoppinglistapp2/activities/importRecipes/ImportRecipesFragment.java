@@ -3,6 +3,7 @@ package com.example.shoppinglistapp2.activities.importRecipes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -10,11 +11,11 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavAction;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,13 +30,12 @@ import android.widget.Toast;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
-import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.mainContentFragments.MainContentFragment;
-import com.example.shoppinglistapp2.activities.mainContentFragments.MainContentFragmentDirections;
 import com.example.shoppinglistapp2.databinding.FragmentImportRecipesBinding;
 import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
 import com.example.shoppinglistapp2.helpers.Animations;
 import com.example.shoppinglistapp2.helpers.ErrorsUI;
+import com.example.shoppinglistapp2.helpers.RecursiveViewHelpers;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.common.util.concurrent.FutureCallback;
@@ -114,25 +114,32 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
                         //setup recyclerview
                         adapter = new ImportListAdapter(backgroundExecutor, fragment, tagsAdapter);
                         binding.importRecyclerview.setAdapter(adapter);
-                        binding.importRecyclerview.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        binding.importRecyclerview.setLayoutManager(new NpaLinearLayoutManager(requireContext()));
 
-                        viewModel.getRecipesToImport().observe(getViewLifecycleOwner(), (list) -> {
-                            //set title
-                            if(list.size() == 1) {
-                                ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar()
-                                        .setTitle(R.string.import_recipes_title_single);
-                            }
-                            else {
-                                ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar()
-                                        .setTitle(getString(R.string.import_recipes_title_multiple, list.size()));
-                            }
-
-                            //populate recyclerview
-                            adapter.submitList(list, () -> {
-                                if (binding.contentContainer.getVisibility() == View.GONE) {
-                                    Animations.fadeSwap(binding.importProgressBar, binding.contentContainer);
+                        viewModel.getRecipesToImport().observe(getViewLifecycleOwner(), new Observer<List<RecipeWithTagsAndIngredients>>() {
+                            @Override
+                            public void onChanged(List<RecipeWithTagsAndIngredients> list) {
+                                //set title
+                                if(list.size() == 1) {
+                                    ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar()
+                                            .setTitle(R.string.import_recipes_title_single);
                                 }
-                            });
+                                else {
+                                    ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar()
+                                            .setTitle(getString(R.string.import_recipes_title_multiple, list.size()));
+                                }
+
+                                //populate recyclerview
+                                adapter.submitList(list, () -> {
+//                                    binding.contentContainer.setVisibility(View.VISIBLE);
+//                                    binding.importProgressBar.setVisibility(View.GONE);
+                                    Animations.fadeSwap(binding.importProgressBar, binding.contentContainer);
+                                    //trying to observe while list is rapidly shortened during save all
+                                    //causes errors when recyclerview tries to keep up. Instead,
+                                    //we manually refresh recyclerview after this point
+                                    viewModel.getRecipesToImport().removeObserver(this);
+                                });
+                            }
                         });
                     }
 
@@ -196,35 +203,74 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
 
     }
 
+    private void enableContent() {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+            try {
+                binding.contentContainer.setAlpha(1f);
+                binding.importProgressBar.setVisibility(View.GONE);
+                requireView().findViewById(R.id.add_tag_button).setEnabled(true);
+                requireView().findViewById(R.id.edit_text_tag).setEnabled(true);
+                requireView().findViewById(R.id.chipgroup).setEnabled(true);
+                requireView().findViewById(R.id.keep_ratings_switch).setEnabled(true);
+                requireView().findViewById(R.id.button_save_all).setEnabled(true);
+            } catch (Exception ignored) {}
+        });
+    }
+
+    private void disableContent() {
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+            try {
+                binding.contentContainer.setAlpha(0.5f);
+                binding.importProgressBar.setVisibility(View.VISIBLE);
+                requireView().findViewById(R.id.add_tag_button).setEnabled(false);
+                requireView().findViewById(R.id.edit_text_tag).setEnabled(false);
+                requireView().findViewById(R.id.chipgroup).setEnabled(false);
+                requireView().findViewById(R.id.keep_ratings_switch).setEnabled(false);
+                requireView().findViewById(R.id.button_save_all).setEnabled(false);
+            }
+            catch (Exception ignored) {}
+        });
+    }
+
     @Override
     public void onSaveAllClicked() {
+        //update ui to reflect what's going on
+        disableContent();
 
         Futures.addCallback(backgroundExecutor.submit(() -> {
                 try {
-                    //update ui to reflect what's going on
-
                     //attempt to save each recipe
                     List<RecipeWithTagsAndIngredients> recipes = new ArrayList<>(viewModel.getRecipesToImport().getValue());
                     for (RecipeWithTagsAndIngredients recipe : recipes) {
                         try {
                             viewModel.saveRecipe(recipe);
                         } catch (ImportRecipesViewModel.DuplicateRecipeNameException e) {
+                            //update list
+                            adapter.submitList(viewModel.getListNonLive());
+                            enableContent();
                             //the latch blocks continuation of saving until user picks an option
                             // from the conflict resolution dialog
                             final CountDownLatch latch = new CountDownLatch(1);
                             promptConflictStrategy(recipe, latch);
                             latch.await();
+                            disableContent();
                         }
                     }
                 } catch (ExecutionException | InterruptedException e) {
-                    uiExecutor.execute(() -> ErrorsUI.showDefaultToast(requireContext()));
+                    uiExecutor.execute(() -> {
+                        ErrorsUI.showDefaultToast(requireContext());
+                        enableContent();
+                    });
                 }
             }),
             new FutureCallback<Object>() {
                 @Override
                 public void onSuccess(@Nullable Object result) {
                     //restore UI
-
+                    enableContent();
                     //show success message
                     Toast.makeText(requireContext(), R.string.imported_successfully, Toast.LENGTH_LONG).show();
 
@@ -239,10 +285,13 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
                 public void onFailure(Throwable t) {
                     ErrorsUI.showDefaultToast(requireContext());
                     Log.e(TAG, "saving imported recipes: ", t);
+                    enableContent();
                 }
             },
             uiExecutor);
     }
+
+
 
     private void promptConflictStrategy(RecipeWithTagsAndIngredients recipe, CountDownLatch latch) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());

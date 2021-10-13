@@ -236,7 +236,7 @@
     <string name="no_tags_placeholder">No tags set.</string>
     <string name="shared_recipes_heading">Shared Recipes</string>
     <string name="import_meal_conflict_title">A recipe with name \"%1$s\" already exists in your recipe book. What would you like to do?</string>
-    <string name="import_conflict_delete_old">Delete the old recipe</string>
+    <string name="import_conflict_delete_old">Replace the old recipe</string>
     <string name="import_conflict_delete_new">Discard the new recipe</string>
     <string name="import_conflict_keep_both">Keep both recipes</string>
     <string name="imported_successfully">Finished importing recipes.</string>
@@ -244,6 +244,6 @@
     <string name="select_all">Select all</string>
     <string name="one_recipe_selected">1 recipe selected</string>
     <string name="many_recipes_selected">%1$d recipes selected</string>
-    <string name="keep_senders_ratings_label">Keep sharer\'s person 1 &amp; 2 recipe ratings</string>
+    <string name="keep_senders_ratings_label">Keep sharer\'s recipe ratings</string>
 
 </resources>

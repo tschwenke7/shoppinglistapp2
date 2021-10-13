@@ -169,5 +169,9 @@ public class ImportRecipesViewModel extends AndroidViewModel {
         this.keepRatings = keepRatings;
     }
 
+    public List<RecipeWithTagsAndIngredients> getListNonLive() {
+        return recipesToImport.getValue();
+    }
+
     public static class DuplicateRecipeNameException extends Exception {}
 }
