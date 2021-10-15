@@ -12,6 +12,8 @@
     <color name="secondary_text_default">#8a8a8a</color>
     <color name="secondary_text_selected">#fafafa</color>
 
+    <color name="standard_background">@color/white</color>
+
 
     <!--cardview stuff -->
     <color name="card_background_extra_light">#e6e6e6</color>
