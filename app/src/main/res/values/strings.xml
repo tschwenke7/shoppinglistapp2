@@ -260,5 +260,6 @@
     <string name="content_description_person_2_icon">Person two\'s rating</string>
     <string name="share_shopping_list_subject">Shopping list</string>
     <string name="share_shopping_list_prompt">Share shopping list using…</string>
+    <string name="suggested_recipes_hint">These recipes share the most ingredients from the \"Ingredients needed\" section above:</string>
 
 </resources>

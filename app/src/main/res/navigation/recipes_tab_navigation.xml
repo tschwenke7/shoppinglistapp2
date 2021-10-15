@@ -53,6 +53,8 @@
             android:id="@+id/action_viewRecipeFragment_to_selectMealFragment"
             app:destination="@id/selectMealFragment"
             app:enterAnim="@anim/slide_in_up_over"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out_down_over" />
     </fragment>
     <fragment

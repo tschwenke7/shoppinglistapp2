@@ -216,11 +216,13 @@ public class MealPlanFragment extends ContentFragment implements MealPlanListAda
                         binding.noSuggestionsPlaceholder.setVisibility(View.VISIBLE);
                         binding.noSuggestionsPlaceholder.setText(R.string.no_suggestions_placeholder);
                         binding.suggestedRecipesRecyclerview.setVisibility(View.GONE);
+                        binding.suggestedRecipesHint.setVisibility(View.GONE);
                     }
                     else{
                         //show suggestions
                         binding.noSuggestionsPlaceholder.setVisibility(View.GONE);
                         binding.suggestedRecipesRecyclerview.setVisibility(View.VISIBLE);
+                        binding.suggestedRecipesHint.setVisibility(View.VISIBLE);
                         suggestionsAdapter.submitList(result);
                     }
 

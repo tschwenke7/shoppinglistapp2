@@ -181,6 +181,15 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 tools:visibility="gone" />
+            <TextView
+                android:id="@+id/suggested_recipes_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/suggested_recipes_hint"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                style="@style/hintText"/>
 
             <TextView
                 android:id="@+id/no_suggestions_placeholder"
