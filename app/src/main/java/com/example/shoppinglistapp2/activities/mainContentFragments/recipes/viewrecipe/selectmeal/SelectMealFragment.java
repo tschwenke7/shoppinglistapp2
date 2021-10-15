@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ContentFragment;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.mainContentFragments.SharedViewModel;
 import com.example.shoppinglistapp2.databinding.FragmentSelectMealBinding;
@@ -39,12 +40,10 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 
 import java.util.concurrent.Executor;
 
-public class SelectMealFragment extends Fragment implements MealSelectionAdapter.ClickListener{
+public class SelectMealFragment extends ContentFragment implements MealSelectionAdapter.ClickListener{
 
     private SelectMealViewModel viewModel;
     private FragmentSelectMealBinding binding;
-    private ListeningExecutorService backgroundExecutor;
-    private Executor uiExecutor;
     private SharedViewModel sharedViewModel;
 
     public static SelectMealFragment newInstance() {
@@ -55,18 +54,16 @@ public class SelectMealFragment extends Fragment implements MealSelectionAdapter
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentSelectMealBinding.inflate(inflater, container, false);
-        backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
-        uiExecutor = ContextCompat.getMainExecutor(requireContext());
 
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+        viewModel = new ViewModelProvider(this).get(SelectMealViewModel.class);
 
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
-        viewModel = new ViewModelProvider(this).get(SelectMealViewModel.class);
-
+        super.onViewCreated(view, savedInstanceState);
         setupViews();
     }
 
@@ -85,18 +82,12 @@ public class SelectMealFragment extends Fragment implements MealSelectionAdapter
         viewModel.getMeals().observe(getViewLifecycleOwner(), adapter::submitList);
 
         //setup action bar
-        this.setHasOptionsMenu(true);
-        //configure back button to work within parent fragment
-        Fragment f1 = this;
-        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                NavHostFragment.findNavController(f1).navigateUp();
-            }
-        };
+        setHasMenu(true);
+        setPageTitle(getString(R.string.select_meal_title));
+        setShowUpButton(true);
 
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
-        ((MainActivity) requireActivity()).showUpButton();
+        //configure back button to work within parent fragment
+        addDefaultOnBackPressedCallback();
     }
 
     private void updateHintText() {
@@ -233,18 +224,10 @@ public class SelectMealFragment extends Fragment implements MealSelectionAdapter
 
         //show back button
         MainActivity activity = (MainActivity) requireParentFragment().requireActivity();
-        if (activity != null) {
-            activity.showUpButton();
-
-            //check if we need to redirect to a recipe, and if so, go back to recipe list so we
-            //can navigate to the desired recipe
-            if(null != sharedViewModel.getNavigateToRecipeId() || null != sharedViewModel.getSelectingForMeal()){
-                activity.onBackPressed();
-            }
+        //check if we need to redirect to a recipe, and if so, go back to recipe list so we
+        //can navigate to the desired recipe
+        if(null != sharedViewModel.getNavigateToRecipeId() || null != sharedViewModel.getSelectingForMeal()){
+            activity.onBackPressed();
         }
-
-        //set title of page
-        ((AppCompatActivity) requireActivity()).getSupportActionBar().setTitle(R.string.select_meal_title);
     }
-
 }

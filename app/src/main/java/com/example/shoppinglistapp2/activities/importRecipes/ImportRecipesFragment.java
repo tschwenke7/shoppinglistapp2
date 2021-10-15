@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ContentFragment;
 import com.example.shoppinglistapp2.activities.mainContentFragments.MainContentFragment;
 import com.example.shoppinglistapp2.databinding.FragmentImportRecipesBinding;
 import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
@@ -47,13 +48,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
-public class ImportRecipesFragment extends Fragment implements ImportListAdapter.ClickListener {
+public class ImportRecipesFragment extends ContentFragment implements ImportListAdapter.ClickListener {
 
     private static final String TAG = "T_DBG_IMPORT_FRAG";
     private ImportRecipesViewModel viewModel;
     private FragmentImportRecipesBinding binding;
-    private ListeningExecutorService backgroundExecutor;
-    private Executor uiExecutor;
     private ImportListAdapter adapter;
 
     private int conflictStrategy = ImportRecipesViewModel.NOT_SET;
@@ -77,6 +76,7 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view,savedInstanceState);
         setupViews();
     }
 
@@ -120,12 +120,10 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
                             public void onChanged(List<RecipeWithTagsAndIngredients> list) {
                                 //set title
                                 if(list.size() == 1) {
-                                    ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar()
-                                            .setTitle(R.string.import_recipes_title_single);
+                                    setPageTitle(getString(R.string.import_recipes_title_single));
                                 }
                                 else {
-                                    ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar()
-                                            .setTitle(getString(R.string.import_recipes_title_multiple, list.size()));
+                                    setPageTitle(getString(R.string.import_recipes_title_multiple, list.size()));
                                 }
 
                                 //populate recyclerview
@@ -249,6 +247,16 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
                         } catch (ImportRecipesViewModel.DuplicateRecipeNameException e) {
                             //update list
                             adapter.submitList(viewModel.getListNonLive());
+                            //set title
+                            if(viewModel.getListNonLive().size() == 1) {
+                                uiExecutor.execute(() ->
+                                        setPageTitle(getString(R.string.import_recipes_title_single)));
+                            }
+                            else {
+                                uiExecutor.execute(() -> setPageTitle(
+                                        getString(R.string.import_recipes_title_multiple, viewModel.getListNonLive().size())));
+                            }
+
                             enableContent();
                             //the latch blocks continuation of saving until user picks an option
                             // from the conflict resolution dialog

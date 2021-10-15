@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ContentFragment;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.mainContentFragments.SharedViewModel;
 import com.example.shoppinglistapp2.databinding.FragmentCreateRecipeBinding;
@@ -41,11 +42,9 @@ import java.util.concurrent.Executor;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CreateRecipeFragment extends Fragment {
+public class CreateRecipeFragment extends ContentFragment {
     private CreateRecipeViewModel viewModel;
     private SharedViewModel sharedViewModel;
-    private ListeningExecutorService backgroundExecutor;
-    private Executor uiExecutor;
 
     private FragmentCreateRecipeBinding binding;
 
@@ -64,9 +63,6 @@ public class CreateRecipeFragment extends Fragment {
         sharedViewModel =
                 new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
-        backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
-        uiExecutor = ContextCompat.getMainExecutor(this.requireContext());
-
         return binding.getRoot();
     }
 
@@ -78,9 +74,10 @@ public class CreateRecipeFragment extends Fragment {
     }
 
     private void setupUi(){
-
-        //setup action bar to allow back button
-        this.setHasOptionsMenu(true);
+        //setup action bar
+        setHasMenu(true);
+        setPageTitle(getString(R.string.create_recipe_title));
+        setShowUpButton(true);
 
         binding.textViewSupportedWebsites.setText(Html.fromHtml(getString(R.string.supported_recipes)));
         binding.textViewSupportedWebsites.setMovementMethod(LinkMovementMethod.getInstance());
@@ -93,15 +90,7 @@ public class CreateRecipeFragment extends Fragment {
         binding.createRecipeManuallyButton.setOnClickListener(view -> onManualButtonClicked());
 
         //configure back button to work within parent fragment
-        Fragment f1 = this;
-        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                NavHostFragment.findNavController(f1).navigateUp();
-            }
-        };
-
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
+        addDefaultOnBackPressedCallback();
     }
 
     //create new empty recipe and navigate to recipe editor screen
@@ -204,21 +193,11 @@ public class CreateRecipeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
-        //show back button
-        MainActivity activity = (MainActivity) requireParentFragment().requireActivity();
-        if (activity != null) {
-            activity.showUpButton();
-
-            //check if we need to redirect to a recipe, and if so, go back to recipe list so we
-            //can navigate to the desired recipe
-            if(null != sharedViewModel.getNavigateToRecipeId() || null != sharedViewModel.getSelectingForMeal()){
-                activity.onBackPressed();
-            }
+        //check if we need to redirect to a recipe, and if so, go back to recipe list so we
+        //can navigate to the desired recipe
+        if(null != sharedViewModel.getNavigateToRecipeId() || null != sharedViewModel.getSelectingForMeal()){
+            requireActivity().onBackPressed();
         }
-
-        //set title of page
-        ((AppCompatActivity) requireParentFragment().requireActivity()).getSupportActionBar().setTitle(R.string.create_recipe_title);
     }
 
     @Override
@@ -226,8 +205,6 @@ public class CreateRecipeFragment extends Fragment {
         menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
     }
-
-
 
     /** hide progress bar and reset opacity of everything else */
     private void showProgressBar(){

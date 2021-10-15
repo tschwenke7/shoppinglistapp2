@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ContentFragment;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.databinding.FragmentFavouritesBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
@@ -41,13 +42,10 @@ import java.util.concurrent.Executor;
  * Use the {@link FavouritesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FavouritesFragment extends Fragment implements FavouritesAdapter.ClickListener {
+public class FavouritesFragment extends ContentFragment implements FavouritesAdapter.ClickListener {
     private static final String TAG = "T_DBG_FAVFRAG";
     private FavouritesViewModel viewModel;
     private FragmentFavouritesBinding binding;
-
-    private ListeningExecutorService backgroundExecutor;
-    private Executor uiExecutor;
 
     private FavouritesAdapter adapter;
 
@@ -77,18 +75,8 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Cl
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         setupViews();
-
-        //handle back pressed
-        Fragment f1 = this;
-        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                NavHostFragment.findNavController(f1).navigateUp();
-            }
-        };
-
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
     }
 
     private void setupViews() {
@@ -105,11 +93,14 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Cl
             }
         });
 
-        //setup menu bar
-        setHasOptionsMenu(true);
-        ((MainActivity) requireActivity()).showUpButton();
-        //set title of page
-        ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar().setTitle(R.string.title_favourites);
+        //setup action bar
+        setHasMenu(true);
+        setPageTitle(getString(R.string.title_favourites));
+        setShowUpButton(true);
+
+        //handle back pressed
+        addDefaultOnBackPressedCallback();
+
     }
 
     @Override
@@ -224,7 +215,7 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Cl
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        menu.clear();
+//        menu.clear();
     }
 
     @Override

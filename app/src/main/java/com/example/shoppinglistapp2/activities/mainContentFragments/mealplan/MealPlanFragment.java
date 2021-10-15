@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ContentFragment;
 import com.example.shoppinglistapp2.activities.MainActivity;
 
 import com.example.shoppinglistapp2.activities.BaseRecyclerViewAdapter;
@@ -48,7 +49,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-public class MealPlanFragment extends Fragment implements MealPlanListAdapter.MealPlanClickListener, SuggestedRecipesListAdapter.ClickListener, ShoppingListAdapter.SlItemClickListener {
+public class MealPlanFragment extends ContentFragment implements MealPlanListAdapter.MealPlanClickListener, SuggestedRecipesListAdapter.ClickListener, ShoppingListAdapter.SlItemClickListener {
 
     private static final String TAG = "T_DBG_MP_FRAG";
     private final int NUM_SUGGESTIONS_TO_LOAD = 5;
@@ -58,8 +59,6 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     private SuggestedRecipesListAdapter suggestionsAdapter;
     private MealPlanListAdapter mealsAdapter;
-    private Executor uiExecutor;
-    private ListeningExecutorService backgroundExecutor;
 
     private ActionMode actionMode = null;
     private ActionModeCallback actionModeCallback = new ActionModeCallback();
@@ -85,6 +84,9 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
+        //setup action bar
+        this.setHasOptionsMenu(true);
+
         return binding.getRoot();
     }
 
@@ -99,7 +101,10 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
     }
 
     private void setupViews(){
-        this.setHasOptionsMenu(true);
+        //setup action bar
+        setHasMenu(true);
+        setPageTitle(getString(R.string.title_meal_plan));
+        setShowUpButton(false);
 
         //setup meal plan recyclerview
         mealsAdapter = new MealPlanListAdapter(this);
@@ -271,9 +276,7 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-//        super.onCreateOptionsMenu(menu,inflater);
-//        menu.clear();
-//        inflater.inflate(R.menu.meal_plan_action_bar, menu);
+        inflater.inflate(R.menu.meal_plan_action_bar, menu);
     }
 
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -324,18 +327,6 @@ public class MealPlanFragment extends Fragment implements MealPlanListAdapter.Me
                     }
                 },
                 uiExecutor);
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        //hide back button
-        MainActivity mainActivity = (MainActivity) requireActivity();
-        mainActivity.hideUpButton();
-
-        //set title
-        ((AppCompatActivity) mainActivity).getSupportActionBar().setTitle(R.string.title_meal_plan);
     }
 
     @Override

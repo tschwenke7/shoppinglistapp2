@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ContentFragment;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.databinding.FragmentShoppingListBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
@@ -39,10 +40,8 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 
 import java.util.concurrent.Executor;
 
-public class ShoppingListFragment extends Fragment implements ShoppingListAdapter.SlItemClickListener {
+public class ShoppingListFragment extends ContentFragment implements ShoppingListAdapter.SlItemClickListener {
     private ShoppingListViewModel viewModel;
-    private ListeningExecutorService backgroundExecutor;
-    private Executor uiExecutor;
     private FragmentShoppingListBinding binding;
 
     private final String TAG = "T_DBG_SL_FRAG";
@@ -56,17 +55,12 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
         //inflate fragment
         binding = FragmentShoppingListBinding.inflate(inflater, container, false);
 
-        backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
-        uiExecutor = ContextCompat.getMainExecutor(requireContext());
-
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View root, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(root, savedInstanceState);
-        //setup action bar
-        this.setHasOptionsMenu(true);
 
         //setup shopping list recyclerview
         final ShoppingListAdapter adapter = new ShoppingListAdapter(this, backgroundExecutor);
@@ -104,6 +98,11 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
 
         //listen to add item button
         binding.buttonNewListItem.setOnClickListener(this::addItems);
+
+        //set page title
+        setPageTitle(getString(R.string.title_shopping_list));
+        setShowUpButton(false);
+        setHasMenu(true);
     }
 
     private void addItems(View view){
@@ -147,7 +146,7 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
 //        super.onCreateOptionsMenu(menu,inflater);
 //        menu.clear();
-//        inflater.inflate(R.menu.shopping_list_action_bar, menu);
+        inflater.inflate(R.menu.shopping_list_action_bar, menu);
     }
 
     @Override
@@ -209,18 +208,6 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                 return super.onOptionsItemSelected(item);
         }
         return false;
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        //hide back button
-        MainActivity mainActivity = (MainActivity) requireActivity();
-        mainActivity.hideUpButton();
-
-        //set title
-        ((AppCompatActivity) requireActivity()).getSupportActionBar().setTitle(R.string.title_shopping_list);
     }
 
     @Override

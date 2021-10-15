@@ -32,6 +32,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ContentFragment;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.mainContentFragments.MainContentFragment;
 import com.example.shoppinglistapp2.activities.mainContentFragments.SharedViewModel;
@@ -47,7 +48,7 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-public class RecipeListFragment extends Fragment implements RecipeListAdapter.OnRecipeClickListener, AdapterView.OnItemSelectedListener {
+public class RecipeListFragment extends ContentFragment implements RecipeListAdapter.OnRecipeClickListener, AdapterView.OnItemSelectedListener {
     private final String TAG = "TDB_RCP_LIST_FRAG";
 
     private RecipeListViewModel viewModel;
@@ -56,8 +57,6 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     private ActionMode.Callback multiSelectActionModeCallback = new ActionModeCallback(1);
     private ActionMode.Callback chooseMealPlanItemActionModeCallback = new ActionModeCallback(2);
     private RecipeListAdapter adapter;
-    private ListeningExecutorService backgroundExecutor;
-    private Executor uiExecutor;
 
 
     private FragmentRecipeListBinding binding;
@@ -81,8 +80,6 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
         binding = FragmentRecipeListBinding.inflate(inflater, container, false);
 
-        backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
-        uiExecutor = ContextCompat.getMainExecutor(requireContext());
 
         //this will delete ALL recipes and load recipetineats websites from the spreadsheet in res/raw/<name>.csv
 //        recipesViewModel.loadFromBackup(this);
@@ -98,7 +95,9 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
     private void setupViews(Bundle savedInstanceState){
         //setup action bar
-        this.setHasOptionsMenu(true);
+        setHasMenu(true);
+        setPageTitle(getString(R.string.title_recipes));
+        setShowUpButton(false);
 
         if(advancedSearchVisible) {
             binding.viewgroupAdvancedSearch.setVisibility(View.VISIBLE);
@@ -325,15 +324,6 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
             Navigation.findNavController(requireView()).navigate(action);
         }
 
-        //hide back button
-        MainActivity activity = (MainActivity) getParentFragment().requireActivity();
-        if (activity != null) {
-            activity.hideUpButton();
-        }
-
-        //set title of page
-        ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar().setTitle(R.string.title_recipes);
-
         //if we've arrived at this page to select a recipe for a meal plan,
         if(sharedViewModel.getSelectingForMeal() != null){
             //activate the appropriate action mode
@@ -348,7 +338,8 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
     /** Merges extra menu items into the default activity action bar, according to provided menu xml */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-//        inflater.inflate(R.menu.recipe_list_action_bar, menu);
+//        super.onCreateOptionsMenu(menu,inflater);
+        inflater.inflate(R.menu.recipe_list_action_bar, menu);
     }
 
     /** Handle onClick for the custom action bar menu items for this fragment */
@@ -578,11 +569,11 @@ public class RecipeListFragment extends Fragment implements RecipeListAdapter.On
 
     @Override
     public void onPause() {
+        super.onPause();
         //close action bar if user navigates away
         if(null != actionMode){
             actionMode.finish();
         }
-        super.onPause();
     }
 
     @Override

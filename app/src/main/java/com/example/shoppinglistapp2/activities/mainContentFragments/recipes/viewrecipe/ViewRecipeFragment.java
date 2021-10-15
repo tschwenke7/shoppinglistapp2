@@ -1,6 +1,7 @@
 package com.example.shoppinglistapp2.activities.mainContentFragments.recipes.viewrecipe;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -34,6 +35,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
+import com.example.shoppinglistapp2.activities.ContentFragment;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.mainContentFragments.MainContentFragment;
 import com.example.shoppinglistapp2.activities.mainContentFragments.SharedViewModel;
@@ -56,14 +58,11 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
-public class ViewRecipeFragment extends Fragment implements IngredientListAdapter.IngredientClickListener {
+public class ViewRecipeFragment extends ContentFragment implements IngredientListAdapter.IngredientClickListener {
     private static final String TAG = "T_DBG_VIEW_REC_FRAG";
     private ViewRecipeViewModel viewModel;
     private SharedViewModel sharedViewModel;
     private FragmentViewRecipeBinding binding;
-
-    private ListeningExecutorService backgroundExecutor;
-    private Executor uiExecutor;
 
     private int recipeId;
     private boolean editingFlag;
@@ -74,7 +73,6 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     private ActionMode actionMode;
     private ActionMode.Callback actionModeCallback = new ViewRecipeFragment.ActionModeCallback();
     private IngredientListAdapter adapter;
-    private String pageTitle;
 
     private int lastServesVal;
 
@@ -86,9 +84,6 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
                 new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
         binding = FragmentViewRecipeBinding.inflate(inflater,container,false);
-
-        backgroundExecutor = ((App) requireActivity().getApplication()).backgroundExecutorService;
-        uiExecutor = ContextCompat.getMainExecutor(requireContext());
 
         //retrieve navigation args
         //recipe to be viewed
@@ -113,7 +108,8 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
     private void setupViews(View root, boolean editingFlag){
         //setup action bar
-        this.setHasOptionsMenu(true);
+        setHasMenu(true);
+        setShowUpButton(true);
 
         currentRecipe = viewModel.getRecipe(recipeId);
 
@@ -286,11 +282,11 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
 
     @SuppressLint("SetTextI18n")
     private void populateRecipeViews(Recipe recipe){
-        View root = requireView();
         //set name as action bar title
-        pageTitle = recipe.getName();
+        String pageTitle = recipe.getName();
+        setPageTitleWithoutUpdating(pageTitle);
 
-        ActionBar actionBar = ((AppCompatActivity) getParentFragment().requireActivity()).getSupportActionBar();
+        ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
         //don't change the title if we've navigated to another tab of the viewpager
         if (!(null != actionBar.getTitle()
                 && (
@@ -719,42 +715,29 @@ public class ViewRecipeFragment extends Fragment implements IngredientListAdapte
     @Override
     public void onResume() {
         super.onResume();
-        setHasOptionsMenu(true);
 
-        //show back button
-        MainActivity activity = (MainActivity) getParentFragment().getActivity();
-        if (activity != null) {
-            activity.showUpButton();
-
-            //check if we need to redirect to a recipe, and if so, go back to recipe list so we
-            //can navigate to the desired recipe
-            if(null != sharedViewModel.getNavigateToRecipeId() || null != sharedViewModel.getSelectingForMeal()){
-                activity.onBackPressed();
-                activity.onBackPressed();
-            }
+        Activity activity = requireActivity();
+        //check if we need to redirect to a recipe, and if so, go back to recipe list so we
+        //can navigate to the desired recipe
+        if(null != sharedViewModel.getNavigateToRecipeId() || null != sharedViewModel.getSelectingForMeal()){
+            activity.onBackPressed();
+            activity.onBackPressed();
         }
-
-        //set name as action bar title
-        ((AppCompatActivity) getParentFragment().getActivity()).getSupportActionBar().setTitle(pageTitle);
     }
 
     @Override
     public void onPause() {
-        setHasOptionsMenu(false);
+        super.onPause();
 
         //close action bar if user navigates away
         if(null != actionMode){
             actionMode.finish();
         }
-
-        super.onPause();
     }
 
     /** Merges extra menu items into the default activity action bar, according to provided menu xml */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        menu.clear();
-        requireActivity().invalidateOptionsMenu();
         inflater.inflate(R.menu.view_recipe_action_bar, menu);
     }
 

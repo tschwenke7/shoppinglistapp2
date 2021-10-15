@@ -83,7 +83,7 @@ public class MainContentFragment extends Fragment {
 
         viewPager = binding.mainContentViewPager;
         viewPager.setAdapter(sectionsPagerAdapter);
-        viewPager.setAdapter(sectionsPagerAdapter);
+        viewPager.setOffscreenPageLimit(2);
 
         tabLayout = binding.tabLayout;
         tabLayout.setupWithViewPager(viewPager);
@@ -143,7 +143,6 @@ public class MainContentFragment extends Fragment {
 
         @Override
         public Fragment getItem(int position) {
-            KeyboardHelper.hideKeyboard(requireActivity());
             Fragment fragment = null;
             switch (position) {
                 case MainContentFragment.MEAL_PLAN_VIEWPAGER_INDEX:
@@ -179,32 +178,32 @@ public class MainContentFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        menu.clear();
+//        menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
 
         //inflate current viewpager page's specific menu
-        final int[] menuResourceIds = new int[]{
-                R.menu.shopping_list_action_bar,
-                R.menu.recipe_list_action_bar,
-                R.menu.meal_plan_action_bar
-        };
-        inflater.inflate(menuResourceIds[viewPager.getCurrentItem()], menu);
+//        final int[] menuResourceIds = new int[]{
+//                R.menu.shopping_list_action_bar,
+//                R.menu.recipe_list_action_bar,
+//                R.menu.meal_plan_action_bar
+//        };
+//        inflater.inflate(menuResourceIds[viewPager.getCurrentItem()], menu);
 
         //inflate settings icon
 //        inflater.inflate(R.menu.main_content_menu, menu);
     }
     /** Respond to menu items from action bar being pressed */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d("TOM_TEST", "onOptionsItemSelected: " + item.toString());
-        switch (item.getItemId()) {
-            //settings pressed
-            case R.id.action_settings:
-                Navigation.findNavController(requireView()).navigate(
-                        MainContentFragmentDirections.actionMainContentFragmentToRootSettingsFragment());
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        Log.d("TOM_TEST", "onOptionsItemSelected: " + item.toString());
+//        switch (item.getItemId()) {
+//            //settings pressed
+//            case R.id.action_settings:
+//                Navigation.findNavController(requireView()).navigate(
+//                        MainContentFragmentDirections.actionMainContentFragmentToRootSettingsFragment());
+//
+//            default:
+//                return super.onOptionsItemSelected(item);
+//        }
+//    }
 }
