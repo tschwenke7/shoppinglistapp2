@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.mainContentFragments.shoppinglist.ShoppingListFragment">
+    tools:context=".activities.mainContentFragments.shoppinglist.list.ShoppingListFragment">
 
     <EditText
         android:id="@+id/edit_text_new_list_item"
@@ -51,7 +51,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider3"
         tools:listitem="@layout/recyclerview_shopping_list_item"
-        tools:visibility="gone"/>
+        tools:visibility="visible" />
 
     <ProgressBar
         android:id="@+id/shopping_list_progress_bar"
@@ -62,19 +62,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider3"
         tools:listitem="@layout/recyclerview_shopping_list_item"
-        tools:visibility="visible"/>
+        tools:visibility="gone" />
 
     <TextView
         android:id="@+id/textview_no_sl_items"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/divider3"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:textAlignment="center"
-        android:textSize="20sp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/no_sl_items_placeholder_text" />
+        android:text="@string/no_sl_items_placeholder_text"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/divider3"
+        tools:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>

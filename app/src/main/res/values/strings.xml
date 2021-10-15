@@ -245,5 +245,16 @@
     <string name="one_recipe_selected">1 recipe selected</string>
     <string name="many_recipes_selected">%1$d recipes selected</string>
     <string name="keep_senders_ratings_label">Keep sharer\'s recipe ratings</string>
+    <string name="action_open_favourites">View favourite items</string>
+    <string name="favourite_items_help">Save your regular shopping list items here to quickly add some or all of them again in the future.
+    \n\nAdd some favourites by clicking the \"Add favourites items\" button above.
+    \n\nAny time you want to quickly add these items to your shopping list again, return to this page and click \"Add all\", or click the individual buttons next to each item to add only some.</string>
+    <string name="add_item_to_shopping_list">Add item to shopping list</string>
+    <string name="item_added">Item added.</string>
+    <string name="new_list_item_button_verbose">Add favourites items</string>
+    <string name="add_all_to_shopping_list_button">Add all to shopping list</string>
+    <string name="added">Added</string>
+    <string name="title_favourites">Favourites</string>
+    <string name="favourites_added_success">Favourites items added to shopping list.</string>
 
 </resources>

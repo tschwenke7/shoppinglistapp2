@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_open_favourites"
+        android:title="@string/action_open_favourites"
+        android:icon="@drawable/ic_baseline_favorite_24"
+        app:showAsAction="ifRoom"
+        />
+    <item
         android:id="@+id/action_copy_list_to_clipboard"
         android:title="@string/copy_list_to_clipboard"
         android:icon="@drawable/ic_baseline_share_24"

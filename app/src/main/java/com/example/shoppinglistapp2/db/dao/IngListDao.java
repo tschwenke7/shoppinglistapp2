@@ -25,4 +25,7 @@ public interface IngListDao extends BaseDao<IngList> {
 
     @Query("SELECT id FROM ing_lists WHERE meal_plan_id = :mealPlanId")
     int getIngListIdForMealPlan(int mealPlanId);
+
+    @Query("SELECT EXISTS(SELECT * FROM ing_lists WHERE id = :listId)")
+    boolean listIdExists(int listId);
 }

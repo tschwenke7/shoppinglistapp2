@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 
 import com.example.shoppinglistapp2.R;
-import com.example.shoppinglistapp2.activities.mainContentFragments.BaseRecyclerViewAdapter;
+import com.example.shoppinglistapp2.activities.BaseRecyclerViewAdapter;
 import com.example.shoppinglistapp2.activities.mainContentFragments.recipes.recipelist.RecipeListAdapter;
 import com.example.shoppinglistapp2.databinding.RecyclerviewImportHeaderBinding;
 import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;

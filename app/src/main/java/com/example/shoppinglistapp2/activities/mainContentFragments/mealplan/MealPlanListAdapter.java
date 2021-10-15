@@ -1,20 +1,18 @@
 package com.example.shoppinglistapp2.activities.mainContentFragments.mealplan;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.shoppinglistapp2.R;
-import com.example.shoppinglistapp2.activities.mainContentFragments.BaseDiffCallback;
-import com.example.shoppinglistapp2.activities.mainContentFragments.BaseRecyclerViewAdapter;
+import com.example.shoppinglistapp2.activities.BaseDiffCallback;
+import com.example.shoppinglistapp2.activities.BaseRecyclerViewAdapter;
 import com.example.shoppinglistapp2.databinding.RecyclerviewMealPlanMealContentBinding;
 import com.example.shoppinglistapp2.databinding.RecyclerviewMealPlanMealTitleBinding;
 import com.example.shoppinglistapp2.db.tables.Meal;
@@ -23,7 +21,6 @@ import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
 import com.example.shoppinglistapp2.helpers.KeyboardHelper;
 
 
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 

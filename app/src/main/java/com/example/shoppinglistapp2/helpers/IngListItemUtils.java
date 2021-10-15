@@ -15,6 +15,7 @@ public class IngListItemUtils {
 
 //    public static final int MEALPLAN_LIST_ID = 1;
     public static final int SHOPPING_LIST_ID = 0;
+    public static final int FAVOURITES_LIST_ID = -1;
 
     private static final List<String> unitsOfMeasurement = Arrays.asList(
             "cup",

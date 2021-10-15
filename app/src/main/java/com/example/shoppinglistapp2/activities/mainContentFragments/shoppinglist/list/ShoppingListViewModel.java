@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglist;
+package com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglist.list;
 
 import android.app.Application;
 
@@ -102,5 +102,9 @@ public class ShoppingListViewModel extends AndroidViewModel {
 
     public void deleteItem(IngListItem item) {
         slaRepository.deleteIngListItem(item);
+    }
+
+    public void resetFavouritesAdded() {
+        slaRepository.resetFavouritesAdded();
     }
 }

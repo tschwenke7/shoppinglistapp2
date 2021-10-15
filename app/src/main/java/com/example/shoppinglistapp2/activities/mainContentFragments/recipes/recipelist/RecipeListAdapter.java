@@ -13,8 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.shoppinglistapp2.R;
-import com.example.shoppinglistapp2.activities.mainContentFragments.BaseDiffCallback;
-import com.example.shoppinglistapp2.activities.mainContentFragments.BaseRecyclerViewAdapter;
+import com.example.shoppinglistapp2.activities.BaseDiffCallback;
+import com.example.shoppinglistapp2.activities.BaseRecyclerViewAdapter;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.db.tables.Tag;

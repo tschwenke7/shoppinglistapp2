@@ -21,10 +21,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.shoppinglistapp2.R;
-import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.mainContentFragments.mealplan.MealPlanFragment;
 import com.example.shoppinglistapp2.activities.mainContentFragments.recipes.RecipesParentFragment;
-import com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglist.ShoppingListFragment;
+import com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglist.ShoppingListParentFragment;
+import com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglist.list.ShoppingListFragment;
 import com.example.shoppinglistapp2.databinding.FragmentMainContentBinding;
 import com.example.shoppinglistapp2.helpers.KeyboardHelper;
 import com.google.android.material.tabs.TabLayout;
@@ -153,7 +153,7 @@ public class MainContentFragment extends Fragment {
                     fragment = RecipesParentFragment.newInstance();
                     break;
                 case MainContentFragment.SHOPPING_LIST_VIEWPAGER_INDEX:
-                    fragment = new ShoppingListFragment();
+                    fragment = new ShoppingListParentFragment();
                     break;
             }
             return fragment;

@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -290,8 +289,6 @@ public class ImportRecipesFragment extends Fragment implements ImportListAdapter
             },
             uiExecutor);
     }
-
-
 
     private void promptConflictStrategy(RecipeWithTagsAndIngredients recipe, CountDownLatch latch) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());

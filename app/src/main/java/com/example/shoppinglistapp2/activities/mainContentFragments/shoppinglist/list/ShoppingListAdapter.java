@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglist;
+package com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglist.list;
 
 import android.graphics.Paint;
 import android.view.LayoutInflater;
@@ -11,8 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.example.shoppinglistapp2.R;
-import com.example.shoppinglistapp2.activities.mainContentFragments.BaseDiffCallback;
-import com.example.shoppinglistapp2.activities.mainContentFragments.BaseRecyclerViewAdapter;
+import com.example.shoppinglistapp2.activities.BaseDiffCallback;
+import com.example.shoppinglistapp2.activities.BaseRecyclerViewAdapter;
 import com.example.shoppinglistapp2.databinding.RecyclerviewShoppingListItemBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.helpers.KeyboardHelper;

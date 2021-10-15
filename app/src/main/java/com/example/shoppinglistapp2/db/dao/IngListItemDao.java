@@ -15,6 +15,9 @@ public interface IngListItemDao extends BaseDao<IngListItem> {
     LiveData<List<IngListItem>> getIngredientsByListId(int id);
 
     @Query("SELECT * FROM ing_list_items WHERE list_id = :id")
+    LiveData<List<IngListItem>> getIngredientsByListIdUnordered(int id);
+
+    @Query("SELECT * FROM ing_list_items WHERE list_id = :id")
     List<IngListItem> getIngredientsByListIdNonLive(int id);
 
     @Query("SELECT * FROM ing_list_items WHERE list_id = :listId AND checked = 0")

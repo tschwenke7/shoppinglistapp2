@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_margin="16dp"
+    android:animateLayoutChanges="true">
+
+    <Button
+        android:id="@+id/button_add_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add_all_to_shopping_list_button"
+        app:icon="@drawable/add_to_list_drawable_ic"
+        app:iconGravity="start"
+        app:layout_constraintTop_toBottomOf="@id/textview_favourites_hint"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/edit_text_new_list_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="@string/new_list_item_field_placeholder"
+            android:importantForAutofill="no"
+            android:inputType="textMultiLine|text"
+            android:minHeight="48dp"
+            android:visibility="gone"
+            tools:visibility="gone" />
+        <Button
+            android:id="@+id/button_new_list_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/new_list_item_button_verbose"
+            app:icon="@drawable/add_icon_white_24"
+            app:iconGravity="start"
+            />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textview_favourites_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/favourite_items_help"
+        android:textSize="18sp"
+        style="@style/hintText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textAlignment="center"/>
+</LinearLayout>
+
+
+

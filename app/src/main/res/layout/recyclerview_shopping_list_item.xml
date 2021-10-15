@@ -9,6 +9,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     tools:visibility="visible"
+    android:gravity="center_vertical"
     >
 
         <TextView

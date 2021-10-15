@@ -1,4 +1,4 @@
-package com.example.shoppinglistapp2.activities.mainContentFragments;
+package com.example.shoppinglistapp2.activities;
 
 import androidx.recyclerview.widget.DiffUtil;
 

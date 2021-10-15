@@ -1,12 +1,8 @@
-package com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglist;
+package com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglist.list;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -25,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,6 +31,7 @@ import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.databinding.FragmentShoppingListBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
+import com.example.shoppinglistapp2.helpers.Animations;
 import com.example.shoppinglistapp2.helpers.ErrorsUI;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -89,12 +87,17 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
             else{
                 //hide placeholder text
                 binding.textviewNoSlItems.setVisibility(View.GONE);
-                binding.shoppingListRecyclerview.setVisibility(View.VISIBLE);
+
 
                 Parcelable recyclerViewState = binding.shoppingListRecyclerview.getLayoutManager().onSaveInstanceState();
                 adapter.submitList(items, () -> {
                     binding.shoppingListRecyclerview.getLayoutManager().onRestoreInstanceState(recyclerViewState);
-                    binding.shoppingListProgressBar.setVisibility(View.GONE);
+                    if (binding.shoppingListProgressBar.getVisibility() == View.VISIBLE) {
+                        Animations.fadeSwap(binding.shoppingListProgressBar, binding.shoppingListRecyclerview);
+                    }
+                    else {
+                        binding.shoppingListRecyclerview.setVisibility(View.VISIBLE);
+                    }
                 });
             }
         });
@@ -197,6 +200,11 @@ public class ShoppingListFragment extends Fragment implements ShoppingListAdapte
                         }))
                         .show();
                 break;
+            case R.id.action_open_favourites:
+                //reset checked status of list when the fragment is reentered
+                viewModel.resetFavouritesAdded();
+                Navigation.findNavController(requireView())
+                        .navigate(R.id.action_shoppingListFragment_to_favouritesFragment);
             default:
                 return super.onOptionsItemSelected(item);
         }

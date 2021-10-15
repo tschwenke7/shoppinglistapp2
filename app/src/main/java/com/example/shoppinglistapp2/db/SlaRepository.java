@@ -2,6 +2,7 @@ package com.example.shoppinglistapp2.db;
 
 import android.content.Context;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 
@@ -24,6 +25,8 @@ import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
 import com.example.shoppinglistapp2.db.tables.relations.RecipeWithTagsAndIngredients;
 import com.example.shoppinglistapp2.helpers.IngListItemUtils;
 import com.example.shoppinglistapp2.helpers.InvalidIngredientStringException;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.List;
@@ -478,5 +481,44 @@ public class SlaRepository {
 
     public void updateIngListItems(List<IngListItem> currentList) {
         SlaDatabase.databaseWriteExecutor.submit(() -> ingListItemDao.updateAll(currentList));
+    }
+    public void updateIngListItem(IngListItem item) {
+        SlaDatabase.databaseWriteExecutor.submit(() -> ingListItemDao.update(item));
+    }
+
+    public LiveData<List<IngListItem>> getFavouritesItems() {
+        //check if inglist exists yet
+        Future<Boolean> future = SlaDatabase.databaseWriteExecutor.submit(
+                () -> ingListDao.listIdExists(IngListItemUtils.FAVOURITES_LIST_ID));
+        try {
+            boolean exists = future.get();
+            //insert the ingList if it didn't exist yet
+            if (!exists) {
+                IngList favouritesList = new IngList();
+                favouritesList.setId(IngListItemUtils.FAVOURITES_LIST_ID);
+                Future<Long> future1 = SlaDatabase.databaseWriteExecutor.submit(
+                        () -> ingListDao.insert(favouritesList));
+                future1.get();
+            }
+
+            return Transformations.distinctUntilChanged(
+                    ingListItemDao.getIngredientsByListIdUnordered(IngListItemUtils.FAVOURITES_LIST_ID));
+
+        } catch (ExecutionException | InterruptedException ignored) {
+            return null;
+        }
+    }
+
+    /**
+     * Sets all ingListItems in the favourites list to have checked == false
+     */
+    public void resetFavouritesAdded() {
+        SlaDatabase.databaseWriteExecutor.submit(() -> {
+           List<IngListItem> items = ingListItemDao.getIngredientsByListIdNonLive(IngListItemUtils.FAVOURITES_LIST_ID);
+           for (IngListItem item: items) {
+               item.setChecked(false);
+           }
+           ingListItemDao.updateAll(items);
+        });
     }
 }

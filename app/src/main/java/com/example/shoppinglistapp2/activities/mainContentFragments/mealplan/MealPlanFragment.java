@@ -30,10 +30,10 @@ import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.MainActivity;
 
-import com.example.shoppinglistapp2.activities.mainContentFragments.BaseRecyclerViewAdapter;
+import com.example.shoppinglistapp2.activities.BaseRecyclerViewAdapter;
 import com.example.shoppinglistapp2.activities.mainContentFragments.MainContentFragment;
 import com.example.shoppinglistapp2.activities.mainContentFragments.SharedViewModel;
-import com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglist.ShoppingListAdapter;
+import com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglist.list.ShoppingListAdapter;
 import com.example.shoppinglistapp2.databinding.FragmentMealPlanBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.relations.MealWithRecipe;
