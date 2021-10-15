@@ -258,5 +258,7 @@
     <string name="favourites_added_success">Favourites items added to shopping list.</string>
     <string name="content_description_person_1_icon">Person one\'s rating</string>
     <string name="content_description_person_2_icon">Person two\'s rating</string>
+    <string name="share_shopping_list_subject">Shopping list</string>
+    <string name="share_shopping_list_prompt">Share shopping list using…</string>
 
 </resources>

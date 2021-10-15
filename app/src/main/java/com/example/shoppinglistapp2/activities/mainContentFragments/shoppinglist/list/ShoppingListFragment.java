@@ -3,6 +3,7 @@ package com.example.shoppinglistapp2.activities.mainContentFragments.shoppinglis
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -17,28 +18,20 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.shoppinglistapp2.App;
 import com.example.shoppinglistapp2.R;
 import com.example.shoppinglistapp2.activities.ContentFragment;
-import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.databinding.FragmentShoppingListBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.helpers.Animations;
 import com.example.shoppinglistapp2.helpers.ErrorsUI;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListeningExecutorService;
-
-import java.util.concurrent.Executor;
 
 public class ShoppingListFragment extends ContentFragment implements ShoppingListAdapter.SlItemClickListener {
     private ShoppingListViewModel viewModel;
@@ -168,34 +161,18 @@ public class ShoppingListFragment extends ContentFragment implements ShoppingLis
                         .setNegativeButton(R.string.clear_list_negative_button, null)
                         .show();
                 break;
-            case R.id.action_copy_list_to_clipboard:
+            case R.id.share_list:
                 //ask whether to include crossed off items
                 new AlertDialog.Builder(requireContext())
                         .setTitle(R.string.copy_to_clipboard_dialog_title)
                         .setMessage(R.string.copy_to_clipboard_dialog_message)
                         //include crossed off items
                         .setPositiveButton(R.string.copy_to_clipboard_dialog_positive_button, (dialogInterface, i) -> {
-                            ClipboardManager clipboard = (ClipboardManager) requireActivity()
-                                    .getSystemService(Context.CLIPBOARD_SERVICE);
-                            ClipData clip = ClipData.newPlainText("shopping_list",
-                                    viewModel.getAllItemsAsString(true));
-                            clipboard.setPrimaryClip(clip);
-                            new AlertDialog.Builder(requireContext())
-                                    .setTitle(R.string.copy_to_clipboard_dialog_title)
-                                    .setMessage(R.string.share_shopping_list_success)
-                                    .setPositiveButton(R.string.ok, null).show();
+                            shareShoppingList(true);
                         })
                         //negative button corresponds to "don't include"
                         .setNegativeButton(R.string.copy_to_clipboard_dialog_negative_button, ((dialog, which) -> {
-                            ClipboardManager clipboard = (ClipboardManager) requireActivity()
-                                    .getSystemService(Context.CLIPBOARD_SERVICE);
-                            ClipData clip = ClipData.newPlainText("shopping_list",
-                                    viewModel.getAllItemsAsString(false));
-                            clipboard.setPrimaryClip(clip);
-                            new AlertDialog.Builder(requireContext())
-                                    .setTitle(R.string.copy_to_clipboard_dialog_title)
-                                    .setMessage(R.string.share_shopping_list_success)
-                                    .setPositiveButton(R.string.ok, null).show();
+                            shareShoppingList(false);
                         }))
                         .show();
                 break;
@@ -208,6 +185,15 @@ public class ShoppingListFragment extends ContentFragment implements ShoppingLis
                 return super.onOptionsItemSelected(item);
         }
         return false;
+    }
+
+    private void shareShoppingList(boolean includeChecked) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        String body = viewModel.getAllItemsAsString(includeChecked);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_shopping_list_subject));
+        intent.putExtra(android.content.Intent.EXTRA_TEXT, body);
+        startActivity(Intent.createChooser(intent, getString(R.string.share_shopping_list_prompt)));
     }
 
     @Override
