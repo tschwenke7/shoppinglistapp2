@@ -126,6 +126,20 @@
     <string name="error_loading_tags">Error - unable to load tags for recipe.</string>
     <string name="error_serves_cant_be_negative">Number of serves cannot be 0 or negative.</string>
 
+    <string name="recipe_prefill_preamble">A recipe has been created and prefilled successfully. However, you should check to make sure all details are consistent and make sense before clicking \"SAVE\".
+        \n\nTIPS
+    </string>
+    <string name="general_new_recipe_hints">\n\n• Try to use generic ingredient names, e.g. \"coriander\" instead of \"roughly chopped fresh coriander.\" Consistent naming allows ingredients to have their quantities combined when added to your shopping list from different recipes, and makes it easier to search recipes by ingredients.</string>
+    <string name="recipe_prefill_hints_general">\n\n• Delete any ingredients you wouldn\'t add to a shopping list, e.g. \"salt and pepper\".
+        \n\n• Some ingredients may have had a substitute or alternative name listed. Edit these ingredients to include only the one you will use.</string>
+    <string name="recipe_prefill_hints_recipe_tin_eats">
+        \n\n• Check for multiple ingredients in one line, and add a separate ingredient for each instead.
+        \n\n• Check for ingredients with a range of quantities, (e.g. \"13-16\") and edit them to choose one.
+        \n\n• Ingredient names beginning with \"[EDIT_ME]\" were unable to be understood. Please edit and simplify them.
+    </string>
+    <string name="recipe_prefill_hints_hello_fresh">\n\n• Quantities of HelloFresh recipes often tend to be in "packets" or similar ambiguous units. These will be counted as part of the ingredient\'s name, so you might want to try and replace these with a weight/volume measurement so they can be consistent with other recipes.
+    </string>
+
     <!-- Select meal page -->
     <string name="select_meal_title">Select a meal</string>
     <string name="replace_meal_button_override">Replace it</string>
@@ -261,5 +275,8 @@
     <string name="share_shopping_list_subject">Shopping list</string>
     <string name="share_shopping_list_prompt">Share shopping list using…</string>
     <string name="suggested_recipes_hint">These recipes share the most ingredients from the \"Ingredients needed\" section above:</string>
+    <string name="recipe_prefill_hint_title">Recipe prefilled successfully</string>
+    <string name="from_scratch_preamble">TIPS</string>
+    <string name="from_scrach_recipe_title">Creating a new recipe</string>
 
 </resources>

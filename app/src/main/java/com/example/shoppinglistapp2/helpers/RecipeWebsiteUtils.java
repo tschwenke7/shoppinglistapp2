@@ -23,14 +23,6 @@ import java.util.List;
 
 
 public class RecipeWebsiteUtils {
-    /**
-     * Enum of supported domains for recipe website conversion
-     */
-    public static enum Domain {
-        RECIPE_TIN_EATS,
-        HELLO_FRESH,
-        NOT_SUPPORTED
-    }
 
     /**
      * Gets the domain of the recipe url provided so we can use the appropriate converter
@@ -50,6 +42,7 @@ public class RecipeWebsiteUtils {
             return Domain.NOT_SUPPORTED;
         }
     }
+
 
     public static boolean validateUrl(String url) throws InvalidRecipeUrlExeception{
         //check that something was provided

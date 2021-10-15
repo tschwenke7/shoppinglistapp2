@@ -42,6 +42,7 @@ import com.example.shoppinglistapp2.activities.mainContentFragments.SharedViewMo
 import com.example.shoppinglistapp2.databinding.FragmentViewRecipeBinding;
 import com.example.shoppinglistapp2.db.tables.IngListItem;
 import com.example.shoppinglistapp2.db.tables.Tag;
+import com.example.shoppinglistapp2.helpers.Domain;
 import com.example.shoppinglistapp2.helpers.KeyboardHelper;
 import com.example.shoppinglistapp2.db.tables.Recipe;
 import com.example.shoppinglistapp2.helpers.RecipeSharer;
@@ -102,8 +103,40 @@ public class ViewRecipeFragment extends ContentFragment implements IngredientLis
         super.onViewCreated(view, savedInstanceState);
         backgroundExecutor.submit(() -> viewModel.saveBackupOfRecipe(recipeId));
 
+        showHintIfJustCreated();
+
         //decide whether to start in edit mode or not
         setupViews(view, ViewRecipeFragmentArgs.fromBundle(getArguments()).getEditingFlag());
+    }
+
+    private void showHintIfJustCreated() {
+        String hintsBody = "";
+        String hintsTitle = getString(R.string.recipe_prefill_hint_title);
+        switch ((Domain) getArguments().get("prefill_source")) {
+            case RECIPE_TIN_EATS:
+                hintsTitle =
+                hintsBody = getString(R.string.recipe_prefill_preamble)
+                    + getString(R.string.general_new_recipe_hints)
+                    + getString(R.string.recipe_prefill_hints_general)
+                    + getString(R.string.recipe_prefill_hints_recipe_tin_eats);
+                break;
+            case HELLO_FRESH:
+                hintsBody = getString(R.string.recipe_prefill_preamble)
+                    + getString(R.string.general_new_recipe_hints)
+                    + getString(R.string.recipe_prefill_hints_general)
+                    + getString(R.string.recipe_prefill_hints_hello_fresh);
+                break;
+            case FROM_SCRATCH:
+                hintsTitle = getString(R.string.from_scrach_recipe_title);
+                hintsBody += getString(R.string.from_scratch_preamble) + getString(R.string.general_new_recipe_hints);
+                break;
+            case NOT_SUPPORTED:
+                return;
+        }
+        new AlertDialog.Builder(requireContext()).setTitle(hintsTitle)
+                .setMessage(hintsBody)
+                .setPositiveButton(R.string.ok, null)
+                .show();
     }
 
     private void setupViews(View root, boolean editingFlag){
@@ -220,7 +253,8 @@ public class ViewRecipeFragment extends ContentFragment implements IngredientLis
             }
         });
 
-
+        //make back button work within these nested fragments
+        addDefaultOnBackPressedCallback();
 
         //configure either in edit mode or view only mode
         if(editingFlag){
@@ -229,17 +263,6 @@ public class ViewRecipeFragment extends ContentFragment implements IngredientLis
         else{
             enterViewMode();
         }
-
-        //make back button work within these nested fragments
-        Fragment f1 = this;
-        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                NavHostFragment.findNavController(f1).navigateUp();
-            }
-        };
-
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
     }
 
     private void changeServes() {
@@ -660,21 +683,26 @@ public class ViewRecipeFragment extends ContentFragment implements IngredientLis
     }
 
     private void discardChanges() {
-        //restore ingredients to previous state
-        Futures.addCallback(backgroundExecutor.submit(() -> viewModel.resetIngredientsToBackup()),
-                new FutureCallback<Boolean>() {
-                    @Override
-                    public void onSuccess(@Nullable Boolean result) {
-                        //do nothing
-                    }
+        //if this was a new recipe, go back to createRecipe page and delete this draft
+        if (newRecipeFlag && !saved) {
+            requireActivity().onBackPressed();
+        }
+        else {
+            //restore ingredients to previous state
+            Futures.addCallback(backgroundExecutor.submit(() -> viewModel.resetIngredientsToBackup()),
+                    new FutureCallback<Boolean>() {
+                        @Override
+                        public void onSuccess(@Nullable Boolean result) {
+                            //do nothing
+                        }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Toast.makeText(requireContext(), R.string.error_could_not_access_database, Toast.LENGTH_LONG).show();
-                    }
-                },
-                uiExecutor
-        );
+                        @Override
+                        public void onFailure(Throwable t) {
+                            Toast.makeText(requireContext(), R.string.error_could_not_access_database, Toast.LENGTH_LONG).show();
+                        }
+                    },
+                    uiExecutor);
+        }
 
 
 

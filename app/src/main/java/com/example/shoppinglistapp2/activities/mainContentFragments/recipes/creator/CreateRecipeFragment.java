@@ -29,6 +29,9 @@ import com.example.shoppinglistapp2.activities.ContentFragment;
 import com.example.shoppinglistapp2.activities.MainActivity;
 import com.example.shoppinglistapp2.activities.mainContentFragments.SharedViewModel;
 import com.example.shoppinglistapp2.databinding.FragmentCreateRecipeBinding;
+import com.example.shoppinglistapp2.helpers.Domain;
+import com.example.shoppinglistapp2.helpers.IngListItemUtils;
+import com.example.shoppinglistapp2.helpers.RecipeWebsiteUtils;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -108,6 +111,7 @@ public class CreateRecipeFragment extends ContentFragment {
                             CreateRecipeFragmentDirections.actionCreateRecipeToViewRecipe();
                     //pass id of newly created website as parameter of navigation
                     action.setRecipeId(result);
+                    action.setPrefillSource(Domain.FROM_SCRATCH);
                     Navigation.findNavController(requireView()).navigate(action);
 
                     //hide progress bar and reset opacity of everything else
@@ -143,6 +147,7 @@ public class CreateRecipeFragment extends ContentFragment {
                 else{
                     CreateRecipeFragmentDirections.ActionCreateRecipeToViewRecipe action =
                             CreateRecipeFragmentDirections.actionCreateRecipeToViewRecipe();
+                    action.setPrefillSource(RecipeWebsiteUtils.getDomain(url));
 
                     //pass id of newly created recipe
                     action.setRecipeId(recipeId);
