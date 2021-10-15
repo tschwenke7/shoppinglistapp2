@@ -163,7 +163,10 @@ public class RecipeListFragment extends ContentFragment implements RecipeListAda
         binding.searchBar.setMaxLines(20);
 
         //setup clear search button
-        binding.clearSearchButton.setOnClickListener((v) -> binding.searchBar.setText(""));
+        binding.clearSearchButton.setOnClickListener((v) -> {
+            binding.searchBar.setText("");
+            scrollToTop();
+        });
 
         //have it listen and update results in realtime as the user types
         binding.searchBar.addTextChangedListener(new TextWatcher() {
@@ -177,7 +180,7 @@ public class RecipeListFragment extends ContentFragment implements RecipeListAda
                 if(actionMode != null && sharedViewModel.getSelectingForMeal() == null){
                     actionMode.finish();
                 }
-                adapter.filter(newText);
+                adapter.filter(newText, () -> scrollToTop());
 
                 //show clear search button if there's any text in the search bar
                 if (newText.length() == 0){
@@ -445,7 +448,7 @@ public class RecipeListFragment extends ContentFragment implements RecipeListAda
                 //notify adapter of change
                 adapter.setSearchCriteria(searchCriteria);
                 //refilter list based on new search criteria
-                adapter.refilter();
+                adapter.refilter(this::scrollToTop);
 
                 //update autocompelte suggestions for the new search criteria
                 setAutoCompleteSuggestions();
@@ -454,14 +457,20 @@ public class RecipeListFragment extends ContentFragment implements RecipeListAda
 
             //when an option is selected in the "order by" spinner
             case R.id.order_by_spinner:
-                adapter.sort(pos);
+                adapter.sort(pos, this::scrollToTop);
                 break;
         }
+
+        //scroll recyclerview back to the top
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
         //neither spinner has a "nothing" option
+    }
+
+    private void scrollToTop() {
+        binding.recipeRecyclerview.getLayoutManager().scrollToPosition(0);
     }
 
     /** Creates and handles a contextual action bar for when one or more recipes are selected

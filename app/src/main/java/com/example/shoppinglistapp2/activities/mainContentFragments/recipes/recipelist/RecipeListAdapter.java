@@ -175,7 +175,7 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         this.latestConstraint = constraint;
     }
 
-    public void sort(int orderingCriteria){
+    public void sort(int orderingCriteria, Runnable callback){
         //set the orderByCriteria
         this.orderByCriteria = orderingCriteria;
 
@@ -189,7 +189,7 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
             List<RecipeWithTagsAndIngredients> sortedList = new ArrayList<>(getCurrentList());
 
             //submit sorted list to adapter
-            this.submitList(sortList(sortedList));
+            this.submitList(sortList(sortedList), callback);
         }
     }
 
@@ -259,13 +259,24 @@ public class RecipeListAdapter extends BaseRecyclerViewAdapter<RecipeWithTagsAnd
         }
     }
 
-    public void filter(CharSequence constraint) {
+    public void filter(CharSequence constraint, Runnable callback) {
         latestConstraint = constraint;
-        getFilter().filter(constraint);
+        updateListExecutor.execute(() -> {
+            getFilter().filter(constraint);
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(callback);
+        });
     }
 
+    public void filter(CharSequence constraint) {
+        filter(constraint, null);
+    }
+
+    public void refilter(Runnable callback){
+        filter(latestConstraint, callback);
+    }
     public void refilter(){
-        filter(latestConstraint);
+        filter(latestConstraint, null);
     }
 
     /** Filters recipes to match those whose name contains the query string */

@@ -56,7 +56,8 @@
             android:hint="@string/recipe_name_placeholder"
             android:inputType="text|textCapSentences"
             android:textSize="24sp"
-            android:visibility="visible" />
+            android:visibility="visible"
+            android:importantForAutofill="no" />
 
         <TextView
             android:id="@+id/ingredients_heading"
@@ -82,6 +83,7 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="@string/add_ingredient_placeholder"
+                android:importantForAutofill="no"
                 android:inputType="textMultiLine|text|textCapSentences"
                 android:minHeight="48dp" />
 
@@ -211,7 +213,8 @@
                 android:gravity="center"
                 android:inputType="number"
                 android:textSize="18sp"
-                tools:text="20" />
+                tools:text="20"
+                android:importantForAutofill="no" />
         </LinearLayout>
         <TextView
             android:id="@+id/serves_hint"
@@ -265,7 +268,8 @@
                 android:inputType="number"
                 android:textSize="18sp"
                 tools:text="290"
-                tools:visibility="gone" />
+                tools:visibility="gone"
+                android:importantForAutofill="no" />
 
             <TextView
                 android:id="@+id/prep_time_units"
@@ -294,7 +298,8 @@
                 android:inputType="number"
                 android:textSize="18sp"
                 tools:text="290"
-                tools:visibility="gone"/>
+                tools:visibility="gone"
+                android:importantForAutofill="no" />
 
             <TextView
                 android:id="@+id/text_view_cook_time"
@@ -323,11 +328,12 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/tiernan_icon"
+                android:id="@+id/person_1_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                app:srcCompat="@drawable/ic_tiernan_face" />
+                app:srcCompat="@drawable/ic_tiernan_face"
+                android:contentDescription="@string/content_description_person_1_icon"/>
 
             <RatingBar
                 android:id="@+id/tiernan_rating_bar"
@@ -345,11 +351,12 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/tom_icon"
+                android:id="@+id/person_2_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                app:srcCompat="@drawable/ic_tom_face" />
+                app:srcCompat="@drawable/ic_tom_face"
+                android:contentDescription="@string/content_description_person_2_icon"/>
 
             <RatingBar
                 android:id="@+id/tom_rating_bar"
@@ -427,6 +434,7 @@
             android:hint="@string/recipe_notes_placeholder"
             android:inputType="textMultiLine|textCapSentences"
             android:textSize="18sp"
-            tools:text="Notes about the recipe\nOver multiple lines." />
+            tools:text="Notes about the recipe\nOver multiple lines."
+            android:importantForAutofill="no" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

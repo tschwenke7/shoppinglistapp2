@@ -31,8 +31,8 @@
         <item>Recipe name A-Z</item>
         <item>Prep time</item>
         <item>Total time</item>
-        <item>Tom\'s rating</item>
-        <item>Tiernan\'s rating</item>
+        <item>Person 1\'s rating</item>
+        <item>Person 2\'s rating</item>
         <item>Combined rating</item>
     </string-array>
     <string name="ingredient_search_hint">Enter one or more ingredients separated by commas</string>
@@ -256,5 +256,7 @@
     <string name="added">Added</string>
     <string name="title_favourites">Favourites</string>
     <string name="favourites_added_success">Favourites items added to shopping list.</string>
+    <string name="content_description_person_1_icon">Person one\'s rating</string>
+    <string name="content_description_person_2_icon">Person two\'s rating</string>
 
 </resources>
