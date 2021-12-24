@@ -2,6 +2,14 @@ apply plugin: 'com.android.application'
 apply plugin: "androidx.navigation.safeargs"
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\tschw\\Android store keys\\PlanMyShopKey.jks')
+            storePassword 'planmyshop7'
+            keyAlias 'keyPMS'
+            keyPassword 'planmyshop7'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
@@ -19,6 +27,7 @@ android {
                 arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
         }
+        signingConfig signingConfigs.debug
     }
 
     buildTypes {
@@ -26,13 +35,21 @@ android {
             viewBinding true
         }
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        abortOnError false
+    }
+
+    configurations {
+        all {
+            exclude module: 'commons-logging'
+        }
     }
 }
 
@@ -97,6 +114,4 @@ dependencies {
     dependencies {
         implementation 'com.google.code.gson:gson:2.8.8'
     }
-
-
 }
