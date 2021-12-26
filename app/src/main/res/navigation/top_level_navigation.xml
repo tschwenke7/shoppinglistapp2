@@ -13,8 +13,8 @@
         <action
             android:id="@+id/action_mainContentFragment_to_rootSettingsFragment"
             app:destination="@id/rootSettingsFragment"
-            app:enterAnim="@anim/slide_in_up_over"
-            app:popExitAnim="@anim/slide_out_down_over" />
+            app:enterAnim="@anim/slide_and_fade_in_up"
+            app:popExitAnim="@anim/slide_and_fade_out_down" />
         <argument
             android:name="setViewpagerTo"
             app:argType="integer"

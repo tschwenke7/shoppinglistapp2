@@ -26,6 +26,11 @@ public class MealPlanUtils {
             "monday" //repeat first day so we can consistently tell what day comes after a given day
     };
 
+    private static final String[] meals = new String[] {
+            "lunch",
+            "dinner"
+    };
+
     /**
      * Checks if previous title made mention of a day name, and if so,
      * returns the next day of the week. Otherwise it returns a default placeholder name.

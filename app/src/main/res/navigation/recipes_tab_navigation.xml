@@ -13,10 +13,10 @@
         <action
             android:id="@+id/action_recipe_list_to_view_recipe"
             app:destination="@id/viewRecipeFragment"
-            app:enterAnim="@anim/slide_in_left_delayed"
-            app:exitAnim="@anim/slide_out_right_delayed"
-            app:popEnterAnim="@anim/slide_in_right_delayed"
-            app:popExitAnim="@anim/slide_out_left_delayed">
+            app:enterAnim="@anim/slide_and_fade_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_and_fade_out_down">
             <argument
                 android:name="newRecipeFlag"
                 android:defaultValue="false" />
@@ -27,10 +27,10 @@
         <action
             android:id="@+id/action_recipe_list_to_create_recipe"
             app:destination="@id/createRecipe"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_right"
-            app:popEnterAnim="@anim/slide_in_right_delayed"
-            app:popExitAnim="@anim/slide_out_left_delayed" />
+            app:enterAnim="@anim/slide_and_fade_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_and_fade_out_down" />
     </fragment>
 
     <fragment
@@ -52,10 +52,10 @@
         <action
             android:id="@+id/action_viewRecipeFragment_to_selectMealFragment"
             app:destination="@id/selectMealFragment"
-            app:enterAnim="@anim/slide_in_up_over"
+            app:enterAnim="@anim/slide_and_fade_in_up"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/slide_out_down_over" />
+            app:popExitAnim="@anim/slide_and_fade_out_down" />
         <argument
             android:name="prefill_source"
             app:argType="com.example.shoppinglistapp2.helpers.Domain"
@@ -69,10 +69,10 @@
         <action
             android:id="@+id/action_create_recipe_to_view_recipe"
             app:destination="@id/viewRecipeFragment"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_right"
-            app:popEnterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_left">
+            app:enterAnim="@anim/slide_and_fade_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_and_fade_out_down">
             <argument
                 android:name="editingFlag"
                 android:defaultValue="true" />
