@@ -3,7 +3,7 @@ package com.example.shoppinglistapp2.db.tables;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Fts4;
+import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity(
-    tableName = "recipes",
-    indices = {@Index(value = {"name"}, unique = true)}//the recipe name must be unique
+        tableName = "recipes",
+        indices = {@Index(value = {"name"}, unique = true)}//the recipe name must be unique
 )
 public class Recipe {
 
@@ -31,7 +31,8 @@ public class Recipe {
     @ColumnInfo(name = "cook_time")
     private int cookTime;
 
-    private int serves;
+    @ColumnInfo(defaultValue = "1")
+    private int serves = 1;
 
     private String url;
     private String notes;
@@ -39,11 +40,8 @@ public class Recipe {
     private int tom_rating;
     private int tier_rating;
 
-    @Ignore
-    private List<Ingredient> ingredients;
-
-    @Ignore
-    private List<String> tags;
+    public Recipe() {
+    }
 
     public int getId() {
         return id;
@@ -94,14 +92,6 @@ public class Recipe {
         this.tier_rating = tier_rating;
     }
 
-    public List<Ingredient> getIngredients() {
-        return ingredients;
-    }
-
-    public void setIngredients(List<Ingredient> ingredients) {
-        this.ingredients = ingredients;
-    }
-
     public int getPrepTime() {
         return prepTime;
     }
@@ -126,13 +116,6 @@ public class Recipe {
         this.serves = serves;
     }
 
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<String> tags) {
-        this.tags = tags;
-    }
 
     @Ignore
     @Override

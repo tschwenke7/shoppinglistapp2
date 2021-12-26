@@ -3,7 +3,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -21,23 +22,43 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             >
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/create_recipe_preamble_2"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/create_recipe_manually_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/create_recipe_manual_button"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/or_separator"
+                android:textColor="@color/primary_text_default"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/create_recipe_preamble_1"
+                android:text="@string/create_recipe_preamble_1_1"
                 android:textAlignment="center"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/supported_recipes"
-                android:textAlignment="center"
-                android:textSize="18sp" />
 
             <EditText
                 android:id="@+id/edit_text_recipe_website"
@@ -57,33 +78,21 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:text="@string/or_separator"
-                android:textColor="@color/primary_text_default"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                android:text="@string/create_recipe_preamble_1_2"
+                android:textSize="18sp"
+                android:textAlignment="center"/>
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/text_view_supported_websites"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/create_recipe_preamble_2"
                 android:textAlignment="center"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/create_recipe_manually_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/create_recipe_manual_button"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:lineSpacingMultiplier="1.4"
+                tools:text="@string/supported_recipes"
+                />
         </LinearLayout>
 
         <ProgressBar

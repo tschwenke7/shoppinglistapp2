@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginBottom="8dp"
+    android:padding="8dp"
+    android:background="@drawable/background_select_meal"
+    >
+
+    <TextView
+        android:id="@+id/day_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@null"
+        android:textColor="@color/day_title_edittext_font_color"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:text="Monday" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/recipe_cardview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_weight="1"
+        app:cardBackgroundColor="@color/recipe_item_background_light"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/meal_plan_notes"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginBottom="0dp"
+        tools:visibility="visible">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/recipe_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:gravity="center_vertical"
+                android:paddingTop="8dp"
+                android:paddingBottom="0dp"
+                android:textColor="@color/recipe_item_text_primary"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Curried Sausages" />
+
+            <ImageView
+                android:id="@+id/clock_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/recipe_title"
+                app:layout_constraintTop_toBottomOf="@id/recipe_title"
+                app:srcCompat="@drawable/ic_baseline_access_time_24"
+                app:tint="@color/recipe_item_text_secondary" />
+
+            <TextView
+                android:id="@+id/prep_time_heading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="4dp"
+                android:text="@string/prep_time_heading_short"
+                android:textColor="@color/recipe_item_text_secondary"
+                app:layout_constraintBottom_toBottomOf="@+id/clock_icon"
+                app:layout_constraintStart_toEndOf="@+id/clock_icon"
+                app:layout_constraintTop_toTopOf="@+id/clock_icon" />
+
+            <TextView
+                android:id="@+id/prep_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="2dp"
+                android:textColor="@color/recipe_item_text_secondary"
+                app:layout_constraintBottom_toBottomOf="@id/clock_icon"
+                app:layout_constraintStart_toEndOf="@id/prep_time_heading"
+                app:layout_constraintTop_toTopOf="@id/clock_icon"
+                tools:text="15 mins" />
+
+            <TextView
+                android:id="@+id/cook_time_heading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="6dp"
+                android:text="@string/cook_time_heading_short"
+                android:textColor="@color/recipe_item_text_secondary"
+                app:layout_constraintBottom_toBottomOf="@id/clock_icon"
+                app:layout_constraintStart_toEndOf="@id/prep_time"
+                app:layout_constraintTop_toTopOf="@id/clock_icon" />
+
+            <TextView
+                android:id="@+id/cook_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="2dp"
+                android:textColor="@color/recipe_item_text_secondary"
+                app:layout_constraintBottom_toBottomOf="@id/clock_icon"
+                app:layout_constraintStart_toEndOf="@id/cook_time_heading"
+                app:layout_constraintTop_toTopOf="@id/clock_icon"
+                tools:text="180 mins" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/meal_plan_notes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@null"
+        android:gravity="start|top"
+        android:textSize="16sp"
+        tools:text="Buy takeaway today"
+        tools:visibility="visible" />
+
+</LinearLayout>

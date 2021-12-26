@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/top_level_navigation"
+    app:startDestination="@id/mainContentFragment">
+
+    <fragment
+        android:id="@+id/mainContentFragment"
+        android:name="com.example.shoppinglistapp2.activities.mainContentFragments.MainContentFragment"
+        android:label="fragment_main_content"
+        tools:layout="@layout/fragment_main_content" >
+        <action
+            android:id="@+id/action_mainContentFragment_to_rootSettingsFragment"
+            app:destination="@id/rootSettingsFragment"
+            app:enterAnim="@anim/slide_and_fade_in_up"
+            app:popExitAnim="@anim/slide_and_fade_out_down" />
+        <argument
+            android:name="setViewpagerTo"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
+    <fragment
+        android:id="@+id/rootSettingsFragment"
+        android:name="com.example.shoppinglistapp2.activities.settingsFragments.RootSettingsFragment"
+        android:label="@string/settings_title"
+        tools:layout="@layout/fragment_root_settings" />
+    <fragment
+        android:id="@+id/importRecipesFragment"
+        android:name="com.example.shoppinglistapp2.activities.importRecipes.ImportRecipesFragment"
+        android:label="fragment_import_recipes"
+        tools:layout="@layout/fragment_import_recipes">
+        <argument
+            android:name="jsonRecipes"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_import_to_main_content"
+            app:destination="@id/mainContentFragment"
+            >
+            <argument
+                android:name="setViewpagerTo"
+                android:defaultValue="1" />
+        </action>
+    </fragment>
+    <action
+        android:id="@+id/action_global_importRecipesFragment"
+        app:destination="@id/importRecipesFragment" />
+</navigation>

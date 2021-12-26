@@ -4,17 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.ui.shoppinglist.ShoppingListFragment">
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/shopping_list_recyclerview"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider3"
-        tools:listitem="@layout/shopping_list_recyclerview_item" />
+    tools:context=".activities.mainContentFragments.shoppinglist.list.ShoppingListFragment">
 
     <EditText
         android:id="@+id/edit_text_new_list_item"
@@ -26,9 +16,11 @@
         android:ems="10"
         android:hint="@string/new_list_item_field_placeholder"
         android:inputType="textMultiLine|text"
+        android:minHeight="48dp"
         app:layout_constraintEnd_toStartOf="@+id/button_new_list_item"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:importantForAutofill="no" />
 
     <View
         android:id="@+id/divider3"
@@ -49,4 +41,41 @@
         app:layout_constraintBottom_toBottomOf="@+id/edit_text_new_list_item"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/edit_text_new_list_item" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/shopping_list_recyclerview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider3"
+        tools:listitem="@layout/recyclerview_shopping_list_item"
+        tools:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/shopping_list_progress_bar"
+        android:layout_width="0dp"
+        android:layout_height="96dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider3"
+        tools:listitem="@layout/recyclerview_shopping_list_item"
+        tools:visibility="gone" />
+
+    <TextView
+        android:id="@+id/textview_no_sl_items"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/no_sl_items_placeholder_text"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/divider3"
+        tools:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>

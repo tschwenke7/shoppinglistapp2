@@ -1,6 +1,5 @@
 package com.example.shoppinglistapp2.db.tables;
 
-
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -8,12 +7,14 @@ import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.util.Objects;
+
 @Entity(tableName = "tags",
         foreignKeys = @ForeignKey(
-        entity = Recipe.class,
-        parentColumns = "id",
-        childColumns = "recipe_id",
-        onDelete = ForeignKey.CASCADE)
+                entity = Recipe.class,
+                parentColumns = "id",
+                childColumns = "recipe_id",
+                onDelete = ForeignKey.CASCADE)
 )
 public class Tag {
 
@@ -24,7 +25,7 @@ public class Tag {
     private String name;
 
     @NonNull
-    @ColumnInfo(name = "recipe_id")
+    @ColumnInfo(name = "recipe_id", index = true)
     private int recipeId;
 
     public Tag(){};
@@ -33,6 +34,11 @@ public class Tag {
     public Tag(int recipeId, String tagName) {
         this.recipeId = recipeId;
         this.name = tagName;
+    }
+
+    @Ignore
+    public Tag(@NonNull String name) {
+        this.name = name;
     }
 
     public int getId() {
@@ -58,4 +64,18 @@ public class Tag {
     public void setRecipeId(int recipeId) {
         this.recipeId = recipeId;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tag tag = (Tag) o;
+        return name.equals(tag.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
 }
+

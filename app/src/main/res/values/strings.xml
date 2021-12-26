@@ -1,9 +1,12 @@
 <resources>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
+    <string name="error_title">Error</string>
+    <string name="ok">OK</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
 
-
-    <string name="app_name">SLA2</string>
+    <string name="app_name">Plan My Shop</string>
     <string name="title_activity_main2">MainActivity</string>
     <string name="title_meal_plan">Meal Plan</string>
     <string name="title_recipes">Recipes</string>
@@ -13,7 +16,7 @@
     <!-- Recipe list page -->
     <string name="add_recipe_action_title">Add new recipe</string>
     <string name="add_all_to_list_action_title">Add all ingredients to list</string>
-    <string name="delete_recipe_action_title">Delete recipe</string>
+    <string name="delete_recipe_action_title">Delete recipes</string>
     <string name="default_rating">0</string>
     <string name="show_advanced_search_prompt">Advanced search ▼</string>
     <string name="hide_advanced_search_prompt">Hide ▲</string>
@@ -28,8 +31,8 @@
         <item>Recipe name A-Z</item>
         <item>Prep time</item>
         <item>Total time</item>
-        <item>Tom\'s rating</item>
-        <item>Tiernan\'s rating</item>
+        <item>Person 1\'s rating</item>
+        <item>Person 2\'s rating</item>
         <item>Combined rating</item>
     </string-array>
     <string name="ingredient_search_hint">Enter one or more ingredients separated by commas</string>
@@ -39,20 +42,33 @@
     <string name="delete_warning_prompt1">Are you sure you want to permanently delete</string>
     <string name="delete_warning_prompt2">recipe/s?</string>
 
+    <string name="no_recipes_message">Your recipe book is empty!\n\nYou can add recipes here to browse through for future meal planning, and easily add all ingredients from a recipe straight to your shopping list.\n\nAdd recipes by clicking the \"+\" icon in the top right of this screen.</string>
+    <string name="content_description_clear_search">Clear search bar</string>
+    <string name="searchbar_name_hint">Recipe name…</string>
+    <string name="searchbar_ingredient_hint">ingredient1,  ingredient2,   …</string>
+    <string name="searchbar_tag_hint">tag1,   tag2,   …</string>
+    <string name="error_deleting_recipes">Error - something went wrong when trying to delete recipes.\nPlease try again in a few minutes.</string>
+
+
     <!-- New recipe page -->
     <string name="create_recipe_title">Create New Recipe</string>
-    <string name="create_recipe_preamble_1">Enter a website to create a recipe from. </string>
-    <string name="supported_recipes">Currently supported websites:\n
-    \u25CF\trecipetineats.com</string>
-    <string name="recipe_website_hint">Recipe website…</string>
-    <string name="create_recipe_website_button">Create recipe from website</string>
+    <string name="create_recipe_preamble_1_1">Enter a link to prefill a recipe from.</string>
+    <string name="create_recipe_preamble_1_2">A new recipe will be generated and prefilled using any ingredients and other details from that webpage.</string>
+    <string name="supported_recipes"><![CDATA[
+    <b>Currently supported websites:</b><br>
+    • <a href="https://www.recipetineats.com/">RecipeTin Eats</a><br>
+    • <a href="https://www.hellofresh.com.au/recipes/">Hello Fresh</a><br>
+    • <a href="https://www.taste.com.au/">Taste.com.au</a>
+    ]]></string>
+    <string name="recipe_website_hint">Paste in link to recipe here…</string>
+    <string name="create_recipe_website_button">Prefill recipe from website</string>
     <string name="or_separator">OR</string>
     <string name="create_recipe_preamble_2">Create a new recipe manually by clicking the button below.</string>
     <string name="create_recipe_manual_button">Create recipe from scratch</string>
 
     <string name="recipe_url_empty">Please enter a website to create a recipe from</string>
     <string name="recipe_url_invalid">The website you have provided is not a valid url. Be sure to include the full \"https://www.\" address.</string>
-    <string name="recipe_url_unsupported">The website you have provided is not currently supported. Check the list above for supported sites.</string>
+    <string name="recipe_url_unsupported">The website you have provided is not currently supported. Check the list below for supported sites.</string>
     <string name="recipe_url_error">Error - a recipe could not be read from this website. Please check the link you\'ve provided.</string>
     <string name="recipe_url_timeout_error">Error - website too long to respond. Check your internet connection and try again.</string>
 
@@ -74,12 +90,16 @@
     <string name="edit_mode_title">Editing recipe</string>
 
     <string name="ingredients_heading">Ingredients</string>
+    <string name="edit_ingredient_hint">Tap and hold an ingredient below to edit it.</string>
     <string name="notes_heading">Notes</string>
     <string name="url_heading">Website link:</string>
     <string name="prep_time_heading">Prep time (minutes):</string>
     <string name="cook_time_heading">Cooking time (minutes):</string>
     <string name="tags_heading">Tags:</string>
     <string name="tags_hint">Add tag…</string>
+    <string name="change_serves_hint">Changing serves will ask if you also want to change all ingredients\' quantities to match.</string>
+    <string name="change_serves_dialog_message">You changed the number of serves from %1$d to %2$d. Do you want to update the quantity of all ingredients to match this?</string>
+    <string name="change_serves_dialog_title">Update ingredient quantities</string>
 
     <string name="recipe_name_placeholder">Recipe name…</string>
     <string name="add_ingredient_placeholder">New ingredient…</string>
@@ -88,11 +108,55 @@
 
     <string name="add_ingredient_button">Add</string>
     <string name="save_recipe_button">Save</string>
-    <string name="save_recipe_toat">Recipe saved.</string>
+    <string name="save_recipe_toast">Recipe saved.</string>
+    <string name="default_recipe_name">Untitled Recipe</string>
+    <string name="save_recipe_prompt_title">Save changes to recipe?</string>
+    <string name="save_recipe_prompt_message">Do you wish to save any changes you may have just made to this recipe?</string>
+    <string name="save_recipe_prompt_positive_button">Save changes</string>
+    <string name="save_recipe_prompt_negative_button">Discard changes</string>
+
+    <string name="content_description_add_ingredient_button">Add ingredient</string>
+    <string name="content_description_clock_icon">clock icon</string>
+    <string name="recipe_no_ingredients_placeholder_view_mode">This recipe has no ingredients yet.\nAdd some by clicking the edit icon (pen) in the top right corner of your screen to edit the recipe.</string>
+    <string name="recipe_no_ingredients_placeholder_edit_mode">This recipe has no ingredients yet.\nAdd some using the box above.
+        \n\nHint: you can copy/paste in a list of ingredients at once, as long as each ingredient is on a separate line.</string>
+
+    <string name="error_recipe_name_already_used">This recipe name is already in use - please choose another.</string>
+    <string name="error_no_recipe_name_entered">Please enter a name for this recipe</string>
+    <string name="error_adding_recipe_to_meal">Something went wrong trying to add the recipe to this meal - please try again later.</string>
+    <string name="error_loading_tags">Error - unable to load tags for recipe.</string>
+    <string name="error_serves_cant_be_negative">Number of serves cannot be 0 or negative.</string>
+
+    <string name="recipe_prefill_preamble">A recipe has been created and prefilled successfully. However, you should check to make sure all details are consistent and make sense before clicking \"SAVE\".
+        \n\nTIPS
+    </string>
+    <string name="general_new_recipe_hints">\n\n• Try to use generic ingredient names, e.g. \"coriander\" instead of \"roughly chopped fresh coriander.\" Consistent naming allows ingredients to have their quantities combined when added to your shopping list from different recipes, and makes it easier to search recipes by ingredients.</string>
+    <string name="recipe_prefill_hints_general">\n\n• Delete any ingredients you wouldn\'t add to a shopping list, e.g. \"salt and pepper\".
+        \n\n• Some ingredients may have had a substitute or alternative name listed. Edit these ingredients to include only the one you will use.</string>
+    <string name="recipe_prefill_hints_recipe_tin_eats">
+        \n\n• Check for multiple ingredients in one line, and add a separate ingredient for each instead.
+        \n\n• Check for ingredients with a range of quantities, (e.g. \"13-16\") and edit them to choose one.
+        \n\n• Ingredient names beginning with \"[EDIT_ME]\" were unable to be understood. Please edit and simplify them.
+    </string>
+    <string name="recipe_prefill_hints_hello_fresh">\n\n• Quantities of HelloFresh recipes often tend to be in "packets" or similar ambiguous units. These will be counted as part of the ingredient\'s name, so you might want to try and replace these with a weight/volume measurement so they can be consistent with other recipes.
+    </string>
+
+    <!-- Select meal page -->
+    <string name="select_meal_title">Select a meal</string>
+    <string name="replace_meal_button_override">Replace it</string>
+    <string name="replace_meal_button_move">Move it to another recipe</string>
+    <string name="replace_meal_prompt_title">Replace existing meal</string>
+    <string name="replace_meal_button_keep">Keep it</string>
+    <string name="replace_meal_prompt_message">The meal \"%1$s\" already has the recipe \"%2$s.\"
+        \nWhat would you like to do with this recipe?</string>
+    <string name="select_meal_hint">Choose a meal to add \"%1$s\" to:</string>
+
 
     <!-- Shopping list page -->
     <string name="new_list_item_button">Add</string>
     <string name="new_list_item_field_placeholder">New item/s…</string>
+    <string name="no_sl_items_placeholder_text">Your shopping list is empty!\n\nAdd items to it using the text box above, or by adding ingredients directly from a recipe or meal plan.
+    \n\nHint: Someone texted you a shopping list? You can copy/paste in a list of items at once, as long as each item is on a separate line.</string>
     <string name="error_no_list_item_entered">No item entered</string>
     <string name="clear_checked_list_items_title">Clear crossed-off items</string>
     <string name="clear_all_list_items_title">Clear ALL items</string>
@@ -102,32 +166,118 @@
     <string name="clear_list_negative_button">Cancel</string>
     <string name="serves_heading">Serves:</string>
 
+    <string name="export_ingredients_option">Send ingredients to shopping list</string>
+    <string name="export_ingredients_warning">Add all ingredients to the shopping list?\n(Crossed-off items will be ignored).</string>
+    <string name="export_ingredients_positive">Confirm</string>
+    <string name="export_ingredients_success">Ingredients added to shopping list</string>
+    <string name="copy_list_to_clipboard">Copy list to clipboard</string>
+    <string name="share_shopping_list_success">Your shopping list has been copied to the clipboard.\nYou can now paste it wherever you want, e.g. in a text message or email.</string>
+
+    <string name="copy_to_clipboard_dialog_title">Share shopping list</string>
+    <string name="copy_to_clipboard_dialog_message">Do you want to include items you have crossed-off?</string>
+    <string name="copy_to_clipboard_dialog_positive_button">Yes</string>
+    <string name="copy_to_clipboard_dialog_negative_button">Don\'t Include</string>
+
+
     <!-- Meal Plan Fragment -->
     <string name="plans_heading">Meals</string>
     <string name="plan_ingredients_heading">Ingredients needed</string>
     <string name="suggestions_heading">Suggested Recipes</string>
     <string name="meal_plan_notes_placeholder">Add notes…</string>
     <string name="add_day_button_text">Add meal…</string>
-    <string name="choose_plan_recipe_button">Recipe</string>
-    <string name="add_plan_notes_button">Notes</string>
+    <string name="choose_plan_recipe_button">Add Recipe</string>
+    <string name="add_plan_notes_button">Add Notes</string>
     <string name="plan_notes_hint">Click to add notes…</string>
     <string name="delete_meal_warning">Are you sure you want to delete this meal?</string>
     <string name="delete_meal_option">Delete meal</string>
 
     <string name="add_ingredients_to_list_option">Add all ingredients to shopping list</string>
-    <string name="remove_recipes_option">Clear all meal slots</string>
+    <string name="remove_recipes_option">Clear all recipes and notes</string>
     <string name="remove_recipes_warning">Are you sure? All recipes, notes and ingredients will be removed from your plan, but the meal slots will be kept.</string>
     <string name="remove_recipes_positive_button">Clear</string>
     <string name="clear_meal_plans_option">Reset entire meal plan</string>
-    <string name="clear_meal_plans_warning">This will delete all meal slots, recipes and ingredients. You will need to add days/meals before adding more recipes again. \nAre you sure?</string>
+    <string name="clear_meal_plans_warning">This will delete all meal slots, recipes and ingredients. You will need to add days/meals before adding more recipes again.\nAre you sure?</string>
     <string name="clear_meal_plans_positive_button">Reset all</string>
 
-    <string name="export_ingredients_option">Send ingredients to shopping list</string>
-    <string name="export_ingredients_warning">Add all ingredients to the shopping list?\n(Crossed-off items will be ignored).</string>
-    <string name="export_ingredients_positive">Confirm</string>
-    <string name="export_ingredients_success">Ingredients added to shopping list</string>
-    <string name="copy_list_to_clipboard">Copy list to clipboard</string>
-    <string name="toast_copied_list_to_clipboard">Shopping list copied to clipboard.\nYou can now paste wherever you want.</string>
+    <string name="no_meals_placeholder">This meal plan is empty! Click the \"Add Meal\" button below to add your first meal to this plan.</string>
+    <string name="no_plan_ingredients_placeholder">Ingredients used in recipes you add to this meal plan will show up here.</string>
+    <string name="no_suggestions_placeholder">Once you\'ve added some recipes to your plan, other recipes using similar ingredients will be suggested here.\nAdd some recipes to get started!</string>
 
+    <string name="default_meal_title">Monday</string>
+    <string name="default_meal_plan_title">New meal plan</string>
+
+    <string name="error_clearing_meals">Error - something went wrong while clearing meals</string>
+    <string name="error_removing_recipe_from_meal">Error - something went wrong when removing the recipe from this meal.</string>
+    <string name="error_getting_suggestions">Error while generating recipe suggestions. Try adding or removing recipes from the meal plan.</string>
+
+
+    <!-- Multi-location errors -->
+    <string name="unknown_error">Oops, something went wrong. Please submit a bug report to the app\'s creator letting them know what caused this.</string>
+    <string name="error_sending_ingredients_to_shopping_list">Something went wrong while trying to add these ingredients to the shopping list. Please try again later and report this bug if it continues.</string>
+    <string name="error_could_not_add_items">There item you tried to enter was invalid.\nPlease enter the item\'s quantity and unit of measurement (optional) followed by its name.\ne.g. \"500g butter\", \"6 carrots\", or \"avocado\".\n\nNote: for technical reasons, you can\'t use the \"+\" icon in the ingredient\'s name.</string>
+    <string name="error_could_not_access_database">Error - could not connect to database. Please try again later.</string>
+    <string name="content_description_save_notes">Save notes</string>
+    <string name="content_description_edit_notes">Edit meal notes</string>
+    <string name="content_description_delete_notes">Delete meal notes</string>
+    <string name="content_description_delete_recipe_from_meal">Remove recipe from this meal</string>
+    <string name="content_description_drag_handle">Drag to move meal content</string>
+    <string name="content_description_edit_meal_title">Edit name of meal</string>
+    <string name="content_description_save_meal_title">Save name of meal</string>
+    <string name="content_description_delete_meal">Delete this meal</string>
+    <string name="meal_title_hint">Name of meal…</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="settings_title">Settings</string>
+    <string name="content_description_save_ingredient_button">Save ingredient</string>
+    <string name="edit_ing_list_item_hint">Item…</string>
+    <string name="content_description_ingredient_options">Options</string>
+    <string name="edit">Edit</string>
+    <string name="edit_meal_name">Edit meal name</string>
+    <string name="add_to_shopping_list">Add to shopping list</string>
+    <string name="add_to_meal_plan">Add to meal plan</string>
+    <string name="share_recipe">Share recipe</string>
+    <string name="error_sharing_file">Error - could not share recipe/s. Please try again later.</string>
+    <string name="share_recipe_body_text">Your friend has shared some recipes with you! If you have the \"Plan My Shop\" app installed on this device, you can open the attached file to automatically add them to your recipe book.</string>
+    <string name="share_recipe_prompt_title">Share recipe</string>
+    <string name="share_recipe_subject">Add these recipes to your Plan My Shop app!</string>
+    <string name="share_recipe_success">Recipe shared successfully.</string>
+    <string name="share_recipe_default_filename">Shared recipes</string>
+    <string name="import_recipes_title_single">Import Recipe</string>
+    <string name="import_recipes_title_multiple">Import %1$d Recipes</string>
+    <string name="error_importing_recipes">Error - the recipes file you tried to read was invalid.\nPlease ask the sender to try sharing again.</string>
+    <string name="save_all_to_recipe_book_button">Save all to recipe book</string>
+    <string name="import_recipes_help">The recipes below have been shared with you. To add them to your recipe book, simply click the \"Save All\" button below.\n\nIf you want to add any custom tags to these recipes to help identify them, enter them below BEFORE clicking ths \"Save All\" button.</string>
+    <string name="import_tags_heading">These tags will be added to all recipes below:</string>
+    <string name="no_tags_placeholder">No tags set.</string>
+    <string name="shared_recipes_heading">Shared Recipes</string>
+    <string name="import_meal_conflict_title">A recipe with name \"%1$s\" already exists in your recipe book. What would you like to do?</string>
+    <string name="import_conflict_delete_old">Replace the old recipe</string>
+    <string name="import_conflict_delete_new">Discard the new recipe</string>
+    <string name="import_conflict_keep_both">Keep both recipes</string>
+    <string name="imported_successfully">Finished importing recipes.</string>
+    <string name="share_recipes">Share recipes</string>
+    <string name="select_all">Select all</string>
+    <string name="one_recipe_selected">1 recipe selected</string>
+    <string name="many_recipes_selected">%1$d recipes selected</string>
+    <string name="keep_senders_ratings_label">Keep sharer\'s recipe ratings</string>
+    <string name="action_open_favourites">View favourite items</string>
+    <string name="favourite_items_help">Save your regular shopping list items here to quickly add some or all of them again in the future.
+    \n\nAdd some favourites by clicking the \"Add favourites items\" button above.
+    \n\nAny time you want to quickly add these items to your shopping list again, return to this page and click \"Add all\", or click the individual buttons next to each item to add only some.</string>
+    <string name="add_item_to_shopping_list">Add item to shopping list</string>
+    <string name="item_added">Item added.</string>
+    <string name="new_list_item_button_verbose">Add favourites items</string>
+    <string name="add_all_to_shopping_list_button">Add all to shopping list</string>
+    <string name="added">Added</string>
+    <string name="title_favourites">Favourites</string>
+    <string name="favourites_added_success">Favourites items added to shopping list.</string>
+    <string name="content_description_person_1_icon">Person one\'s rating</string>
+    <string name="content_description_person_2_icon">Person two\'s rating</string>
+    <string name="share_shopping_list_subject">Shopping list</string>
+    <string name="share_shopping_list_prompt">Share shopping list using…</string>
+    <string name="suggested_recipes_hint">These recipes share the most ingredients from the \"Ingredients needed\" section above:</string>
+    <string name="recipe_prefill_hint_title">Recipe prefilled successfully</string>
+    <string name="from_scratch_preamble">TIPS</string>
+    <string name="from_scrach_recipe_title">Creating a new recipe</string>
 
 </resources>

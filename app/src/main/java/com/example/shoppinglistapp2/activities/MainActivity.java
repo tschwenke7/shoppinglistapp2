@@ -1,90 +1,114 @@
 package com.example.shoppinglistapp2.activities;
 
+import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 
 import com.example.shoppinglistapp2.R;
-import com.example.shoppinglistapp2.activities.ui.mealplan.MealPlanFragment;
-import com.example.shoppinglistapp2.activities.ui.recipes.RecipesParentFragment;
-import com.example.shoppinglistapp2.activities.ui.recipes.recipelist.RecipeListFragment;
-import com.example.shoppinglistapp2.activities.ui.shoppinglist.ShoppingListFragment;
-import com.google.android.material.tabs.TabLayout;
+import com.example.shoppinglistapp2.activities.importRecipes.ImportRecipesFragmentDirections;
+import com.google.common.io.Files;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import androidx.navigation.fragment.NavHostFragment;
 
-import java.util.Stack;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 
-public class MainActivity extends AppCompatActivity implements MealPlanFragment.Callback, RecipeListFragment.Callback {
+public class MainActivity extends AppCompatActivity {
 
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
-    private SectionsPagerAdapter sectionsPagerAdapter;
-//    private Stack<Integer> viewPagerBackStack = new Stack<>();
-//    private boolean saveToBackStack = true;
-//    private int lastPage = 0;
+
+    private static final String TAG = "T_DBG_MAIN_ACTIVITY";
+    private Activity activity = this;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d(TAG, "onCreate: " + getIntent().toString());
+        if(getIntent() != null) {
+            handleIntent(getIntent());
+        }
+    }
 
-        sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
 
-        viewPager = findViewById(R.id.view_pager);
-        viewPager.setAdapter(sectionsPagerAdapter);
+    public void handleIntent(Intent intent) {
+        String action = intent.getAction();
 
-        tabLayout = findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(0).setIcon(R.drawable.ic_calender);
-        tabLayout.getTabAt(1).setIcon(R.drawable.ic_baseline_menu_book_24);
-        tabLayout.getTabAt(2).setIcon(R.drawable.ic_baseline_format_list_bulleted_24);
+        if(Intent.ACTION_VIEW.equals(action)) {
+            String scheme = intent.getScheme();
+            ContentResolver resolver = getContentResolver();
 
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            if (scheme.compareTo(ContentResolver.SCHEME_CONTENT) == 0) {
+                Uri uri = intent.getData();
+                StringBuilder builder = new StringBuilder();
+
+                try (InputStream inputStream = resolver.openInputStream(uri)){
+
+                    Reader reader = new BufferedReader(
+                            new InputStreamReader(
+                                    inputStream, Charset.forName(StandardCharsets.UTF_8.name())));
+                    int c;
+                    while ((c = reader.read()) != -1) {
+                        builder.append((char) c);
+                    }
+
+                    Log.d(TAG, builder.toString());
+
+                    NavDirections navAction = ImportRecipesFragmentDirections
+                            .actionGlobalImportRecipesFragment(builder.toString());
+
+                    NavHostFragment navHostFragment =
+                            (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentContainerView);
+                    NavController navController = navHostFragment.getNavController();
+
+                    navController
+                            .navigate(navAction);
+
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
             }
+            else if (scheme.compareTo(ContentResolver.SCHEME_FILE) == 0) {
+                Uri uri = intent.getData();
+                try {
+                    Files.toString(new File(uri.getPath()), StandardCharsets.UTF_8);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
 
-            @Override
-            public void onPageSelected(int position) {
-                invalidateOptionsMenu();
+                Log.v("tag" , "File intent detected: " + action + " : " + intent.getDataString() + " : " + intent.getType() + " : ");
+                InputStream input = null;
+                try {
+                    input = resolver.openInputStream(uri);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-        //we don't want multiple copies of the same page on backstack
-//                //so duplicates replace the previous occurrence
-//                if(viewPagerBackStack.contains(lastPage)){
-//                    viewPagerBackStack.remove(Integer.valueOf(lastPage));
-//                }
-//                //add the previous page to the viewpager back stack, unless we navigated by pressing
-//                //the back button (i.e. saveToBackStack == false)
-//                if(saveToBackStack){
-//                    viewPagerBackStack.push(lastPage);
-//                }
-//                lastPage = position;
-
-        //start on shopping list tab
-//        viewPager.setCurrentItem(1, false);
+        }
     }
 
     //enable the back button in action bar to go to previous fragment
     @Override
     public void onBackPressed() {
-//        else if (!viewPagerBackStack.empty()){
-//            saveToBackStack = false;
-//            viewPager.setCurrentItem(viewPagerBackStack.pop());
-//            saveToBackStack = true;
-//        }
         super.onBackPressed();
     }
 
@@ -96,63 +120,4 @@ public class MainActivity extends AppCompatActivity implements MealPlanFragment.
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
     }
 
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-        public SectionsPagerAdapter(FragmentManager fm, int behaviour) {
-            super(fm, behaviour);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            Fragment fragment = null;
-            switch (position) {
-                case 0:
-                    fragment = MealPlanFragment.newInstance();
-                    break;
-                case 1:
-                    fragment = RecipesParentFragment.newInstance();
-                    break;
-                case 2:
-                    fragment = new ShoppingListFragment();
-                    break;
-            }
-            return fragment;
-        }
-        @Override
-        public int getCount() {
-            // Show 3 total pages.
-            return 3;
-        }
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return getResources().getString(R.string.title_meal_plan);
-                case 1:
-                    return getResources().getString(R.string.title_recipes);
-                case 2:
-                    return getResources().getString(R.string.title_shopping_list);
-            }
-            return null;
-        }
-    }
-
-    @Override
-    public void setViewpagerTo(int page) {
-        viewPager.setCurrentItem(page);
-    }
-
-
-
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-        final int[] menuResourceIds = new int[]{
-                R.menu.meal_plan_action_bar,
-                R.menu.recipe_list_action_bar,
-                R.menu.shopping_list_action_bar
-        };
-        super.onCreateOptionsMenu(menu);
-        menu.clear();
-        getMenuInflater().inflate(menuResourceIds[viewPager.getCurrentItem()], menu);
-        return true;
-    }
 }

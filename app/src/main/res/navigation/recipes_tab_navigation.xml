@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_recipe_list">
+
+    <fragment
+        android:id="@+id/nav_recipe_list"
+        android:name="com.example.shoppinglistapp2.activities.mainContentFragments.recipes.recipelist.RecipeListFragment"
+        android:label="@string/title_recipes"
+        tools:layout="@layout/fragment_recipe_list" >
+        <action
+            android:id="@+id/action_recipe_list_to_view_recipe"
+            app:destination="@id/viewRecipeFragment"
+            app:enterAnim="@anim/slide_and_fade_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_and_fade_out_down">
+            <argument
+                android:name="newRecipeFlag"
+                android:defaultValue="false" />
+            <argument
+                android:name="editingFlag"
+                android:defaultValue="false" />
+        </action>
+        <action
+            android:id="@+id/action_recipe_list_to_create_recipe"
+            app:destination="@id/createRecipe"
+            app:enterAnim="@anim/slide_and_fade_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_and_fade_out_down" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/viewRecipeFragment"
+        android:name="com.example.shoppinglistapp2.activities.mainContentFragments.recipes.viewrecipe.ViewRecipeFragment"
+        android:label="View Recipe"
+        tools:layout="@layout/fragment_view_recipe">
+        <argument android:name="recipeId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <argument
+            android:name="newRecipeFlag"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="editingFlag"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <action
+            android:id="@+id/action_viewRecipeFragment_to_selectMealFragment"
+            app:destination="@id/selectMealFragment"
+            app:enterAnim="@anim/slide_and_fade_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_and_fade_out_down" />
+        <argument
+            android:name="prefill_source"
+            app:argType="com.example.shoppinglistapp2.helpers.Domain"
+            android:defaultValue="NOT_SUPPORTED" />
+    </fragment>
+    <fragment
+        android:id="@+id/createRecipe"
+        android:name="com.example.shoppinglistapp2.activities.mainContentFragments.recipes.creator.CreateRecipeFragment"
+        android:label="@string/create_recipe_title"
+        tools:layout="@layout/fragment_create_recipe">
+        <action
+            android:id="@+id/action_create_recipe_to_view_recipe"
+            app:destination="@id/viewRecipeFragment"
+            app:enterAnim="@anim/slide_and_fade_in_up"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_and_fade_out_down">
+            <argument
+                android:name="editingFlag"
+                android:defaultValue="true" />
+            <argument
+                android:name="newRecipeFlag"
+                android:defaultValue="true" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/selectMealFragment"
+        android:name="com.example.shoppinglistapp2.activities.mainContentFragments.recipes.viewrecipe.selectmeal.SelectMealFragment"
+        android:label="fragment_select_meal"
+        tools:layout="@layout/fragment_select_meal" >
+        <argument
+            android:name="selectingRecipeId"
+            app:argType="integer" />
+        <argument
+            android:name="mealPlanId"
+            app:argType="integer" />
+    </fragment>
+
+</navigation>

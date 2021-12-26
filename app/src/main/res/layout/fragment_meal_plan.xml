@@ -3,7 +3,7 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".activities.ui.mealplan.MealPlanFragment"
+    tools:context=".activities.mainContentFragments.mealplan.MealPlanFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -55,14 +55,25 @@
                 android:layout_height="wrap_content"
                 tools:visibility="gone" />
 
+            <TextView
+                android:id="@+id/no_meals_placeholder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/no_meals_placeholder"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/plan_recipes_recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginStart="-8dp"
                 android:nestedScrollingEnabled="false"
                 tools:itemCount="7"
-                tools:listitem="@layout/meal_plan_recyclerview_item" />
+                tools:listitem="@layout/recyclerview_meal_plan_meal_content" />
 
             <Button
                 android:id="@+id/add_day_button"
@@ -107,14 +118,30 @@
 
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/plan_ingredients_recyclerview"
+        <LinearLayout
+            android:id="@+id/layout_ingredients_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"
-            android:scrollbars="vertical"
-            tools:listitem="@layout/meal_plan_ingredient_recyclerview_item"
-            />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/no_plan_ingredients_placeholder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/no_plan_ingredients_placeholder"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/plan_ingredients_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:scrollbars="vertical"
+                tools:listitem="@layout/recyclerview_meal_plan_ingredient" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/layout_suggestions_title"
@@ -141,13 +168,50 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/suggested_recipes_recyclerview"
+        <LinearLayout
+            android:id="@+id/layout_suggestions_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="vertical"
-            tools:itemCount="5"
-            tools:listitem="@layout/meal_plan_suggestion_recyclerview_item"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ProgressBar
+                android:id="@+id/recipe_suggestions_loading_spinner"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="gone" />
+            <TextView
+                android:id="@+id/suggested_recipes_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/suggested_recipes_hint"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                style="@style/hintText"/>
+
+            <TextView
+                android:id="@+id/no_suggestions_placeholder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/no_suggestions_placeholder"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:visibility="visible"
+                tools:visibility="visible" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/suggested_recipes_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical"
+                android:visibility="gone"
+                tools:itemCount="5"
+                tools:listitem="@layout/recyclerview_suggested_recipe"
+                tools:visibility="visible" />
+        </LinearLayout>
+
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
 

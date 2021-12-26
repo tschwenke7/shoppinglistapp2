@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<!--    <SeekBarPreference-->
+<!--        android:title="Larger text mode"-->
+<!--        android:summary="Increase the size of all text"-->
+<!--        app:min="1"-->
+<!--        app:max="2"-->
+<!--        app:seekBarIncrement="1"-->
+<!--        app:key="globalTextSize"-->
+<!--        app:updatesContinuously="true"/>-->
+    <Preference
+        android:title="Shopping List"
+        android:summary="Favourites, change list item size"
+        />
+    <Preference
+        android:title="Recipes"
+        android:summary="Website prefill preferences, ingredients to ignore"
+        />
+
+<!--    <Preference-->
+<!--        android:title="Meal Plans"-->
+<!--        />-->
+</PreferenceScreen>

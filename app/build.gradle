@@ -2,6 +2,14 @@ apply plugin: 'com.android.application'
 apply plugin: "androidx.navigation.safeargs"
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\tschw\\Android store keys\\PlanMyShopKey.jks')
+            storePassword 'planmyshop7'
+            keyAlias 'keyPMS'
+            keyPassword 'planmyshop7'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
@@ -13,17 +21,35 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+        signingConfig signingConfigs.debug
     }
 
     buildTypes {
+        buildFeatures {
+            viewBinding true
+        }
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        abortOnError false
+    }
+
+    configurations {
+        all {
+            exclude module: 'commons-logging'
+        }
     }
 }
 
@@ -37,9 +63,8 @@ dependencies {
 //https://github.com/MrRefactoring/Fraction.java
 
     //Navigation
-    def nav_version = "2.3.3"
-    implementation "androidx.navigation:navigation-fragment:$nav_version"
-    implementation "androidx.navigation:navigation-ui:$nav_version"
+    implementation "androidx.navigation:navigation-fragment:$navVersion"
+    implementation "androidx.navigation:navigation-ui:$navVersion"
 
 
     // Room components
@@ -74,4 +99,19 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
 
+    //Guava background tasks library
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    implementation group: 'com.google.guava', name: 'guava', version: '30.0-android'
+
+    implementation "androidx.room:room-guava:$rootProject.roomVersion"
+
+    implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC3'
+
+    // https://mvnrepository.com/artifact/androidx.preference/preference
+    implementation group: 'androidx.preference', name: 'preference', version: '1.1.1'
+
+    //GSON
+    dependencies {
+        implementation 'com.google.code.gson:gson:2.8.8'
+    }
 }
