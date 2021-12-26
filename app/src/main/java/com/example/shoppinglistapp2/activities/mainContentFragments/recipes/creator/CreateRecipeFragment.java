@@ -166,7 +166,7 @@ public class CreateRecipeFragment extends ContentFragment {
                     Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_LONG).show();
                 }
                 //the thread processing this was interrupted
-                else if (t instanceof ExecutionException) {
+                else if (t instanceof InterruptedException) {
                     t.printStackTrace();
                     Toast.makeText(getContext(), getString(R.string.recipe_url_timeout_error), Toast.LENGTH_LONG).show();
                 }

@@ -37,6 +37,9 @@ public class RecipeWebsiteUtils {
         if (url.contains("hellofresh.com.au") || url.contains("hellofresh.co.nz")){
             return Domain.HELLO_FRESH;
         }
+        if (url.contains("taste.com.au")) {
+            return Domain.TASTE_COM_AU;
+        }
         //otherwise indicate that this domain is not supported
         else{
             return Domain.NOT_SUPPORTED;
@@ -81,6 +84,8 @@ public class RecipeWebsiteUtils {
                     return convertRecipeTinEats(url);
                 case HELLO_FRESH:
                     return convertHelloFresh(url);
+                case TASTE_COM_AU:
+                    return convertTasteComAu(url);
                 default:
                     return null;
             }
@@ -433,5 +438,123 @@ public class RecipeWebsiteUtils {
         return null;
     }
 
+    private static RecipeWithTagsAndIngredients convertTasteComAu(String url) throws IOException {
+        //open webpage
+        Document doc = Jsoup.connect(url).get();
 
+        RecipeWithTagsAndIngredients populatedRecipe = new RecipeWithTagsAndIngredients();
+
+        Recipe recipe = new Recipe();
+        recipe.setServes(1);//default value for serves should be 1
+
+        /* get url */
+        recipe.setUrl(url);
+
+        /* get recipe name - from webpage title, minus the word "recipe" at the end */
+        recipe.setName(doc.title().replace("recipe", "").trim());
+
+        /* get recipe prep time, cook time and serves from recipe-cooking-info section */
+        Element cookingInfo = doc.getElementsByClass("recipe-cooking-info").first();
+        for (Element li : cookingInfo.children()) {
+            String type = li.text().toLowerCase();
+            String amount = li.select("em").text().trim();
+            if (type.contains("prep")) {
+                recipe.setPrepTime(getTimeFromTasteEmContents(amount));
+            }
+            else if (type.contains("cook")) {
+                recipe.setCookTime(getTimeFromTasteEmContents(amount));
+            }
+            else if (type.contains("serving") || type.contains("makes")) {
+                recipe.setServes(Integer.parseInt(amount));
+            }
+        }
+
+
+        /* Read category tag from active nav bar link if applicable */
+        List<Tag> tags = new ArrayList<>();
+        String category = doc.getElementsByClass("nav-bar").first()
+                .getElementsByClass("active").first().text();
+        if (category != null && !category.trim().equalsIgnoreCase("recipes")) {
+            tags.add(new Tag(category));
+        }
+        tags.add(new Tag("Taste.com.au"));
+
+        /* get ingredients */
+        ArrayList<IngListItem> ingredients = new ArrayList<>();
+        Elements ingredientsRows = doc.getElementsByClass("ingredient-description");
+
+        for (Element ingredientRow: ingredientsRows) {
+            String textContent = ingredientRow.text().trim();
+            String ingText;
+            //if there's two amount/units given, e.g. "3/4 cup (200g)" we need to separate them
+            //and only keep one (preferably mass)
+            if(textContent.contains("(")){
+                int bracketStart = textContent.indexOf("(");
+                int bracketEnd = textContent.indexOf(")");
+                String amount1 = textContent.substring(0, bracketStart).trim();
+                String amount2 = textContent.substring(bracketStart + 1, bracketEnd).trim();
+                String ingName = textContent.substring(bracketEnd + 1).trim();
+
+                //check if second amount is a mass unit
+                boolean useSecond = false;
+                for (String unit : IngListItemUtils.massUnits) {
+                    if (amount2.contains(unit)) {
+                        useSecond = true;
+                        break;
+                    }
+                }
+                //use first unit unless second was mass unit
+                if (useSecond) {
+                    ingText = amount2 + " " + ingName;
+                }
+                else {
+                    ingText = amount1 + " " + ingName;
+                }
+            }
+            else {
+                ingText = textContent;
+            }
+
+            //taste often adds extra prep details after a comma, which don't belong on a shopping list
+            //ignore all content after the comma, unless "plus" is the next word indicating more qty
+            int commaIndex = 0;
+            String extraDetails = ingText;
+            do {
+                commaIndex = ingText.indexOf(",", commaIndex + 1);
+                if (commaIndex != -1) {
+                    extraDetails = ingText.substring(commaIndex + 1).trim();
+                }
+            }
+            //check for another comma section after this one if the current comma is followed by "plus"
+            while (commaIndex != -1 && extraDetails.startsWith("plus"));
+
+            //trim off the extra details after the comma, if applicable
+            if (commaIndex != -1) {
+                ingText = ingText.substring(0, commaIndex);
+            }
+
+            //add the ingredient to the list
+            addIngredientToList(ingredients, ingText);
+        }
+
+        //combine all components into populated recipe to return
+        populatedRecipe.setRecipe(recipe);
+        populatedRecipe.setTags(tags);
+        populatedRecipe.setIngredients(ingredients);
+        return populatedRecipe;
+    }
+
+    private static int getTimeFromTasteEmContents (String emContents) {
+        int time = 0;
+        String[] timeUnits = emContents.split(" ");
+        for (String timeUnit : timeUnits) {
+            if (timeUnit.endsWith("h")) {
+                time += 60 * Integer.parseInt(timeUnit.substring(0, timeUnit.length() - 1));
+            }
+            else if (timeUnit.endsWith("m")) {
+                time += Integer.parseInt(timeUnit.substring(0, timeUnit.length() - 1));
+            }
+        }
+        return time;
+    }
 }

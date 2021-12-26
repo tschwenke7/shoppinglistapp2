@@ -57,7 +57,8 @@
     <string name="supported_recipes"><![CDATA[
     <b>Currently supported websites:</b><br>
     • <a href="https://www.recipetineats.com/">RecipeTin Eats</a><br>
-    • <a href="https://www.hellofresh.com.au/recipes/">Hello Fresh</a>
+    • <a href="https://www.hellofresh.com.au/recipes/">Hello Fresh</a><br>
+    • <a href="https://www.taste.com.au/">Taste.com.au</a>
     ]]></string>
     <string name="recipe_website_hint">Paste in link to recipe here…</string>
     <string name="create_recipe_website_button">Prefill recipe from website</string>

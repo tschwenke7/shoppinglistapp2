@@ -76,12 +76,12 @@ public class IngListItemUtils {
             "hot water"
     );
 
-    private static final List<String> wholeItemUnits = Arrays.asList(
+    public static final List<String> wholeItemUnits = Arrays.asList(
             "x",
             "unit"
     );
 
-    private static final List<String> massUnits = Arrays.asList(
+    public static final List<String> massUnits = Arrays.asList(
             "lb",
             "pound",
             "oz",
@@ -97,7 +97,7 @@ public class IngListItemUtils {
 
     );
 
-    private static final List<String> volumeUnits = Arrays.asList(
+    public static final List<String> volumeUnits = Arrays.asList(
             "cup",
             "ml",
             "millilitre",

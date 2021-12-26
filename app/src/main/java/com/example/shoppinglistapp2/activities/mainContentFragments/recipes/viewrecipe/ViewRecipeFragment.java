@@ -126,9 +126,15 @@ public class ViewRecipeFragment extends ContentFragment implements IngredientLis
                     + getString(R.string.recipe_prefill_hints_general)
                     + getString(R.string.recipe_prefill_hints_hello_fresh);
                 break;
+            case TASTE_COM_AU:
+                hintsBody = getString(R.string.recipe_prefill_preamble)
+                    + getString(R.string.general_new_recipe_hints)
+                    + getString(R.string.recipe_prefill_hints_general);
+                break;
             case FROM_SCRATCH:
                 hintsTitle = getString(R.string.from_scrach_recipe_title);
-                hintsBody += getString(R.string.from_scratch_preamble) + getString(R.string.general_new_recipe_hints);
+                hintsBody += getString(R.string.from_scratch_preamble)
+                    + getString(R.string.general_new_recipe_hints);
                 break;
             case NOT_SUPPORTED:
                 return;
